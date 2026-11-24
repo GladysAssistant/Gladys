@@ -37,10 +37,11 @@ async function listenToCustomMqttTopicIfNeeded(device) {
     if (deviceCustomObjectPathParam) {
       objectPath = deviceCustomObjectPathParam.value;
     }
-    // Add listener to list of custom listeners
+    // Add listener to list of custom listeners. handleNewMessage matches the
+    // stored filter with mqttTopicMatches, which handles "+" per level and "#"
+    // according to the MQTT specification.
     this.deviceFeatureCustomMqttTopics.push({
       topic: mqttTopic,
-      regex_key: mqttTopic.replace('+', '[^/]+').replace('#', '.+'),
       device_feature_id: deviceFeatureId,
       object_path: objectPath,
     });

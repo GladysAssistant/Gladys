@@ -53,15 +53,17 @@ class MqttExternalCredentials extends Component {
         <td class="pr-4 text-muted align-top">
           <Text id={labelId} />
         </td>
-        <td>
-          <div class="d-flex align-items-center flex-wrap" style="gap: 0.5rem;">
-            {secret ? (
-              <code data-cy={dataCy}>{showPassword ? value : '••••••••••••••••••••'}</code>
-            ) : (
-              <code data-cy={dataCy}>{value}</code>
-            )}
+        <td class="w-100">
+          <div class="d-flex align-items-center" style="gap: 0.5rem;">
+            <code class="text-break mr-auto" style="min-width: 0;" data-cy={dataCy}>
+              {secret && !showPassword ? '••••••••••••••••••••' : value}
+            </code>
             {secret && (
-              <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onClick={this.togglePassword}>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary py-0 px-2 flex-shrink-0"
+                onClick={this.togglePassword}
+              >
                 <i
                   class={cx('fe', {
                     'fe-eye': !showPassword,
@@ -73,7 +75,7 @@ class MqttExternalCredentials extends Component {
             {canCopy && (
               <button
                 type="button"
-                class="btn btn-sm btn-outline-secondary py-0 px-2"
+                class="btn btn-sm btn-outline-secondary py-0 px-2 flex-shrink-0"
                 onClick={() => this.copyValue(value)}
                 data-cy="z2m-setup-local-mqtt-copy-button"
               >
@@ -81,7 +83,7 @@ class MqttExternalCredentials extends Component {
               </button>
             )}
             {canCopy && this.state.copiedField === value && (
-              <small class="text-success">
+              <small class="text-success flex-shrink-0">
                 <Text id="integration.zigbee2mqtt.setup.modes.local.externalMqtt.copied" />
               </small>
             )}
@@ -91,16 +93,16 @@ class MqttExternalCredentials extends Component {
     );
   };
 
-  render({ configuration = {}, mqttRunning }, { showPassword }) {
+  render({ configuration = {}, mqttRunning, titleClass }, { showPassword }) {
     const { mqttUrl, mqttUsername, mqttPassword } = configuration;
     const hasMqttCredentials = Boolean(mqttPassword);
 
     if (!hasMqttCredentials) {
       return (
         <div data-cy="z2m-mqtt-external-credentials-pending">
-          <div class="form-label">
+          <h3 class={titleClass}>
             <Text id="integration.zigbee2mqtt.setup.modes.local.externalMqtt.title" />
-          </div>
+          </h3>
           <small class="text-muted">
             <Text id="integration.zigbee2mqtt.setup.modes.local.externalMqtt.credentialsPending" />
           </small>
@@ -113,9 +115,9 @@ class MqttExternalCredentials extends Component {
 
     return (
       <div data-cy="z2m-mqtt-external-credentials">
-        <div class="form-label">
+        <h3 class={titleClass}>
           <Text id="integration.zigbee2mqtt.setup.modes.local.externalMqtt.title" />
-        </div>
+        </h3>
         <small class="form-text text-muted mb-3">
           <Text id="integration.zigbee2mqtt.setup.modes.local.externalMqtt.description" />
         </small>
@@ -128,7 +130,7 @@ class MqttExternalCredentials extends Component {
         )}
         <div class="card bg-light border">
           <div class="card-body py-3">
-            <table class="mb-0">
+            <table class="w-100 mb-0">
               <tbody>
                 {this.renderCredentialRow(
                   'integration.mqtt.setup.urlLabel',

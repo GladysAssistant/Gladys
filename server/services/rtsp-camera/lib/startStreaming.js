@@ -10,6 +10,7 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_ROTATION } = require('../../../utils/constants');
 const { isCameraEnabled } = require('../../../utils/device');
+const { createFfmpegStderrTail } = require('../utils/ffmpegStderrTail');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -162,19 +163,25 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       indexFilePath,
     ];
 
+    // Scale down to Full HD at most, never up: "min(1920,iw)" keeps the native width of a
+    // stream narrower than 1920 px (upscaling adds no detail and costs a lot of CPU).
+    // The quotes protect the comma from the filtergraph parser (args are passed without a shell).
+    // "-2" keeps the aspect ratio like "-1" but rounds the height to an even number:
+    // the H264 encoder refuses an odd height ("height not divisible by 2").
+    const scaleFilter = "scale='min(1920,iw)':-2";
     let cameraRotationArgs = '';
     switch (cameraRotationParam.value) {
       case DEVICE_ROTATION.DEGREES_90:
-        cameraRotationArgs = 'scale=1920:-1,transpose=1'; // Full HD resolution & Rotate 90
+        cameraRotationArgs = `${scaleFilter},transpose=1`; // Rotate 90
         break;
       case DEVICE_ROTATION.DEGREES_180:
-        cameraRotationArgs = 'scale=1920:-1,transpose=1,transpose=1'; // Full HD resolution & Rotate 180
+        cameraRotationArgs = `${scaleFilter},transpose=1,transpose=1`; // Rotate 180
         break;
       case DEVICE_ROTATION.DEGREES_270:
-        cameraRotationArgs = 'scale=1920:-1,transpose=2'; // Full HD resolution & Rotate 270
+        cameraRotationArgs = `${scaleFilter},transpose=2`; // Rotate 270
         break;
       default:
-        cameraRotationArgs = 'scale=1920:-1'; // Full HD resolution & Rotate 0
+        cameraRotationArgs = scaleFilter; // Rotate 0
         break;
     }
 
@@ -215,12 +222,23 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       logger.debug(`stdout: ${data}`);
     });
 
+    // We keep the last lines ffmpeg writes on stderr: when it fails, the reason is in them.
+    // The camera URL contains the credentials of the camera: every line is redacted before it is logged.
+    const stderrTail = createFfmpegStderrTail(cameraUrlParam.value);
     liveStreamingProcess.stderr.on('data', (data) => {
-      logger.debug(`stderr: ${data}`);
+      stderrTail.push(data).forEach((line) => logger.debug(`stderr: ${line}`));
     });
 
     liveStreamingProcess.on('close', (code) => {
       logger.debug(`child process exited with code ${code}`);
+      // A non-zero exit code is a failure of ffmpeg (a stopped stream exits with a null code).
+      // The reason is only logged: the error below goes back to the API, without ffmpeg output.
+      if (code) {
+        const reason = stderrTail.getReason();
+        logger.warn(
+          `Camera ${cameraSelector}: ffmpeg live stream failed with code ${code}${reason ? `: ${reason}` : ''}`,
+        );
+      }
       streamingReadyEvent.emit('init-error', new Error(`Child process exited with code ${code}`));
       this.stopStreaming(cameraSelector);
     });

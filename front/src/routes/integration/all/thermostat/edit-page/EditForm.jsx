@@ -11,7 +11,12 @@ import {
 } from '../../../../../../../server/utils/constants';
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
-  MAX_WINDOW_DELAY_SECONDS
+  PILOT_WIRE_STANDBY_ORDERS,
+  DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  MAX_WINDOW_DELAY_SECONDS,
+  parsePilotWireStandbyOrder,
+  supportedStandbyOrder,
+  defaultTempRange
 } from '../../../../../../../server/utils/thermostatConstants';
 
 // The help text of each thermostat type, keyed by its value.
@@ -104,6 +109,8 @@ const SaveError = ({ status, reason }) =>
       {reason === 'incompleteVirtual' && <Text id="integration.thermostat.edit.incompleteVirtualError" />}
       {reason === 'incompleteExternal' && <Text id="integration.thermostat.edit.incompleteExternalError" />}
       {reason === 'incompletePilotWire' && <Text id="integration.thermostat.edit.incompletePilotWireError" />}
+      {reason === 'pilotWireUnread' && <Text id="integration.thermostat.edit.pilotWireUnreadError" />}
+      {reason === 'invertedRange' && <Text id="integration.thermostat.edit.invertedRangeError" />}
       {!reason && <Text id="integration.thermostat.edit.saveError" />}
     </div>
   );
@@ -215,6 +222,31 @@ const EditForm = ({ ...props }) => {
     pickedPilotWire && pickedPilotWire.supportedOrders && pickedPilotWire.supportedOrders.length > 0
       ? pickedPilotWire.supportedOrders
       : null;
+  // The order the server actually sends, with the server's own fallback: a
+  // stored eco on a module that refuses it rests on frost protection, or on off
+  // when the module takes only off. The form shows that one, and saving stores
+  // that same one (actions.js). Null when the module takes none.
+  const standbyOrder = supportedStandbyOrder(
+    parsePilotWireStandbyOrder(props.thermostatEditPilotWireStandbyOrder),
+    supportedOrders && supportedOrders.map(value => ({ value }))
+  );
+  // Forced, the standby order is eco or off, among the orders the module takes.
+  const standbyForced = standbyOrder !== null && standbyOrder !== DEFAULT_PILOT_WIRE_STANDBY_ORDER;
+  const forcedStandbyOptions = PILOT_WIRE_ORDER_OPTIONS.filter(
+    ([value]) =>
+      PILOT_WIRE_STANDBY_ORDERS.includes(value) &&
+      value !== DEFAULT_PILOT_WIRE_STANDBY_ORDER &&
+      (!supportedOrders || supportedOrders.includes(value))
+  ).sort(([a], [b]) => b - a);
+  // The switch forces "another order than frost protection": it only means
+  // something on a module that takes frost protection. On one that does not,
+  // unchecking it stored frost protection, which resolves back to off or eco,
+  // and the switch checked itself again. Such a module is offered the choice
+  // between eco and off directly when it takes both, and nothing to pick when
+  // its standby order can only be one.
+  const frostProtectionTaken = !supportedOrders || supportedOrders.includes(DEFAULT_PILOT_WIRE_STANDBY_ORDER);
+  const showStandbySwitch = frostProtectionTaken && forcedStandbyOptions.length > 0;
+  const showStandbySelect = showStandbySwitch ? standbyForced : forcedStandbyOptions.length > 1;
   const orderOptionsFor = key =>
     PILOT_WIRE_ORDER_OPTIONS.filter(
       ([value]) => !supportedOrders || supportedOrders.includes(value) || value === pilotWireOrders[key]
@@ -241,6 +273,62 @@ const EditForm = ({ ...props }) => {
           id={`integration.thermostat.edit.pilotWireRegulationHelp.${isPilotWireThermostat ? 'heater' : 'gladys'}`}
         />
       </small>
+      {/* The order a heater Gladys regulates rests on once the room is warm
+          enough (spec C.1.1). Frost protection unless forced: some heaters lock
+          their own functions out under it, a towel rail's boost among them. */}
+      {/* Not offered when the module leaves no choice of standby order. */}
+      {isVirtualThermostat && props.thermostatEditPilotWireFeature && (showStandbySwitch || showStandbySelect) && (
+        <div class="mt-2">
+          {showStandbySwitch && (
+            <label class="custom-switch">
+              <input
+                type="checkbox"
+                class="custom-switch-input"
+                checked={standbyForced}
+                onChange={e =>
+                  props.updateThermostatField(
+                    'thermostatEditPilotWireStandbyOrder',
+                    e.target.checked ? forcedStandbyOptions[0][0] : DEFAULT_PILOT_WIRE_STANDBY_ORDER
+                  )
+                }
+              />
+              <span class="custom-switch-indicator" />
+              <span class="custom-switch-description">
+                <Text id="integration.thermostat.edit.pilotWireStandbyForceLabel" />
+              </span>
+            </label>
+          )}
+          {showStandbySwitch && (
+            <small class="form-text text-muted">
+              <Text id="integration.thermostat.edit.pilotWireStandbyForceHelp" />
+            </small>
+          )}
+          {showStandbySelect && (
+            <div class="mt-2">
+              <label class="form-label" htmlFor="thermostat-pilot-wire-standby-order">
+                <Text id="integration.thermostat.edit.pilotWireStandbyOrderLabel" />
+              </label>
+              <select
+                id="thermostat-pilot-wire-standby-order"
+                class="form-control"
+                value={standbyOrder}
+                onChange={e =>
+                  props.updateThermostatField('thermostatEditPilotWireStandbyOrder', Number(e.target.value))
+                }
+              >
+                {forcedStandbyOptions.map(([value, orderKey]) => (
+                  <option value={value} selected={value === standbyOrder}>
+                    <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+                  </option>
+                ))}
+              </select>
+              <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
+                <Text id="integration.thermostat.edit.pilotWireStandbyOrderWarning" />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       {/* Promised by the spec (G): a module that keeps its own programme
           writes orders that are taken as presses of its button, and Gladys
           and the programme take turns. */}
@@ -252,10 +340,11 @@ const EditForm = ({ ...props }) => {
     </div>
   );
 
-  // Picking the real thermostat's setpoint feature adopts the range it
-  // advertises. A Netatmo says 5-30, and the 5-35 default then offered the user
-  // two degrees the device would refuse or silently clamp. Only the untouched
-  // defaults are replaced: a range the user has already narrowed is theirs.
+  // Picking the real thermostat's setpoint feature adopts the bounds it
+  // advertises that narrow the defaults. A Netatmo says 5-30, and the 5-35
+  // default then offered the user two degrees the device would refuse or
+  // silently clamp. Only the untouched defaults are replaced: a range the user
+  // has already narrowed is theirs.
   // The range the chosen real thermostat advertises, when it declares one in the
   // unit this form is in. Adopting it automatically covers the common path, but
   // only while the bounds are still untouched: this hint covers the rest — a
@@ -280,14 +369,26 @@ const EditForm = ({ ...props }) => {
     (!pickedTarget.unit || (pickedTarget.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT ? 'F' : 'C') === formUnit)
       ? { min: String(pickedTarget.min), max: String(pickedTarget.max) }
       : null;
-  // Shown only when the form does not already say the same thing.
+  // What the device's range would narrow the form's range to. A wider device
+  // range is never offered: Matter advertises the cluster's -100-200 °C whatever
+  // the appliance, and one click would hand the dial the range spec F keeps it
+  // out of. An emptied field stands for its default, as it does once saved.
+  const formDefaults = defaultTempRange(formUnit);
+  const formBound = (value, fallback) =>
+    value === '' || value === null || value === undefined || !Number.isFinite(Number(value)) ? fallback : Number(value);
+  const formMin = formBound(props.thermostatEditMinTemp, formDefaults.min);
+  const formMax = formBound(props.thermostatEditMaxTemp, formDefaults.max);
+  const narrowedRange = targetRange
+    ? { min: Math.max(formMin, Number(targetRange.min)), max: Math.min(formMax, Number(targetRange.max)) }
+    : null;
+  // Shown only when the device narrows the form's range, and leaves it a width.
   const rangeDiffers =
-    targetRange &&
-    (targetRange.min !== String(props.thermostatEditMinTemp) ||
-      targetRange.max !== String(props.thermostatEditMaxTemp));
+    !!narrowedRange &&
+    narrowedRange.min < narrowedRange.max &&
+    (narrowedRange.min !== formMin || narrowedRange.max !== formMax);
   const applyDeviceRange = () => {
-    props.updateThermostatField('thermostatEditMinTemp', targetRange.min);
-    props.updateThermostatField('thermostatEditMaxTemp', targetRange.max);
+    props.updateThermostatField('thermostatEditMinTemp', String(narrowedRange.min));
+    props.updateThermostatField('thermostatEditMaxTemp', String(narrowedRange.max));
   };
 
   const chooseTargetFeature = event => {
@@ -346,19 +447,16 @@ const EditForm = ({ ...props }) => {
     if (picked.unit && featureUnit !== (props.thermostatEditTempUnit || 'C')) {
       return;
     }
-    const defaults = { thermostatEditMinTemp: '5', thermostatEditMaxTemp: '35' };
-    if (
-      picked.min !== null &&
-      picked.min !== undefined &&
-      props.thermostatEditMinTemp === defaults.thermostatEditMinTemp
-    ) {
+    // Still at the defaults the form pre-fills, in its own unit (41-95 in °F),
+    // and only a bound that narrows them, the rule the dial follows (spec F):
+    // Matter's -100-200 would otherwise be saved from a fold nobody opened.
+    const defaults = defaultTempRange(props.thermostatEditTempUnit || 'C');
+    const narrowsMin = picked.min !== null && picked.min !== undefined && Number(picked.min) > defaults.min;
+    const narrowsMax = picked.max !== null && picked.max !== undefined && Number(picked.max) < defaults.max;
+    if (narrowsMin && props.thermostatEditMinTemp === String(defaults.min)) {
       props.updateThermostatField('thermostatEditMinTemp', String(picked.min));
     }
-    if (
-      picked.max !== null &&
-      picked.max !== undefined &&
-      props.thermostatEditMaxTemp === defaults.thermostatEditMaxTemp
-    ) {
+    if (narrowsMax && props.thermostatEditMaxTemp === String(defaults.max)) {
       props.updateThermostatField('thermostatEditMaxTemp', String(picked.max));
     }
   };

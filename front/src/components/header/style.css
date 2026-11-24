@@ -1,10 +1,15 @@
 /* Left-sidebar navigation (Horizon): app-level navigation lives in a fixed
    frosted panel on the left, so the top of the screen belongs to the current
    page — on dashboards, to the dashboard switcher pills.
-   Desktop (≥992px): always-visible rail. Below: off-canvas drawer opened by
-   the slim fixed top bar's menu button, closed by backdrop tap or navigation
-   (handleRoute resets showCollapsedMenu). Content offsets live in
-   style/index.css on body.gladys-sidebar-nav, toggled by the component. */
+   Desktop (≥992px): docked rail, collapsible (a per-device preference,
+   utils/sidebarPreference) — collapsed it slides off-canvas and the page
+   takes the width back, a floating button expanding it into the same docked
+   rail again; both are resting states, neither is an overlay. Below 992px:
+   off-canvas drawer over a backdrop, opened by the slim fixed top bar's menu
+   button, closed by backdrop tap, Escape or navigation (handleRoute resets
+   showCollapsedMenu). Content offsets live in style/index.css on
+   body.gladys-sidebar-nav / body.gladys-sidebar-collapsed, toggled by the
+   component. */
 
 .sidebar {
   position: fixed;
@@ -233,6 +238,160 @@
   opacity: 1;
 }
 
+/* Gladys unreachable (see ConnectionLostNotice): same red as the suspended
+   subscription — the app is not doing its job until this is over — but the one
+   notice that cannot live in the rail. It floats above every signed-in page,
+   the full-screen dashboard included, over an opaque surface since anything
+   may scroll under it.
+
+   Where it floats is where nothing is operated (spec H2, "Gladys unreachable"):
+
+   - from 992px (desktop, wall tablet in landscape): at the bottom, centred on
+     the content column. The top of a page is its controls — the dashboard
+     switcher is sticky up there, the scenes have their filters — the bottom
+     is content. Lifted above the footer of a page that has one, and under the
+     toast of the kit (1200), which only passes;
+   - below 992px (phone, tablet in portrait): at the top, under the top bar.
+     Down there the bottom is where everything is operated: the dashboard
+     dock, the bars and the floating buttons of the phone pages, the toast. */
+.connectionNotice {
+  position: fixed;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  /* the middle of what is left of the viewport beside the rail (no rail, no
+     offset: full-screen dashboard) */
+  left: calc(50% + var(--gladys-sidebar-offset, 0px) / 2);
+  transform: translateX(-50%);
+  z-index: 1190;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: max-content;
+  max-width: min(30rem, calc(100vw - var(--gladys-sidebar-offset, 0px) - 1.5rem));
+  padding: 0.5rem 0.5rem 0.5rem 0.8rem;
+  border-radius: 14px;
+  background-color: #fdeeed;
+  border: 1px solid rgba(205, 32, 31, 0.22);
+  box-shadow: 0 10px 30px rgba(16, 22, 38, 0.18);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: #1c2334;
+  animation: connectionNoticeIn 0.22s ease-out;
+}
+
+/* A page with a footer (scene editor, dashboard editor): above it, its
+   buttons stay reachable. */
+:global(body:has(.fixed-bottom)) .connectionNotice {
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Gladys answers again and the page has to be reloaded: no longer an alarm,
+   the amber of the notices that ask for something. */
+.connectionNoticeInterrupted {
+  background-color: #fdf6e3;
+  border-color: rgba(190, 130, 20, 0.3);
+}
+
+.connectionNoticeIcon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  color: #c0392b;
+}
+
+.connectionNoticeInterrupted .connectionNoticeIcon {
+  color: #9a6700;
+}
+
+.connectionNoticeBody {
+  min-width: 0;
+}
+
+.connectionNoticeTitle {
+  font-weight: 600;
+}
+
+.connectionNoticeText {
+  color: rgba(28, 35, 52, 0.72);
+}
+
+.connectionNoticeButton {
+  flex-shrink: 0;
+  min-height: 2rem;
+  padding: 0 0.8rem;
+  border: 1px solid rgba(28, 35, 52, 0.14);
+  border-radius: 999px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.connectionNoticeButton:hover:not([aria-disabled='true']) {
+  background-color: #f4f6fb;
+}
+
+.connectionNoticeButton[aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@keyframes connectionNoticeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Below 992px: at the top. Under the top bar of the phone layout (3.25rem)
+   when there is one — the burger stays reachable, the notice only covers the
+   top of the content — and at the top edge when there is none (full-screen
+   dashboard: the Header renders nothing, and takes its body class with it).
+   Under the navigation drawer and its backdrop (1050): an open drawer covers
+   the notice, which would otherwise sit on its first links for as long as
+   Gladys is away. */
+@media (max-width: 991.98px) {
+  .connectionNotice,
+  :global(body:has(.fixed-bottom)) .connectionNotice {
+    top: calc(0.75rem + env(safe-area-inset-top, 0px));
+    bottom: auto;
+    left: 50%;
+    max-width: min(30rem, calc(100vw - 1.5rem));
+    z-index: 1045;
+    animation-name: connectionNoticeInFromTop;
+  }
+
+  :global(body.gladys-sidebar-nav) .connectionNotice {
+    top: calc(3.75rem + env(safe-area-inset-top, 0px));
+  }
+}
+
+@keyframes connectionNoticeInFromTop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (pointer: coarse) {
+  .connectionNoticeButton {
+    min-height: 2.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connectionNotice {
+    animation: none;
+  }
+}
+
 /* Footer: profile row opening a dropup menu, dark-mode toggle beside it */
 .sidebarFooter {
   position: relative;
@@ -258,6 +417,38 @@
 .profileButton:hover {
   background-color: rgba(28, 35, 52, 0.06);
   text-decoration: none;
+}
+
+/* Collapse control, in the footer beside the dark-mode toggle. It is NOT in
+   the brand row: at 15rem that row is already full with the logo lockup, and
+   the name would ellipsise (worse still with the ~44px coarse-pointer target
+   below). Hidden below the desktop breakpoint — down there the rail is an
+   on-demand drawer whatever the preference says, and the backdrop closes it. */
+.collapseButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 10px;
+  color: rgba(28, 35, 52, 0.62);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.collapseButton:hover {
+  background-color: rgba(28, 35, 52, 0.06);
+  color: #1c2334;
+}
+
+@media (min-width: 992px) {
+  .collapseButton {
+    display: inline-flex;
+  }
 }
 
 .profileName {
@@ -363,10 +554,10 @@
   text-decoration: none;
 }
 
-/* Echo of the instance update notice (see .updateNoticeCard): on mobile the
-   notice sits in the closed menu, so the burger carries a dot in the same
-   amber to signal there is something worth opening it for */
-.mobileTogglerDot {
+/* Echo of the instance update notice (see .updateNoticeCard): whenever the
+   notice sits in a closed drawer, the burger carries a dot in the same amber
+   to signal there is something worth opening it for */
+.togglerDot {
   position: absolute;
   top: 0.55rem;
   right: 0.55rem;
@@ -428,10 +619,105 @@
   }
 }
 
+/* Collapsed rail at desktop widths: the rail slides off-canvas and the page
+   takes the width back (style/index.css) — the expanded state stays the
+   plain docked rail beside the content, so this is NOT the mobile drawer: no
+   backdrop, no raised z-index, no overlay. Same off-canvas mechanics as the
+   drawer though: hidden as well as translated, so the collapsed rail leaves
+   the tab order and the accessibility tree.
+   The slide only exists while the component marks a toggle in progress
+   (body.gladys-sidebar-animating): a rail that merely appears already
+   collapsed — after signing in, when leaving fullscreen — must not be seen
+   sliding out. */
+@media (min-width: 992px) {
+  :global(body.gladys-sidebar-collapsed) .sidebar {
+    transform: translateX(-105%);
+    visibility: hidden;
+  }
+
+  /* expanding: visible at once — the component focuses the chevron in the
+     same pass, and a hidden element cannot take the focus */
+  :global(body.gladys-sidebar-animating) .sidebar {
+    transition: transform 0.22s ease;
+  }
+
+  /* collapsing: hidden only once the slide-out is over */
+  :global(body.gladys-sidebar-animating.gladys-sidebar-collapsed) .sidebar {
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
+  }
+}
+
+/* The floating expand button of the collapsed rail: it lives in the slim
+   gutter the page keeps free on the left (style/index.css), so it overlaps
+   nothing and costs no row. Only rendered while collapsed; hidden below the
+   breakpoint, where the top bar's burger opens the drawer instead. */
+.expandButton {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.375rem;
+  z-index: 1035;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgba(28, 35, 52, 0.08);
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
+  color: #1c2334;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.expandButton:hover {
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #1c2334;
+}
+
+/* Each toggle hands the focus to the other control (see the component), so a
+   plain :focus ring — the reset stylesheet draws one on every focused
+   button — would also light up after a mouse click or a tap. Keep the ring
+   for the keyboard, where this button is the only way back into a collapsed
+   rail and has to be visible when it is focused. */
+.expandButton:focus,
+.collapseButton:focus {
+  outline: none;
+}
+
+.expandButton:focus-visible,
+.collapseButton:focus-visible {
+  outline: 2px solid #467fcf;
+  outline-offset: 2px;
+}
+
+.expandButton .togglerDot {
+  top: 0.4rem;
+  right: 0.4rem;
+}
+
+@media (min-width: 992px) {
+  .expandButton {
+    display: inline-flex;
+  }
+}
+
 @media (pointer: coarse) {
   .navLink,
   .profileButton {
     min-height: 2.75rem;
+  }
+
+  /* The collapsible rail is aimed at wall tablets, which are coarse-pointer
+     at desktop widths: its two controls need the same ~44px target as the
+     rest of the rail. The expand button still clears the 3.25rem gutter at
+     this size (2.75rem + its 0.375rem inset). */
+  .collapseButton,
+  .expandButton {
+    width: 2.75rem;
+    height: 2.75rem;
   }
 }
 
@@ -441,6 +727,8 @@
    would push them back to dark-on-dark, so let them follow the inversion
    like their labels (same exception the glass theme carries). */
 :global(.dark-mode) .sidebar :global(.fe),
-:global(.dark-mode) .mobileTopBar :global(.fe) {
+:global(.dark-mode) .mobileTopBar :global(.fe),
+:global(.dark-mode) .expandButton :global(.fe),
+:global(.dark-mode) .connectionNotice :global(.fe) {
   filter: none;
 }

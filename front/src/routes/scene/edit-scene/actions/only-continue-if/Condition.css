@@ -3,3 +3,9 @@
   display: flex;
   align-items: center;
 }
+
+/* the "Device / Variable" switch of a phone, above the field it switches: the space is on a
+   wrapper, the sheet forms reset the margins of the segmented control itself */
+.sources {
+  margin-bottom: 0.75rem;
+}

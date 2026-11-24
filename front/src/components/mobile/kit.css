@@ -1,0 +1,1587 @@
+/* ==================================================================
+   The phone kit (docs/specs/mobile-pages/README.md): the surfaces the
+   pages share once they leave the desktop layout — a navigation bar,
+   grouped rows, fields, a switch, a segmented control, a bottom bar, a
+   toast. Same vocabulary and values as the scene pages
+   (routes/scene/mobile.css). Every touch target is >= 44px and every
+   field >= 16px. Light colors only: dark mode is the app-wide inversion
+   filter (the exceptions are at the end of this file).
+   ================================================================== */
+
+/* ---------- page ---------- */
+
+/* a page that brings its own navigation bar (FocusPage): it fills the screen under it */
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: #1c2334;
+}
+
+/* the content of a phone page: the width of a phone even in landscape, clear of the notch, and of
+   the bottom bar when the page has one */
+.content {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(32px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
+}
+
+.contentWithBottomBar {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+
+/* no field of a phone page triggers the iOS zoom on focus */
+.page :global(.form-control),
+.page :global(.custom-select),
+.page input,
+.page select,
+.page textarea,
+.content :global(.form-control),
+.content :global(.custom-select),
+.content input,
+.content select,
+.content textarea {
+  font-size: 16px;
+}
+
+/* ---------- navigation bar ---------- */
+
+.navBar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 max(6px, env(safe-area-inset-right, 0px)) 0 max(6px, env(safe-area-inset-left, 0px));
+  background-color: rgba(242, 244, 248, 0.92);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+/* the two sides share what the title leaves: a short title is centered, a long one takes the room
+   down to the width of the buttons before it is cut (the sides never shrink below their content) */
+.navSide {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+}
+
+.navSideEnd {
+  justify-content: flex-end;
+}
+
+.navBack,
+.navBack:hover,
+.navBack:focus {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 0 8px 0 2px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.navBack :global(.fe) {
+  flex-shrink: 0;
+  font-size: 1.5rem;
+}
+
+.navBackLabel {
+  /* the name of the previous page never takes the place of the title */
+  max-width: 7.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navTitle {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0 4px;
+  color: #1c2334;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navIconButton,
+.navIconButton:hover,
+.navIconButton:focus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1.375rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.navTextButton {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.navTextButton:disabled {
+  opacity: 0.45;
+}
+
+/* ---------- titles ---------- */
+
+/* the large title of a list page, as on the scene list */
+.largeTitle {
+  margin: 4px 0 4px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #1c2334;
+}
+
+.lead {
+  margin: 0 0 16px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f5866;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 24px 4px 8px;
+}
+
+.sectionHeader:first-child {
+  margin-top: 8px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f5866;
+}
+
+.sectionAction {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -12px -6px -12px 0;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* the footnote under a group: one size, one gray */
+.footnote {
+  margin: 8px 4px 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+.footnote a {
+  color: #2f5bd8;
+}
+
+/* ---------- groups and rows ---------- */
+
+/* a group is one card holding rows separated by hairlines */
+.group {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.group > * + * {
+  border-top: 1px solid #edf0f5;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row,
+a.row,
+a.row:hover,
+a.row:focus {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 0;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+.group > .row + .row,
+.group > * + .row {
+  border-top: 1px solid #edf0f5;
+}
+
+/* a row that is not in a group is its own card */
+.rowCard,
+a.rowCard,
+a.rowCard:hover,
+a.rowCard:focus {
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+button.row,
+a.row {
+  cursor: pointer;
+}
+
+button.row:active,
+a.row:active {
+  background-color: #f3f5f9;
+}
+
+/* the focus ring of the kit: the accent, inside the row so the card does not clip it — and only
+   for a keyboard (a sheet gives the focus back to the row that opened it) */
+.row:focus,
+.bigButton:focus,
+.chip:focus,
+.segment:focus,
+.navBack:focus,
+.navIconButton:focus,
+.navTextButton:focus,
+.rowIconButton:focus,
+.switchButton:focus,
+.linkButton:focus,
+.dashedButton:focus,
+.sectionAction:focus,
+.fab:focus {
+  outline: none;
+}
+
+.row:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: -2px;
+}
+
+.bigButton:focus-visible,
+.chip:focus-visible,
+.segment:focus-visible,
+.navBack:focus-visible,
+.navIconButton:focus-visible,
+.navTextButton:focus-visible,
+.rowIconButton:focus-visible,
+.linkButton:focus-visible,
+.dashedButton:focus-visible,
+.sectionAction:focus-visible,
+.fab:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: 2px;
+}
+
+.switchButton:focus-visible .switchTrack {
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.35);
+}
+
+.row:disabled {
+  opacity: 0.55;
+}
+
+.rowTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 1.125rem;
+}
+
+.rowTile-neutral {
+  background-color: #eceff4;
+  color: #4f5866;
+}
+
+.rowTile-success {
+  background-color: #def0e2;
+  color: #23764a;
+}
+
+.rowTile-warning {
+  background-color: #fdecdc;
+  color: #9a4f16;
+}
+
+.rowTile-danger {
+  background-color: #fdeaea;
+  color: #b42d2d;
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rowTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  /* a long name takes a second line rather than losing its end */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.rowSub,
+.rowMeta {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #4f5866;
+  overflow-wrap: anywhere;
+}
+
+.rowMeta {
+  font-size: 0.75rem;
+}
+
+/* what the row is set to, on its right ("Living room", "3 months") */
+.rowValue {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 55%;
+  font-size: 0.9375rem;
+  color: #4f5866;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowChevron {
+  flex-shrink: 0;
+  color: #8b93a1;
+  font-size: 1.125rem;
+}
+
+.rowDanger .rowTitle {
+  color: #b42d2d;
+}
+
+.rowAccent .rowTitle {
+  color: #2f5bd8;
+}
+
+/* a 44px round button at the end of a row (delete, play, more) */
+.rowIconButton,
+.rowIconButton:hover,
+.rowIconButton:focus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: 0 -6px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #4f5866;
+  font: inherit;
+  font-size: 1.125rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rowIconButton:active {
+  background-color: rgba(28, 35, 52, 0.07);
+}
+
+.rowIconButtonDanger,
+.rowIconButtonDanger:hover,
+.rowIconButtonDanger:focus {
+  color: #b42d2d;
+}
+
+/* ---------- status pills ---------- */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  min-height: 24px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background-color: #eceff4;
+  color: #3d4656;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.pill-success {
+  background-color: #def0e2;
+  color: #1f6b42;
+}
+
+.pill-warning {
+  background-color: #fdecdc;
+  color: #8a4a0f;
+}
+
+.pill-danger {
+  background-color: #fdeaea;
+  color: #8c1f1f;
+}
+
+.pill-accent {
+  background-color: #e3ebfb;
+  color: #2449b5;
+}
+
+/* ---------- fields ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+
+.fieldLabel {
+  margin: 0 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1c2334;
+}
+
+.fieldHelp {
+  margin: 0 4px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+.fieldError {
+  margin: 0 4px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #b42d2d;
+}
+
+/* one look for every control: 48px high, the same border, radius and focus ring */
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 14px;
+  border: 1px solid #d7dce5;
+  border-radius: 14px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.3;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.textarea {
+  padding: 12px 14px;
+  line-height: 1.4;
+}
+
+.select {
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f5866' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 0.85rem 0.85rem;
+  text-overflow: ellipsis;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: #2f5bd8;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.18);
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  background-color: #f1f3f7;
+  color: #4f5866;
+}
+
+.inputInvalid,
+.inputInvalid:focus {
+  border-color: #c23434;
+  box-shadow: 0 0 0 3px rgba(194, 52, 52, 0.14);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: #8b93a1;
+}
+
+/* a field and what follows it (a unit, a reveal button) are one control */
+.inputGroup {
+  display: flex;
+  align-items: stretch;
+  min-height: 48px;
+  border: 1px solid #d7dce5;
+  border-radius: 14px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.inputGroup:focus-within {
+  border-color: #2f5bd8;
+  box-shadow: 0 0 0 3px rgba(47, 91, 216, 0.18);
+}
+
+.inputGroupInvalid,
+.inputGroupInvalid:focus-within {
+  border-color: #c23434;
+  box-shadow: 0 0 0 3px rgba(194, 52, 52, 0.14);
+}
+
+.inputGroup .input,
+.inputGroup .select {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.inputGroup .select {
+  flex: 0 0 auto;
+  width: auto;
+  border-left: 1px solid #e4e8ef;
+}
+
+.inputAddon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-left: 1px solid #e4e8ef;
+  background: transparent;
+  color: #4f5866;
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+button.inputAddon {
+  cursor: pointer;
+}
+
+/* the search field of a list: a quiet pill, as on the scene list */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  margin: 0 0 12px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background-color: rgba(28, 35, 52, 0.07);
+  color: #4f5866;
+}
+
+.search .searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1c2334;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+/* ---------- switch ---------- */
+
+.switchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 60px;
+  height: 44px;
+  margin: 0 -6px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.switchButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.switchTrack {
+  position: relative;
+  width: 52px;
+  height: 32px;
+  border-radius: 999px;
+  background-color: #c9ced8;
+  transition: background-color 0.2s;
+}
+
+.switchTrackOn {
+  background-color: #2f5bd8;
+}
+
+.switchKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s;
+}
+
+.switchTrackOn .switchKnob {
+  transform: translateX(20px);
+}
+
+/* ---------- segmented control ---------- */
+
+.segmented {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  margin: 0 0 16px;
+  border-radius: 12px;
+  background-color: rgba(28, 35, 52, 0.08);
+}
+
+.segment {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #3d4656;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.segmentSelected {
+  background-color: #fff;
+  color: #1c2334;
+  box-shadow: 0 1px 3px rgba(16, 22, 38, 0.16);
+}
+
+/* ---------- chips (filters) ---------- */
+
+/* the row bleeds to the edges of the screen: --kit-gutter is the gutter of the page it sits in
+   (16px in a kit page; a page with another container sets it) */
+.chips {
+  display: flex;
+  gap: 8px;
+  margin: 0 calc(-1 * var(--kit-gutter, 16px)) 12px;
+  padding: 2px var(--kit-gutter, 16px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #d7dce5;
+  border-radius: 999px;
+  background-color: #fff;
+  color: #1c2334;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chipSelected {
+  border-color: #1c2334;
+  background-color: #1c2334;
+  color: #fff;
+}
+
+/* ---------- buttons ---------- */
+
+.bigButton,
+a.bigButton,
+a.bigButton:hover,
+a.bigButton:focus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background-color: #e9edf3;
+  color: #1c2334;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bigButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.bigButtonPrimary,
+a.bigButtonPrimary,
+a.bigButtonPrimary:hover,
+a.bigButtonPrimary:focus {
+  background-color: #2f5bd8;
+  color: #fff;
+}
+
+.bigButtonDanger {
+  background-color: #c23434;
+  color: #fff;
+}
+
+.bigButtonDangerSoft {
+  background-color: #fdeaea;
+  color: #8c1f1f;
+}
+
+.bigButtonGhost,
+a.bigButtonGhost,
+a.bigButtonGhost:hover,
+a.bigButtonGhost:focus {
+  background-color: transparent;
+  color: #2f5bd8;
+}
+
+.buttonSpinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: kitSpin 0.7s linear infinite;
+}
+
+@keyframes kitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.buttonsRow {
+  display: flex;
+  gap: 8px;
+}
+
+.buttonsRow .bigButton {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.linkButton {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dashedButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  border: 1.5px dashed #9fb4ea;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #2f5bd8;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* the floating "+" of a list page */
+.fab {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right, 0px));
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background-color: #2f5bd8;
+  color: #fff;
+  font-size: 1.625rem;
+  box-shadow: 0 10px 24px rgba(47, 91, 216, 0.4);
+  cursor: pointer;
+}
+
+/* ---------- bottom bar ---------- */
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
+  background-color: rgba(247, 248, 251, 0.94);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-top: 1px solid rgba(28, 35, 52, 0.08);
+}
+
+.bottomBar > * {
+  max-width: 38rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bottomBarRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bottomBarRow .bigButton {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 48px;
+}
+
+.bottomBarRow .bigButtonFit {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+/* "● Unsaved changes" on the left of the bottom bar */
+.dirtyLabel {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #8a4a0f;
+}
+
+.dirtyDot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background-color: #e8892b;
+}
+
+/* an error shown above the buttons of the bottom bar: visible wherever the user is in the page,
+   closable, and never taller than a third of the screen */
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 10px 4px 10px 12px;
+  border-radius: 12px;
+  background-color: #fdeaea;
+  color: #8c1f1f;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.errorBannerText {
+  flex: 1;
+  min-width: 0;
+  max-height: 30vh;
+  max-height: 30dvh;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+
+.errorBannerClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+/* ---------- notices ---------- */
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background-color: #eef2fb;
+  border: 1px solid #d5dff5;
+  color: #1f3a8a;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.notice > :global(.fe) {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 1.125rem;
+}
+
+.noticeBody {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.notice-warning {
+  background-color: #fff4e5;
+  border-color: #f3d3a8;
+  color: #6b3a07;
+}
+
+.notice-danger {
+  background-color: #fdeaea;
+  border-color: #f3c4c4;
+  color: #8c1f1f;
+}
+
+.notice-success {
+  background-color: #e8f5ec;
+  border-color: #c3e3cd;
+  color: #1f6b42;
+}
+
+/* ---------- empty state ---------- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background-color: #e3ebfb;
+  color: #2f5bd8;
+  font-size: 1.5rem;
+}
+
+.emptyTitle {
+  margin: 4px 0 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.emptyText {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f5866;
+}
+
+/* ---------- steps of a flow ---------- */
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.stepsLabel {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4f5866;
+}
+
+.stepsTrack {
+  display: flex;
+  gap: 6px;
+}
+
+.stepsSegment {
+  flex: 1 1 0;
+  height: 4px;
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.12);
+}
+
+.stepsSegmentDone {
+  background-color: #2f5bd8;
+}
+
+/* ---------- sheet content ---------- */
+
+.sheetText {
+  margin: 4px 4px 16px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #3d4656;
+}
+
+/* a form in a sheet sits on a white card */
+.sheetCard {
+  padding: 14px 14px 2px;
+  margin-bottom: 12px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+}
+
+/* ---------- toast ---------- */
+
+.toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  max-width: 38rem;
+  margin: 0 auto;
+  /* rendered on <body>, above any stack of sheets (1060 + 2 per level) */
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 6px 4px 16px;
+  border-radius: 14px;
+  background-color: #1c2334;
+  color: #fff;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  box-shadow: 0 10px 30px rgba(16, 22, 38, 0.3);
+  animation: kitToastIn 0.22s ease-out;
+}
+
+/* above the bottom bar of the page */
+.toastAboveBar {
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Beside the navigation rail of a wide screen, a toast is centred on the page it talks about,
+   not on the viewport (--gladys-sidebar-offset: style/index.css; nothing where there is no rail) */
+@media (min-width: 992px) {
+  .toast {
+    left: calc(var(--gladys-sidebar-offset, 0px) + 16px);
+  }
+}
+
+/* A toast of the app shell (toastAboveDock): below the desktop breakpoint a page may pin
+   something to the bottom of the screen — the dock of the dashboard (which follows
+   --dock-lift, mirrored on <html> by DashboardPage), a bottom bar — and the shell cannot
+   know which. It always sits above where they are. */
+@media (max-width: 991.98px) {
+  .toastAboveDock {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px) + var(--dock-lift, 0px));
+  }
+}
+
+.toastText {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  overflow-wrap: anywhere;
+}
+
+.toastButton {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #a9c0ff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* the close button (×) of a toast which can be dismissed */
+.toastClose {
+  min-width: 44px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.125rem;
+}
+
+@keyframes kitToastIn {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .buttonSpinner {
+    animation: none;
+  }
+
+  .switchTrack,
+  .switchKnob {
+    transition: none;
+  }
+}
+
+/* a phone in landscape: the screen is low, the bars take less of it */
+@media (max-height: 500px) {
+  .bottomBar {
+    padding-top: 6px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bottomBar .bigButton {
+    min-height: 44px;
+  }
+
+  .contentWithBottomBar {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ---------- Glass variant ----------
+   A page that sits on the Horizon wallpaper (the logged-out pages: docs/specs/mobile-pages/
+   auth.md, B) sets the global class `gladys-mobile-glass` on its shell: the surfaces of the kit
+   are then the frosted glass of the theme instead of opaque white — the bars, the groups and
+   their rows, the fields — and the primary action is the ink pill of the Horizon buttons.
+   The tokens (--gl-*) come from the glass scene the shell is in. Sizes, targets and structure do
+   not change: only the material does. */
+
+:global(.gladys-mobile-glass) .navBar {
+  /* frosted, and dense enough for what scrolls under it to stay out of the way of the title
+     where the blur is not rendered */
+  background-color: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+:global(.gladys-mobile-glass) .bottomBar {
+  background-color: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(24px) saturate(1.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+:global(.gladys-mobile-glass) .group,
+:global(.gladys-mobile-glass) .rowCard,
+:global(.gladys-mobile-glass) a.rowCard {
+  background: var(--gl-card-bg, rgba(255, 255, 255, 0.52));
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  border-radius: var(--gl-radius-md, 18px);
+  box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
+}
+
+/* the rows of a group are part of its glass */
+:global(.gladys-mobile-glass) .group > .row,
+:global(.gladys-mobile-glass) .group > a.row {
+  background-color: transparent;
+}
+
+:global(.gladys-mobile-glass) .group > button.row:active,
+:global(.gladys-mobile-glass) .group > a.row:active {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+:global(.gladys-mobile-glass) .group > * + *,
+:global(.gladys-mobile-glass) .group > .row + .row,
+:global(.gladys-mobile-glass) .group > * + .row {
+  border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
+}
+
+/* the fields: the translucent white of the theme's controls, solid once focused */
+:global(.gladys-mobile-glass) .input,
+:global(.gladys-mobile-glass) .select,
+:global(.gladys-mobile-glass) .textarea,
+:global(.gladys-mobile-glass) .inputGroup {
+  border-color: rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+:global(.gladys-mobile-glass) .input:focus,
+:global(.gladys-mobile-glass) .select:focus,
+:global(.gladys-mobile-glass) .textarea:focus,
+:global(.gladys-mobile-glass) .inputGroup:focus-within {
+  border-color: var(--gl-accent, #3d6df0);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(61, 109, 240, 0.15);
+}
+
+:global(.gladys-mobile-glass) .inputInvalid,
+:global(.gladys-mobile-glass) .inputInvalid:focus,
+:global(.gladys-mobile-glass) .inputGroupInvalid,
+:global(.gladys-mobile-glass) .inputGroupInvalid:focus-within {
+  border-color: #c23434;
+  box-shadow: 0 0 0 3px rgba(194, 52, 52, 0.14);
+}
+
+:global(.gladys-mobile-glass) .inputGroup .input,
+:global(.gladys-mobile-glass) .inputGroup .input:focus {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+:global(.gladys-mobile-glass) .input:disabled,
+:global(.gladys-mobile-glass) .select:disabled {
+  background-color: rgba(28, 35, 52, 0.05);
+}
+
+/* a card of fields (`formCard`, the glass card of the page): what sits on it is nested glass —
+   a group of rows loses its own blur and shadow, a chip is a translucent control like a field */
+.formCard {
+  position: relative;
+}
+
+:global(.gladys-mobile-glass) .formCard .group {
+  background: var(--gl-card-nested-bg, rgba(255, 255, 255, 0.4));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+:global(.gladys-mobile-glass) .chip {
+  border-color: rgba(28, 35, 52, 0.12);
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+:global(.gladys-mobile-glass) .chipSelected {
+  border-color: var(--gl-ink, #1c2334);
+  background-color: var(--gl-ink, #1c2334);
+}
+
+/* the buttons join the pill family of the theme: the ink pill for the primary action, a
+   frosted capsule for the others */
+:global(.gladys-mobile-glass) .bigButton,
+:global(.gladys-mobile-glass) a.bigButton {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border, rgba(255, 255, 255, 0.85));
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: var(--gl-shadow-soft, 0 4px 16px rgba(44, 62, 118, 0.09));
+}
+
+:global(.gladys-mobile-glass) .bigButtonPrimary,
+:global(.gladys-mobile-glass) a.bigButtonPrimary,
+:global(.gladys-mobile-glass) a.bigButtonPrimary:hover,
+:global(.gladys-mobile-glass) a.bigButtonPrimary:focus {
+  border-color: transparent;
+  background-color: var(--gl-ink, #1c2334);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(28, 35, 52, 0.22);
+}
+
+:global(.gladys-mobile-glass) .bigButtonPrimary:active {
+  background-color: #2a3550;
+}
+
+:global(.gladys-mobile-glass) .bigButtonPrimary:focus-visible {
+  outline-color: var(--gl-ink, #1c2334);
+}
+
+:global(.gladys-mobile-glass) .errorBanner {
+  border: 1px solid rgba(194, 52, 52, 0.14);
+  border-radius: 16px;
+}
+
+:global(.gladys-mobile-glass) .notice {
+  border-radius: var(--gl-radius-md, 18px);
+}
+
+/* ---------- Dark mode ----------
+   Dark mode is the app-wide inversion (style/dark-mode.css): the light colors above are inverted
+   with the page, which is right for surfaces and text. Colors that carry a meaning are inverted
+   back to themselves, and the global rules written for the classic form controls are undone
+   where they do not fit. */
+
+/* accent and danger blocks keep their own color and their white label */
+:global(.dark-mode) .bigButtonPrimary,
+:global(.dark-mode) .bigButtonDanger,
+:global(.dark-mode) .fab,
+:global(.dark-mode) .stepsSegmentDone {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* an icon in such a block follows its block: outside a glass page dark-mode.css inverts the
+   icons back, which would invert them a third time */
+:global(.dark-mode) .bigButtonPrimary :global(.fe),
+:global(.dark-mode) .bigButtonDanger :global(.fe),
+:global(.dark-mode) .fab :global(.fe) {
+  filter: none;
+}
+
+/* a selected chip is the ink on the page: inverted with it, it is the light chip among the dark
+   ones (inverted back, it would be a dark chip among dark chips) */
+:global(.dark-mode) .chip :global(.fe) {
+  filter: none;
+}
+
+/* the icons of the kit are part of their surface, wherever the page puts them (a sheet and a
+   toast are rendered on <body>) */
+:global(.dark-mode) .row :global(.fe),
+:global(.dark-mode) .navBar :global(.fe),
+:global(.dark-mode) .bottomBar :global(.fe),
+:global(.dark-mode) .notice :global(.fe),
+:global(.dark-mode) .empty :global(.fe),
+:global(.dark-mode) .bigButton :global(.fe),
+:global(.dark-mode) .linkButton :global(.fe),
+:global(.dark-mode) .dashedButton :global(.fe),
+:global(.dark-mode) .inputAddon :global(.fe),
+:global(.dark-mode) .search :global(.fe),
+:global(.dark-mode) .toast :global(.fe) {
+  filter: none;
+}
+
+/* a switch reads by its knob: white on the accent when on, on a dark track when off */
+:global(.dark-mode) .switchTrack {
+  background-color: #4a5263;
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+:global(.dark-mode) .switchTrackOn {
+  background-color: #2f5bd8;
+}
+
+/* dark-mode.css paints every input and select with a solid background and inverts the inputs
+   back: the fields of the kit are light surfaces that invert with the page, like their card */
+:global(.dark-mode) input.input,
+:global(.dark-mode) select.select,
+:global(.dark-mode) textarea.textarea {
+  background-color: #fff !important;
+  color: #1c2334 !important;
+  border-color: #d7dce5 !important;
+  filter: none;
+}
+
+:global(.dark-mode) input.input:focus,
+:global(.dark-mode) select.select:focus,
+:global(.dark-mode) textarea.textarea:focus {
+  border-color: #2f5bd8 !important;
+}
+
+:global(.dark-mode) input.input.inputInvalid,
+:global(.dark-mode) select.select.inputInvalid,
+:global(.dark-mode) textarea.textarea.inputInvalid {
+  border-color: #c23434 !important;
+}
+
+:global(.dark-mode) input.input:disabled,
+:global(.dark-mode) select.select:disabled,
+:global(.dark-mode) textarea.textarea:disabled {
+  background-color: #f1f3f7 !important;
+  color: #4f5866 !important;
+}
+
+:global(.dark-mode) input.input::placeholder,
+:global(.dark-mode) textarea.textarea::placeholder {
+  color: #8b93a1 !important;
+}
+
+/* a native date or time field inverted with the page keeps the light scheme of its icon */
+:global(.dark-mode) input.input[type='date'],
+:global(.dark-mode) input.input[type='time'] {
+  color-scheme: light;
+}
+
+:global(.dark-mode) .inputGroup input.input,
+:global(.dark-mode) .inputGroup select.select {
+  border: 0 !important;
+}
+
+:global(.dark-mode) .inputGroup select.select {
+  border-left: 1px solid #e4e8ef !important;
+}
+
+:global(.dark-mode) .search input.searchInput {
+  background-color: transparent !important;
+  color: #1c2334 !important;
+  border: 0 !important;
+  filter: none;
+}
+
+:global(.dark-mode) .search input.searchInput::placeholder {
+  color: #6b7385 !important;
+}
+
+/* the selected segment stands out lighter than its track once inverted, as it does in light mode */
+:global(.dark-mode) .segmentSelected {
+  background-color: #c9d1de;
+  box-shadow: none;
+}
+
+/* the glass variant: the ink pill inverts WITH the theme into a light pill (like the Horizon
+   primary buttons), and the fields keep the translucent surface the inversion derives from */
+:global(.dark-mode .gladys-mobile-glass) .bigButtonPrimary {
+  filter: none;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input,
+:global(.dark-mode .gladys-mobile-glass) select.select,
+:global(.dark-mode .gladys-mobile-glass) textarea.textarea {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(28, 35, 52, 0.12) !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input:focus,
+:global(.dark-mode .gladys-mobile-glass) select.select:focus {
+  background-color: #fff !important;
+  border-color: #3d6df0 !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input.inputInvalid,
+:global(.dark-mode .gladys-mobile-glass) select.select.inputInvalid {
+  border-color: #c23434 !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) .inputGroup input.input,
+:global(.dark-mode .gladys-mobile-glass) .inputGroup input.input:focus {
+  background-color: transparent !important;
+  border: 0 !important;
+}
+
+:global(.dark-mode .gladys-mobile-glass) input.input:disabled,
+:global(.dark-mode .gladys-mobile-glass) select.select:disabled {
+  background-color: rgba(28, 35, 52, 0.05) !important;
+}

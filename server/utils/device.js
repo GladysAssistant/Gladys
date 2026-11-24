@@ -320,13 +320,13 @@ function normalize(value, currentMin, currentMax, newRangeMin, newRangeMax) {
 }
 
 /**
- * @description Check if variable is number.
- * @param {string|number} n - Variable to check.
- * @returns {boolean} Return true if variable is number.
+ * @description Check if a value is a finite number (strings are not accepted).
+ * @param {*} n - Value to check.
+ * @returns {boolean} True only if n is a finite number.
  * @example isNumeric(12)
  */
 function isNumeric(n) {
-  return !Number.isNaN(parseFloat(n)) && Number.isFinite(n);
+  return Number.isFinite(n);
 }
 
 module.exports = {

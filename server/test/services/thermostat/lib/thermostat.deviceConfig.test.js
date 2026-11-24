@@ -139,6 +139,20 @@ describe('thermostat.deviceConfig - buildParamsConfig', () => {
     expect(config.pilot_wire_regulation).to.equal('gladys');
   });
 
+  // Frost protection by default; eco or off when forced (C.1.1). Anything else —
+  // a comfort, a malformed value — is the default.
+  it('should read the standby order of a heater Gladys regulates', () => {
+    const read = (value) =>
+      buildParamsConfig(deviceWithParams({ THERMOSTAT_PILOT_WIRE_STANDBY_ORDER: value })).pilot_wire_standby_order;
+
+    expect(read('2')).to.equal(2);
+    expect(read('0')).to.equal(0);
+    ['5', '2garbage', '2.5', '-1', ''].forEach((value) => expect(read(value), value).to.equal(1));
+    expect(
+      buildParamsConfig(deviceWithParams({ THERMOSTAT_TEMPERATURE_FEATURE: 'temp' })).pilot_wire_standby_order,
+    ).to.equal(1);
+  });
+
   it('should let the heater regulate a pilot wire on a pilot-wire thermostat, sensor or not', () => {
     const config = buildParamsConfig(
       deviceWithParams({ THERMOSTAT_TYPE: 'pilot-wire', THERMOSTAT_TEMPERATURE_FEATURE: 'temp' }),
@@ -249,6 +263,32 @@ describe('thermostat.deviceConfig - getDeviceConfig', () => {
     expect(config.temp_min).to.equal(5);
     expect(config.temp_max).to.equal(35);
     expect(config.temp_unit).to.equal('C');
+  });
+
+  // In Celsius, 35 °F was also its cooling stop setpoint (C.0).
+  it('should default the min/max in Fahrenheit on a Fahrenheit thermostat', () => {
+    const config = getDeviceConfig(deviceWithParams({ THERMOSTAT_TEMP_UNIT: 'F' }));
+
+    expect(config.temp_min).to.equal(41);
+    expect(config.temp_max).to.equal(95);
+  });
+
+  // Refused at save time, but an older device may still carry one: 8 was read
+  // as the cooling stop setpoint, and the unit asked to cool as hard as it can.
+  it('should read an inverted range as the default one', () => {
+    const config = getDeviceConfig(deviceWithParams({ THERMOSTAT_MIN_TEMP: '25', THERMOSTAT_MAX_TEMP: '8' }));
+
+    expect(config.temp_min).to.equal(5);
+    expect(config.temp_max).to.equal(35);
+  });
+
+  it('should read a range with no width as the default one, in the thermostat unit', () => {
+    const config = getDeviceConfig(
+      deviceWithParams({ THERMOSTAT_MIN_TEMP: '68', THERMOSTAT_MAX_TEMP: '68', THERMOSTAT_TEMP_UNIT: 'F' }),
+    );
+
+    expect(config.temp_min).to.equal(41);
+    expect(config.temp_max).to.equal(95);
   });
 
   it('should leave the manual duration null when unset', () => {

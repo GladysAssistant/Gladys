@@ -1142,6 +1142,20 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: systemController.getSystemInfos,
     },
+    'get /api/v1/system/clock': {
+      authenticated: true,
+      controller: systemController.getClock,
+    },
+    'get /api/v1/system/clock/sync': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.getTimeSyncStatus,
+    },
+    'post /api/v1/system/clock/sync': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.enableTimeSync,
+    },
     'get /api/v1/system/disk': {
       authenticated: true,
       controller: systemController.getDiskSpace,
@@ -1230,6 +1244,11 @@ function getRoutes(gladys) {
     'get /api/v1/energy_contract/template/:provider/:key': {
       authenticated: true,
       controller: energyContractController.getTemplate,
+    },
+    // current price of a meter (section 8.1): declared before `:selector`, like `template`
+    'get /api/v1/energy_contract/current': {
+      authenticated: true,
+      controller: energyContractController.getMeterCurrent,
     },
     'get /api/v1/energy_contract/:selector': {
       authenticated: true,

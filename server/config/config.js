@@ -1,7 +1,13 @@
+const { getDevelopmentDataPaths } = require('../utils/getDevelopmentDataPaths');
+
+// A feature that needs to persist files must derive its path from the folder of `storage`,
+// so that in development it lands in the data folder without any new ignore rule.
+const developmentDataPaths = getDevelopmentDataPaths();
+
 module.exports = {
   development: {
     dialect: 'sqlite',
-    storage: process.env.SQLITE_FILE_PATH || './gladys-development.db',
+    storage: process.env.SQLITE_FILE_PATH || developmentDataPaths.storage,
     logging: false,
     define: {
       underscored: true,
@@ -14,7 +20,7 @@ module.exports = {
       name: 'query',
       max: 5,
     },
-    backupsFolder: './gladys-backups',
+    backupsFolder: developmentDataPaths.backupsFolder,
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
     dockerImage: 'gladysassistant/gladys-4-playground',
     tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',

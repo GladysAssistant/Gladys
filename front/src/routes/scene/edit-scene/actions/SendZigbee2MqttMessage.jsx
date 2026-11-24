@@ -29,7 +29,7 @@ class SendZigbee2MqttMessage extends Component {
                 <Text id="global.requiredField" />
               </span>
             </label>
-            <div style={helpTextStyle}>
+            <div class="small" style={helpTextStyle}>
               <Text id="editScene.actionsCard.zigbee2mqttMessage.topicExplanation" />
             </div>
             <Localizer>
@@ -46,7 +46,7 @@ class SendZigbee2MqttMessage extends Component {
             <label class="form-label">
               <Text id="editScene.actionsCard.zigbee2mqttMessage.messageLabel" />
             </label>
-            <div style={helpTextStyle}>
+            <div class="small" style={helpTextStyle}>
               <Text id="editScene.actionsCard.zigbee2mqttMessage.variablesExplanation" />
             </div>
             <Localizer>

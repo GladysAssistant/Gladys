@@ -9,6 +9,7 @@ import { PARAMS } from '../../../../../../server/services/zwavejs-ui/lib/constan
 import { connect } from 'unistore/preact';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class ZwaveJSUIDeviceBox extends Component {
   componentWillMount() {
@@ -235,9 +236,9 @@ class ZwaveJSUIDeviceBox extends Component {
 
                   {deleteButton && (
                     <>
-                      <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
+                      <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger mr-2">
                         <Text id="integration.zwavejs-ui.deleteButton" />
-                      </button>
+                      </DeleteDeviceButton>
                       <MigrateDeviceButton device={device} onMigrated={getZwaveJSUIDevices} />
                     </>
                   )}

@@ -37,6 +37,7 @@ const DevicePanel = ({ children, ...props }) => (
             {props.xiaomiDevices &&
               props.xiaomiDevices.map((xiaomiDevice, index) => (
                 <Device
+                  key={xiaomiDevice.selector}
                   device={xiaomiDevice}
                   deviceIndex={index}
                   houses={props.houses}

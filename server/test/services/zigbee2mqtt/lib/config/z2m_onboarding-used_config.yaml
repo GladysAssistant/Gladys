@@ -23,5 +23,6 @@ map_options:
         active: '#009900'
         inactive: '#994444'
 frontend:
+  enabled: true
   port: 12000
 onboarding: true

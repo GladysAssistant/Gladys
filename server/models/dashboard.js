@@ -8,6 +8,8 @@ const {
   DASHBOARD_VISIBILITY_LIST,
   DASHBOARD_WIDTH_LIST,
   DASHBOARD_BACKGROUND_SCENE_LIST,
+  DASHBOARD_SECTION_MOBILE_ORDER_LIST,
+  DASHBOARD_BOX_MAX_ITEMS,
 } = require('../utils/constants');
 const {
   WIDGET_KEY_REGEX,
@@ -65,7 +67,10 @@ const boxSchema = Joi.object().keys({
   gauge_color_high: Joi.string(),
   colors: Joi.array().items(Joi.string()),
   show_subscription_prices: Joi.boolean(),
-  // energy-price box: the selector of the contract whose current price is shown
+  // energy-price box: the device selector of the meter whose active contract's price is shown
+  // (empty: the main meter); `energy_contract` is the contract selector of a box saved before
+  // the meter targeting, read as the meter of that contract
+  electric_meter: Joi.string().allow(''),
   energy_contract: Joi.string(),
   period_start_day: Joi.number()
     .integer()
@@ -106,7 +111,7 @@ const boxSchema = Joi.object().keys({
         icon: Joi.string(),
       }),
     )
-    .max(20),
+    .max(DASHBOARD_BOX_MAX_ITEMS.HOUSE_VIEW_PINS),
   // chips box: an ordered list of compact state pills
   chips: Joi.array()
     .items(
@@ -123,7 +128,7 @@ const boxSchema = Joi.object().keys({
         calendar_event_name_filter: Joi.string().allow(''),
       }),
     )
-    .max(20),
+    .max(DASHBOARD_BOX_MAX_ITEMS.CHIPS),
   // actions box: an ordered list of compact command buttons. A device-feature
   // action without a value toggles a binary feature; with a value it sends
   // that value (e.g. COVER_STATE open/stop/close for shutters).
@@ -140,7 +145,7 @@ const boxSchema = Joi.object().keys({
         value: Joi.number(),
       }),
     )
-    .max(20),
+    .max(DASHBOARD_BOX_MAX_ITEMS.ACTIONS),
   // external-widget box: a widget declared by an installed external
   // integration. `settings` is bounded in size but NOT validated against the
   // manifest here — the box schema is static and manifest-independent, the
@@ -185,7 +190,9 @@ const boxSchema = Joi.object().keys({
 // to this shape in a beforeValidate hook, so validation only sees sections.
 // widths holds one integer weight per column (1 = normal, 2 = wide); the
 // beforeValidate hook aligns it to the columns and drops it when every
-// column has the default weight, so it is optional here.
+// column has the default weight, so it is optional here. mobile_order is the
+// order of the section's widgets on a phone, where its columns stack
+// (columns by default, or rows): optional, absent means columns.
 const boxesSchema = Joi.array().items(
   Joi.object().keys({
     columns: Joi.array()
@@ -200,6 +207,7 @@ const boxesSchema = Joi.array().items(
           .max(MAX_COLUMN_WIDTH),
       )
       .max(MAX_COLUMNS_PER_SECTION),
+    mobile_order: Joi.string().valid(...DASHBOARD_SECTION_MOBILE_ORDER_LIST),
   }),
 );
 

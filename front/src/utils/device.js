@@ -69,6 +69,16 @@ const getDeviceFeatureName = (dictionnary, device, feature) => {
   return `${device.name} (${feature.name})`;
 };
 
+// The feature half of getDeviceFeatureName ("Temperature" in "Living room
+// sensor (Temperature)"), for lists that already group features under their
+// device and must not repeat its name on every line
+const getDeviceFeatureDescription = (dictionnary, device, feature) => {
+  if (shouldDisplayDeviceName(device, feature)) {
+    return get(dictionnary, `deviceFeatureCategory.${feature.category}.${feature.type}`) || feature.name;
+  }
+  return feature.name;
+};
+
 const getDeviceName = (device, feature) => {
   const displayDeviceName = shouldDisplayDeviceName(device, feature);
   if (displayDeviceName) {
@@ -114,6 +124,7 @@ const stripDeviceStatesForSave = device => {
 
 export {
   getDeviceFeatureName,
+  getDeviceFeatureDescription,
   getDeviceName,
   getDeviceParam,
   stripDeviceStatesForSave,

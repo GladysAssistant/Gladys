@@ -1,5 +1,8 @@
 import { Text } from 'preact-i18n';
 
+import authStyle from '../auth/style.css';
+import { MobileGroup, MobileRow, kitStyle } from '../mobile';
+
 // Any app implementing TOTP works, but most users don't have one yet: we
 // recommend a few free apps that only require a download (no account, no SMS).
 const TWO_FACTOR_APPS = [
@@ -25,7 +28,65 @@ const TWO_FACTOR_APPS = [
   }
 ];
 
-const TwoFactorAppList = () => (
+// The store of the phone the page is opened on, when it says which one it is
+const getStorePlatform = () => {
+  const userAgent = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+  if (/android/i.test(userAgent)) {
+    return 'android';
+  }
+  if (/iphone|ipad|ipod/i.test(userAgent)) {
+    return 'ios';
+  }
+  return null;
+};
+
+// The apps on a phone (docs/specs/mobile-pages/auth.md, D.3): one row per app. On an iPhone or
+// an Android phone the row opens the app in the store of that phone; elsewhere it carries both
+// links, each one a target of its own
+const MobileTwoFactorAppList = () => {
+  const platform = getStorePlatform();
+  return (
+    <div data-cy="two-factor-apps-mobile">
+      <p class={kitStyle.lead}>
+        <Text id="twoFactorApps.description" />
+      </p>
+      <MobileGroup>
+        {TWO_FACTOR_APPS.map(app =>
+          platform ? (
+            <MobileRow
+              key={app.name}
+              icon="shield"
+              title={app.name}
+              href={app[platform]}
+              target="_blank"
+              rel="noopener noreferrer"
+              dataCy="two-factor-app"
+            />
+          ) : (
+            <MobileRow
+              key={app.name}
+              icon="shield"
+              title={app.name}
+              trailing={
+                <span class={authStyle.mobileStoreLinks}>
+                  <a href={app.ios} target="_blank" rel="noopener noreferrer" aria-label={`${app.name} - iOS`}>
+                    iOS
+                  </a>
+                  <a href={app.android} target="_blank" rel="noopener noreferrer" aria-label={`${app.name} - Android`}>
+                    Android
+                  </a>
+                </span>
+              }
+              dataCy="two-factor-app"
+            />
+          )
+        )}
+      </MobileGroup>
+    </div>
+  );
+};
+
+const DesktopTwoFactorAppList = () => (
   <div class="form-group">
     <p>
       <Text id="twoFactorApps.description" />
@@ -46,5 +107,8 @@ const TwoFactorAppList = () => (
     </ul>
   </div>
 );
+
+// mobile: the phone layout, for the pages that have one (the others keep the list above)
+const TwoFactorAppList = ({ mobile }) => (mobile ? <MobileTwoFactorAppList /> : <DesktopTwoFactorAppList />);
 
 export default TwoFactorAppList;

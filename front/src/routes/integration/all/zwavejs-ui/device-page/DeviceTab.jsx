@@ -111,6 +111,7 @@ class DeviceTab extends Component {
                   zwaveJSUIDevices.length > 0 &&
                   zwaveJSUIDevices.map((device, index) => (
                     <ZwaveJSUIDeviceBox
+                      key={device.external_id}
                       editable
                       saveButton
                       deleteButton

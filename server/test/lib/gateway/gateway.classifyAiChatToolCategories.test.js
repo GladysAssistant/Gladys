@@ -107,6 +107,7 @@ describe('gateway.classifyAiChatToolCategories', () => {
   describe('buildRouterUserContent', () => {
     it('should include the current message', () => {
       expect(buildRouterUserContent('Turn on the light')).to.equal('User message: Turn on the light');
+      expect(buildRouterUserContent('Turn on the light', null)).to.equal('User message: Turn on the light');
     });
 
     it('should include a compact truncated history', () => {
@@ -122,6 +123,21 @@ describe('gateway.classifyAiChatToolCategories', () => {
       expect(content).to.include('Previous assistant reply: a3');
       expect(content).to.include('...');
       expect(content).to.include('User message: And in the kitchen?');
+    });
+
+    it('should keep the exchange a short reply answers when scene messages follow it', () => {
+      const previousQuestions = [
+        { question: 'Ferme les volets ce soir', answer: 'Veux-tu une scène qui ferme les volets à 21 h ?' },
+        { question: null, answer: '[Scene message] Lavage terminé.' },
+        { question: null, answer: '[Scene message] Faut-il éteindre la machine à laver ?' },
+        { question: null, answer: '[Scene message] Séchage terminé.' },
+        { question: null, answer: '[Scene message] Faut-il éteindre le sèche-linge ?' },
+      ];
+      const content = buildRouterUserContent('Oui, vas-y', previousQuestions);
+      expect(content).to.include('Previous user message: Ferme les volets ce soir');
+      expect(content).to.include('Previous assistant reply: Veux-tu une scène qui ferme les volets à 21 h ?');
+      expect(content).to.not.include('Lavage terminé');
+      expect(content).to.include('Previous assistant reply: [Scene message] Faut-il éteindre le sèche-linge ?');
     });
   });
 

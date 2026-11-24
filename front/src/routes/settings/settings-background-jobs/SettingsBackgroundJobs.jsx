@@ -1,17 +1,23 @@
 import SettingsLayout from '../SettingsLayout';
 import JobList from './JobList';
+import MobileJobList from './MobileJobList';
+import { withMobileViewport } from '../../../components/mobile';
 
-const SettingsBackgroundJobsPage = ({ jobs, user, loadNextPage, loadPreviousPage, isFirstPage, isLastPage }) => (
-  <SettingsLayout>
-    <JobList
-      jobs={jobs}
-      user={user}
-      loadNextPage={loadNextPage}
-      loadPreviousPage={loadPreviousPage}
-      isFirstPage={isFirstPage}
-      isLastPage={isLastPage}
-    />
-  </SettingsLayout>
-);
+// On a phone the jobs are rows (docs/specs/mobile-pages/settings-pages.md, D): same props
+const SettingsBackgroundJobsPage = ({ isMobile, ...props }) => {
+  const List = isMobile ? MobileJobList : JobList;
+  return (
+    <SettingsLayout>
+      <List
+        jobs={props.jobs}
+        user={props.user}
+        loadNextPage={props.loadNextPage}
+        loadPreviousPage={props.loadPreviousPage}
+        isFirstPage={props.isFirstPage}
+        isLastPage={props.isLastPage}
+      />
+    </SettingsLayout>
+  );
+};
 
-export default SettingsBackgroundJobsPage;
+export default withMobileViewport(SettingsBackgroundJobsPage);

@@ -1,4 +1,5 @@
 import Select from '../../../../components/form/Select';
+import DevicePickerField from '../../../../components/device/DevicePickerField';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
@@ -30,7 +31,7 @@ class PlayNotification extends Component {
         label: device.name
       }));
 
-      await this.setState({ devicesOptions });
+      await this.setState({ devicesOptions, devices });
       this.refreshSelectedOptions(this.props);
       return devicesOptions;
     } catch (e) {
@@ -94,6 +95,8 @@ class PlayNotification extends Component {
       this.props.updateActionProperty(this.props.path, 'device', null);
     }
   };
+  // on a phone the speaker is picked in the device picker sheet
+  handlePickerChange = ([device]) => this.handleDeviceChange(device ? { value: device } : null);
 
   // null while the request is in flight: the Gladys Plus upsell must not
   // flash before the active provider is known (the unknown-state pattern of
@@ -181,7 +184,7 @@ class PlayNotification extends Component {
     );
   };
 
-  render(props, { selectedDeviceFeatureOption, devicesOptions, volumeDraft, computedVolume, ttsProvider }) {
+  render(props, { selectedDeviceFeatureOption, devicesOptions, devices, volumeDraft, computedVolume, ttsProvider }) {
     const volume = volumeDraft !== undefined ? volumeDraft : props.action.volume;
     const volumeIsSet = volume !== undefined && volume !== null && volume !== '';
     return (
@@ -219,17 +222,26 @@ class PlayNotification extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select
-            styles={{
-              // Fixes the overlapping problem of the component
-              menu: provided => ({ ...provided, zIndex: 2 })
-            }}
-            options={devicesOptions}
-            value={selectedDeviceFeatureOption}
-            onChange={this.handleDeviceChange}
-            className="react-select-container"
-            classNamePrefix="react-select"
-          />
+          <DevicePickerField
+            devices={devices || null}
+            selected={props.action.device ? [props.action.device] : []}
+            onChange={this.handlePickerChange}
+            pickDevices
+            single
+            defaultIcon="speaker"
+          >
+            <Select
+              styles={{
+                // Fixes the overlapping problem of the component
+                menu: provided => ({ ...provided, zIndex: 2 })
+              }}
+              options={devicesOptions}
+              value={selectedDeviceFeatureOption}
+              onChange={this.handleDeviceChange}
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </DevicePickerField>
         </div>
         <div class="form-group">
           <label class={cx('form-label', style.volumeLabel)}>

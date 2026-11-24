@@ -2,6 +2,8 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import AuthLayout from '../../components/auth/AuthLayout';
+import MobileAuthLayout from '../../components/auth/MobileAuthLayout';
+import { withMobileViewport, MobileSteps } from '../../components/mobile';
 import navStyle from '../settings/style.css';
 import style from './style.css';
 
@@ -15,7 +17,7 @@ const STEPS = [
   { href: '/signup/success', textId: 'login.success' }
 ];
 
-const SignupLayout = ({ children, ...props }) => (
+const DesktopSignupLayout = ({ children, ...props }) => (
   <AuthLayout size="wide">
     <div class={cx(navStyle.settingsTabs, style.signupSteps)}>
       {STEPS.map((step, index) => (
@@ -39,4 +41,32 @@ const SignupLayout = ({ children, ...props }) => (
   </AuthLayout>
 );
 
-export default SignupLayout;
+/**
+ * @description The shell of an onboarding screen on a phone
+ * (docs/specs/mobile-pages/onboarding.md, B): the shell of the logged-out pages
+ * (components/auth/MobileAuthLayout.jsx) — the navigation bar with the brand, and the way back
+ * when the step has one — with where the user is in the flow above the content of the step.
+ * Each step brings its own bottom bar.
+ *
+ * currentUrl: the step shown, for the progress — a screen outside the five steps (the Gladys
+ * Plus restore) shows none. backHref: where the back control leads. title: replaces the brand.
+ */
+const MobileSignupLayout = ({ children, currentUrl, backHref, title }) => {
+  const stepIndex = STEPS.findIndex(step => step.href === currentUrl);
+  return (
+    <MobileAuthLayout title={title} backHref={backHref} dataCy="signup-mobile">
+      {stepIndex >= 0 && (
+        <MobileSteps current={stepIndex + 1} total={STEPS.length} label={<Text id={STEPS[stepIndex].textId} />} />
+      )}
+      {children}
+    </MobileAuthLayout>
+  );
+};
+
+// On a phone the onboarding is a flow of full-screen steps
+// (docs/specs/mobile-pages/onboarding.md): same containers, same requests.
+const SignupLayout = ({ isMobile, ...props }) =>
+  isMobile ? <MobileSignupLayout {...props} /> : <DesktopSignupLayout {...props} />;
+
+export { MobileSignupLayout };
+export default withMobileViewport(SignupLayout);

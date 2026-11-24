@@ -52,8 +52,42 @@ const ENERGY_FROM_INDEX_KINDS = {
   },
 };
 
+/**
+ * @description Tell whether a feature is one Gladys derives from a cumulative index (the
+ * 30-minute consumption or production of ENERGY_FROM_INDEX_KINDS, the cost of a consumption):
+ * no integration publishes it, so a rediscovery must keep it.
+ * @param {object} feature - The feature to test.
+ * @returns {boolean} True for a derived energy feature.
+ * @example
+ * isDerivedEnergyFeature({ category: 'energy-sensor', type: 'thirty-minutes-consumption-cost' }); // true
+ */
+const isDerivedEnergyFeature = (feature) =>
+  (feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+    feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST) ||
+  Object.values(ENERGY_FROM_INDEX_KINDS).some(
+    (kind) => feature.category === kind.targetFeatureCategory && feature.type === kind.targetFeatureType,
+  );
+
+/**
+ * @description Tell whether a device param is a cursor of the "index delta -> 30-minute state"
+ * jobs (`ENERGY_INDEX_LAST_PROCESSED`, `ENERGY_PRODUCTION_INDEX_LAST_PROCESSED`, legacy name or
+ * `<name>_<index feature id>`). These params are owned by the core: only the jobs change them
+ * (setParam / destroyParam), a device save never does (docs/specs/energy-hierarchy.md).
+ * @param {string} name - The name of the param.
+ * @returns {boolean} True for an energy cursor param.
+ * @example
+ * isEnergyCursorParam('ENERGY_INDEX_LAST_PROCESSED_1d9e7a4c'); // true
+ */
+const isEnergyCursorParam = (name) =>
+  typeof name === 'string' &&
+  Object.values(ENERGY_FROM_INDEX_KINDS).some(
+    (kind) => name === kind.lastProcessedParamName || name.startsWith(`${kind.lastProcessedParamName}_`),
+  );
+
 module.exports = {
   ENERGY_INDEX_FEATURE_TYPES,
   PRODUCTION_INDEX_FEATURE_TYPES,
   ENERGY_FROM_INDEX_KINDS,
+  isDerivedEnergyFeature,
+  isEnergyCursorParam,
 };

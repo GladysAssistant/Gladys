@@ -290,28 +290,30 @@ function withEnergyParams(device, createdDevice) {
 }
 
 /**
- * @description Bring back the "keep history" choice the user made on the
- * features already created. `keep_history` is published by the integration
- * (it only knows a sensible default), but once the device exists it belongs
- * to the user, like the device name and its room: it is edited on the device
- * screen and must survive a re-publication. The Discovery screen posts this
- * very object back to POST /api/v1/device on the "Update" gesture, which
- * would otherwise restore the integration's value and silently start (or
- * stop) storing that feature's history again. The published list stays
- * untouched: the copy is returned.
+ * @description Bring back the choices the user made on a device already
+ * created: its name and the "keep history" switch of its features. The
+ * integration publishes both (it only knows a sensible default), but once the
+ * device exists they belong to the user, like its room: they are edited on
+ * the device screen and must survive a re-publication. The Discovery screen
+ * posts this very object back to POST /api/v1/device on the "Update" gesture,
+ * which would otherwise rename the device back to the published name and
+ * silently start (or stop) storing a feature's history again. The room needs
+ * nothing: the published device carries none, so the update leaves it alone.
+ * The published list stays untouched: the copy is returned.
  * @param {object} device - The device published by the integration.
  * @param {object} createdDevice - The device already created in DB, or null.
- * @returns {object} The device carrying the user's keep_history choices.
+ * @returns {object} The device carrying the user's name and keep_history choices.
  * @example
- * const device = withUserKeepHistory(publishedDevice, createdDevice);
+ * const device = withUserSettings(publishedDevice, createdDevice);
  */
-function withUserKeepHistory(device, createdDevice) {
+function withUserSettings(device, createdDevice) {
   const createdFeatures = (createdDevice && createdDevice.features) || [];
   const keepHistoryByExternalId = new Map(
     createdFeatures.map((createdFeature) => [createdFeature.external_id, createdFeature.keep_history]),
   );
   return {
     ...device,
+    ...(createdDevice && createdDevice.name ? { name: createdDevice.name } : {}),
     // every feature is copied, created or not, so the whole returned payload
     // is detached from the in-memory published list
     features: device.features.map((feature) =>
@@ -378,10 +380,7 @@ async function getDiscoveredDevices(selector) {
     const deviceWithEnergyFeatures = hasEnergySourceFeature(device)
       ? withEnergyFeatures(device, createdDevice, defaultElectricMeterDeviceFeatureId)
       : device;
-    const deviceToReturn = withUserKeepHistory(
-      withEnergyParams(deviceWithEnergyFeatures, createdDevice),
-      createdDevice,
-    );
+    const deviceToReturn = withUserSettings(withEnergyParams(deviceWithEnergyFeatures, createdDevice), createdDevice);
     return {
       ...deviceToReturn,
       created: createdDevice !== null,

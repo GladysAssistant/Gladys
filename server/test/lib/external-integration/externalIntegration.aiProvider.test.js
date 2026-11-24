@@ -15,6 +15,7 @@ const {
   MAX_AI_CHAT_TOOL_CALLS,
   MAX_AI_CHAT_TOOL_ARGUMENTS_CHARS,
 } = require('../../../lib/external-integration/constants');
+const db = require('../../../models');
 const { buildSupervisor, seedExternalService, TEST_AI_MANIFEST } = require('./testUtils.test');
 
 const seedAiService = (overrides = {}) =>
@@ -380,6 +381,31 @@ describe('externalIntegration.setAiProvider', () => {
     await expect(externalIntegration.setAiProvider('ext-dev-gone-provider')).to.be.rejectedWith(NotFoundError);
     expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(null);
   });
+
+  it('should not undo a later selection of another provider when rolling back', async () => {
+    // provider A is removed while its selection is being re-checked, and
+    // provider B is selected successfully in the meantime: the rollback of
+    // A must not clear B's selection (#3421)
+    const { externalIntegration, variable } = buildSupervisor();
+    const providerB = await seedAiService();
+    const { getBySelector } = externalIntegration;
+    externalIntegration.getBySelector = async (selector) =>
+      selector === 'ext-dev-gone-provider'
+        ? { selector: 'ext-dev-gone-provider', manifest: { type: 'ai' } }
+        : getBySelector.call(externalIntegration, selector);
+    const { setValue } = variable;
+    let bSelection;
+    variable.setValue = async (...args) => {
+      const result = await setValue.apply(variable, args);
+      if (args[1] === 'ext-dev-gone-provider') {
+        bSelection = await externalIntegration.setAiProvider(providerB.selector);
+      }
+      return result;
+    };
+    await expect(externalIntegration.setAiProvider('ext-dev-gone-provider')).to.be.rejectedWith(NotFoundError);
+    expect(bSelection).to.equal(providerB.selector);
+    expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(providerB.selector);
+  });
 });
 
 describe('externalIntegration.uninstall (ai provider cleanup)', () => {
@@ -393,8 +419,8 @@ describe('externalIntegration.uninstall (ai provider cleanup)', () => {
 
   it('should clear a selection written while the uninstall was running', async () => {
     // setAiProvider validated the row before the uninstall deleted it and
-    // wrote the selector in the middle of the uninstall: the cleanup reads
-    // the variable after the row deletion, so it catches that write too
+    // wrote the selector in the middle of the uninstall: the cleanup runs
+    // after the row deletion, so it catches that write too
     const { externalIntegration, variable, system } = buildSupervisor();
     const aiService = await seedAiService();
     const { getGladysBasePath } = system;
@@ -404,6 +430,35 @@ describe('externalIntegration.uninstall (ai provider cleanup)', () => {
     };
     await externalIntegration.uninstall(aiService.selector);
     expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(null);
+  });
+
+  it('should keep a selection of another provider written while the cleanup runs', async () => {
+    // provider A is selected and being uninstalled, and provider B is
+    // selected successfully right before A's cleanup deletes the variable
+    // (after any read it could have done): the cleanup of A must not clear
+    // B's selection (#3421)
+    const { externalIntegration, variable } = buildSupervisor();
+    const providerA = await seedAiService();
+    const providerB = await seedAiService({
+      name: 'ext-dev-other-ai-provider',
+      selector: 'ext-dev-other-ai-provider',
+    });
+    await externalIntegration.setAiProvider(providerA.selector);
+    const { destroy } = db.Variable;
+    let bSelection;
+    sinon.stub(db.Variable, 'destroy').callsFake(async (options) => {
+      if (options.where.name === SYSTEM_VARIABLE_NAMES.AI_PROVIDER && bSelection === undefined) {
+        bSelection = await externalIntegration.setAiProvider(providerB.selector);
+      }
+      return destroy.call(db.Variable, options);
+    });
+    try {
+      await externalIntegration.uninstall(providerA.selector);
+    } finally {
+      sinon.restore();
+    }
+    expect(bSelection).to.equal(providerB.selector);
+    expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(providerB.selector);
   });
 
   it('should keep the AI provider selection when uninstalling another integration', async () => {

@@ -111,8 +111,8 @@ function parseLightState(binding, message) {
     default:
       return toBinaryState(
         applyValueTemplate(config.state_value_template, message),
-        config.payload_on || DEFAULT_PAYLOADS.PAYLOAD_ON,
-        config.payload_off || DEFAULT_PAYLOADS.PAYLOAD_OFF,
+        config.payload_on ?? DEFAULT_PAYLOADS.PAYLOAD_ON,
+        config.payload_off ?? DEFAULT_PAYLOADS.PAYLOAD_OFF,
       );
   }
 }
@@ -165,14 +165,14 @@ function parseHomeAssistantIncomingState(binding, message) {
     case 'switch':
       return toBinaryState(
         applyValueTemplate(config.value_template, message),
-        config.state_on || config.payload_on || DEFAULT_PAYLOADS.PAYLOAD_ON,
-        config.state_off || config.payload_off || DEFAULT_PAYLOADS.PAYLOAD_OFF,
+        config.state_on ?? config.payload_on ?? DEFAULT_PAYLOADS.PAYLOAD_ON,
+        config.state_off ?? config.payload_off ?? DEFAULT_PAYLOADS.PAYLOAD_OFF,
       );
     case 'binary_sensor': {
       const state = toBinaryState(
         applyValueTemplate(config.value_template, message),
-        config.payload_on || DEFAULT_PAYLOADS.PAYLOAD_ON,
-        config.payload_off || DEFAULT_PAYLOADS.PAYLOAD_OFF,
+        config.payload_on ?? DEFAULT_PAYLOADS.PAYLOAD_ON,
+        config.payload_off ?? DEFAULT_PAYLOADS.PAYLOAD_OFF,
       );
       if (state === undefined) {
         return undefined;

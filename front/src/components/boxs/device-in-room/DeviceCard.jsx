@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'preact/hooks';
 import DeviceRow from './DeviceRow';
 import LightDeviceFeature from './device-features/light/LightDeviceFeature';
 import { buildDeviceRows } from './device-features/light/lightFeatures';
@@ -30,6 +31,24 @@ const DeviceCard = ({ children, ...props }) => {
   // other feature keeps the row it has always had.
   const rows = buildDeviceRows(deviceFeatures);
 
+  // Each rendered row is tagged with the selector(s) of the feature(s) it
+  // shows, so the widget editor can point at one row of the live preview
+  // (EditDevices). The rows are <tr>s rendered by 25+ feature components,
+  // hence a tag set from here rather than in each of them; it is skipped
+  // whenever rows and <tr>s don't line up one to one (a feature component
+  // rendering nothing), rather than tagging the wrong row.
+  const tbodyRef = useRef(null);
+  useLayoutEffect(() => {
+    const tbody = tbodyRef.current;
+    if (!tbody || loading || tbody.children.length !== rows.length) {
+      return;
+    }
+    rows.forEach((row, index) => {
+      const selectors = row.features ? row.features.map(feature => feature.selector) : [row.deviceFeature.selector];
+      tbody.children[index].setAttribute('data-feature-selectors', selectors.join(' '));
+    });
+  });
+
   return (
     <div class="card">
       {boxTitle && (
@@ -61,7 +80,7 @@ const DeviceCard = ({ children, ...props }) => {
               the widget's icon/name/control triplet: the devices page shares
               device-list-table but lays its rows out on six columns. */}
           <table class="table card-table table-vcenter device-list-table device-widget-table">
-            <tbody>
+            <tbody ref={tbodyRef}>
               {loading
                 ? placeholderRows.map((_, index) => (
                     <tr key={`placeholder-${index}`}>

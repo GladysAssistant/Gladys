@@ -9,11 +9,20 @@ const ADAPTER_NO_RESPONSE_MESSAGES = [
   'failed to start adapter connection to firmware', // deconz
 ];
 
+// The ember driver refuses the firmware of the dongle, "Adapter EZSP protocol version (12) is not supported by Host
+// [13-19]."
+const EZSP_PROTOCOL_VERSION_REGEX = /Adapter EZSP protocol version \((\d+)\) is not supported by Host \[(\d+)-\d+\]/;
+
 // The first matching line explains why Zigbee2mqtt does not start, its code selects the message shown to the user
 const KNOWN_ERROR_PATTERNS = [
   {
+    // Only a firmware older than the ember driver supports (EmberZNet before 7.4): the legacy ezsp driver runs it.
+    // A newer one is refused by both drivers, its raw error is shown.
     code: 'EZSP_PROTOCOL_VERSION',
-    test: (line) => line.includes('Adapter EZSP protocol version') && line.includes('is not supported by Host'),
+    test: (line) => {
+      const match = line.match(EZSP_PROTOCOL_VERSION_REGEX);
+      return match !== null && Number(match[1]) < Number(match[2]);
+    },
   },
   {
     // A network coordinator out of reach, logged by its driver (namespace "zh:") before the driver gives up. Not by
@@ -51,11 +60,17 @@ const LOGS_READING_TIMEOUT_IN_MS = 5 * 60 * 1000;
  * await z2m.readZ2mContainerLogs('abc123', 1700000000);
  */
 async function readZ2mContainerLogs(containerId, since) {
+  // The installation these logs come from: replaced by a newer one (another coordinator saved meanwhile), its error
+  // does not describe the coordinator now configured. The run too: restarted or stopped since, the error of this run
+  // would replace what the new one tells, or show on a Zigbee2mqtt the user stopped
+  const { installedConfig, z2mRun } = this;
+  // Why Zigbee2mqtt does not start, null when the logs do not tell
+  let containerError = null;
   try {
     // The stream ends when the container stops, as Zigbee2mqtt does when it fails to start. Every line since the
     // restart: the cause can be followed by hundreds of lines, like the stream dump of zstack failing to open a socket
     const stream = await this.gladys.system.getContainerLogs(containerId, { follow: true, since, tail: 'all' });
-    await new Promise((resolve) => {
+    containerError = await new Promise((resolve) => {
       let leftover = '';
       let started = false;
       let knownError = null;
@@ -113,15 +128,14 @@ async function readZ2mContainerLogs(containerId, since) {
         }
         if (started || this.zigbee2mqttConnected) {
           // Zigbee2mqtt runs: whatever was logged did not prevent it from starting
-          this.z2mContainerError = null;
+          resolve(null);
         } else if (knownError !== null) {
-          this.z2mContainerError = knownError;
+          resolve(knownError);
         } else if (lastLoggedError !== null) {
-          this.z2mContainerError = { code: null, message: lastLoggedError };
+          resolve({ code: null, message: lastLoggedError });
         } else {
-          this.z2mContainerError = null;
+          resolve(null);
         }
-        resolve();
       };
 
       timeout = setTimeout(finish, LOGS_READING_TIMEOUT_IN_MS);
@@ -148,7 +162,22 @@ async function readZ2mContainerLogs(containerId, since) {
     });
   } catch (e) {
     logger.warn(`Zigbee2mqtt: failed to read container logs: ${e.message}`);
-    this.z2mContainerError = null;
+  }
+
+  // Nothing written: its error would fail the installation now running (see waitForZigbee2mqtt), and switching to ezsp
+  // would change the coordinator configured since. The reader of the new installation tells what it finds.
+  if (this.installedConfig !== installedConfig) {
+    logger.info('Zigbee2mqtt: logs of a replaced installation, ignored');
+    return;
+  }
+  if (this.z2mRun !== z2mRun) {
+    logger.info('Zigbee2mqtt: logs of a run restarted or stopped since, ignored');
+    return;
+  }
+
+  this.z2mContainerError = containerError;
+  if (containerError && containerError.code === 'EZSP_PROTOCOL_VERSION') {
+    await this.fallbackToEzsp();
   }
 
   this.emitStatusEvent();

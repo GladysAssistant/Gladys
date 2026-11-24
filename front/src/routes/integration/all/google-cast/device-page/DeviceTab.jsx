@@ -111,6 +111,7 @@ class DeviceTab extends Component {
                   googleCastDevices.length > 0 &&
                   googleCastDevices.map((device, index) => (
                     <GoogleCastDeviceBox
+                      key={device.external_id}
                       editable
                       saveButton
                       deleteButton

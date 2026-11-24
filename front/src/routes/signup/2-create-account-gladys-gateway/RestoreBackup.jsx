@@ -3,12 +3,13 @@ import cx from 'classnames';
 
 import { RequestStatus } from '../../../utils/consts';
 import RestoreBackupRow from './RestoreBackupRow';
+import MobileRestoreBackup from './MobileRestoreBackup';
 import style from '../style.css';
 
 // Pill rows instead of a table (same grammar as the settings containers
 // card): date + size stack on the left, the restore action sits on the
 // right — no horizontal overflow in the narrow auth column.
-const RestoreBackup = ({ children, ...props }) => (
+const DesktopRestoreBackup = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h2 class="page-title">
@@ -63,5 +64,8 @@ const RestoreBackup = ({ children, ...props }) => (
     </div>
   </div>
 );
+
+const RestoreBackup = props =>
+  props.mobile ? <MobileRestoreBackup {...props} /> : <DesktopRestoreBackup {...props} />;
 
 export default RestoreBackup;

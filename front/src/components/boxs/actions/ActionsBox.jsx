@@ -8,6 +8,12 @@ import { WEBSOCKET_MESSAGE_TYPES, COVER_STATE } from '../../../../../server/util
 import { DeviceFeatureCategoriesIcon } from '../../../utils/consts';
 import { isCoverStateFeature, isToggleableBinaryFeature } from './actionableFeatures';
 import style from './style.css';
+import {
+  COMMAND_CLIENT_ID,
+  getCommandNotSentCause,
+  sendDeviceFeatureValue,
+  StatesToGoBackTo
+} from '../../../utils/deviceCommand';
 
 const SCENE_START_FEEDBACK_MS = 1200;
 
@@ -18,6 +24,9 @@ const COVER_COMMAND_ICONS = {
 };
 
 class ActionsBox extends Component {
+  // the state each command on its way goes back to if it cannot be sent
+  statesToGoBackTo = new StatesToGoBackTo();
+
   refreshData = async () => {
     const actions = this.props.box.actions || [];
     try {
@@ -65,6 +74,12 @@ class ActionsBox extends Component {
     });
   };
 
+  // A state from Gladys (the websocket, or a rollback of DeviceCommandError.jsx)
+  onDeviceNewState = payload => {
+    this.statesToGoBackTo.keepStateFromGladys(payload.device_feature_selector, { last_value: payload.last_value });
+    this.updateDeviceStateWebsocket(payload);
+  };
+
   runAction = async (action, index) => {
     if (this.state[`pending-${index}`]) {
       return;
@@ -91,8 +106,33 @@ class ActionsBox extends Component {
           value = feature.last_value === 1 ? 0 : 1;
         }
         if (value !== null) {
-          await this.props.httpClient.post(`/api/v1/device_feature/${action.device_feature}/value`, { value });
+          // Displayed before the request leaves: the answer to it comes before the device
+          // is driven, and a failure reported by Gladys (a state flagged `rollback`, see
+          // DeviceCommandError.jsx) can come back first — applied after the request, the
+          // optimistic value would overwrite the real state it had just been given.
+          const command = this.statesToGoBackTo.start(action.device_feature, { last_value: feature.last_value });
           this.updateDeviceStateWebsocket({ device_feature_selector: action.device_feature, last_value: value });
+          let failure = null;
+          try {
+            await sendDeviceFeatureValue(this.props.httpClient, action.device_feature, value);
+          } catch (e) {
+            failure = e;
+          }
+          const stateToGoBackTo = this.statesToGoBackTo.finish(command);
+          if (failure) {
+            // The request failed: back to the last state known, and said like a device
+            // Gladys could not drive, with its own cause (DeviceCommandError.jsx)
+            this.props.session.dispatcher.dispatch(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR, {
+              client_id: COMMAND_CLIENT_ID,
+              cause: getCommandNotSentCause(failure),
+              device_feature_selector: action.device_feature,
+              // the name the user reads on the button
+              device_name: this.getActionLabel(action),
+              value,
+              last_value: stateToGoBackTo.last_value
+            });
+            throw failure;
+          }
         }
       }
     } catch (e) {
@@ -103,10 +143,7 @@ class ActionsBox extends Component {
 
   componentDidMount() {
     this.refreshData();
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket
-    );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onDeviceNewState);
   }
 
   componentDidUpdate(previousProps) {
@@ -116,10 +153,7 @@ class ActionsBox extends Component {
   }
 
   componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket
-    );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onDeviceNewState);
   }
 
   getActionIcon = action => {

@@ -4,6 +4,9 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 
+const { WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ConflictError } = require('../../../../utils/coreErrors');
+
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 // Our own container, named after the requested filter
@@ -25,6 +28,13 @@ describe('zigbee2mqtt reset', () => {
   let zigbee2MqttManager;
   let gladys;
   let fsRmStub;
+
+  // What was sent to the setup page
+  const sentInstallProgresses = () =>
+    gladys.event.emit
+      .getCalls()
+      .filter(({ args }) => args[1].type === WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.INSTALL_PROGRESS)
+      .map(({ args }) => args[1].payload);
 
   beforeEach(() => {
     fsRmStub = fake.resolves(null);
@@ -75,6 +85,12 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.zigbee2mqttConnected = true;
     zigbee2MqttManager.z2mPermitJoin = true;
     zigbee2MqttManager.coordinatorFirmware = '20240101';
+    zigbee2MqttManager.z2mVersion = '2.14.2';
+    zigbee2MqttManager.configured = true;
+    zigbee2MqttManager.stopped = true;
+    zigbee2MqttManager.stoppedAt = '2026-11-17T08:00:00.000Z';
+    zigbee2MqttManager.updatePending = true;
+    zigbee2MqttManager.deviceCount = 12;
     zigbee2MqttManager.z2mContainerError = { message: 'some error' };
     zigbee2MqttManager.mqttConnectionError = { code: 'BAD_CREDENTIALS', message: null };
     zigbee2MqttManager.discoveredDevices = { '0x1234': { friendly_name: 'lamp' } };
@@ -93,8 +109,8 @@ describe('zigbee2mqtt reset', () => {
     assert.calledTwice(gladys.system.stopContainer);
     assert.calledTwice(gladys.system.removeContainer);
 
-    // Should destroy all 15 configuration variables
-    assert.callCount(gladys.variable.destroy, 15);
+    // Should destroy all 16 configuration variables
+    assert.callCount(gladys.variable.destroy, 18);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_BACKUP', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
@@ -110,6 +126,7 @@ describe('zigbee2mqtt reset', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'GLADYS_MQTT_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_MQTT_VERSION', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_Z2M_VERSION', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_GENERATED', serviceId);
 
     // Should call fs.rm on the zigbee2mqtt folder
     assert.calledOnce(gladys.system.getGladysBasePath);
@@ -131,6 +148,12 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(false);
     expect(zigbee2MqttManager.coordinatorFirmware).to.equal(null);
+    expect(zigbee2MqttManager.z2mVersion).to.equal(null);
+    expect(zigbee2MqttManager.configured).to.equal(false);
+    expect(zigbee2MqttManager.stopped).to.equal(false);
+    expect(zigbee2MqttManager.stoppedAt).to.equal(null);
+    expect(zigbee2MqttManager.updatePending).to.equal(false);
+    expect(zigbee2MqttManager.deviceCount).to.equal(null);
     expect(zigbee2MqttManager.z2mContainerError).to.equal(null);
     expect(zigbee2MqttManager.mqttConnectionError).to.equal(null);
     expect(zigbee2MqttManager.startingTimer).to.equal(null);
@@ -142,6 +165,100 @@ describe('zigbee2mqtt reset', () => {
 
     // Should emit status event
     assert.called(gladys.event.emit);
+  });
+
+  it('should forget the outcome of the last installation', async () => {
+    zigbee2MqttManager.installation = {
+      state: 'failed',
+      kind: 'install',
+      phases: [{ key: 'pull_z2m', state: 'failed', progress: 10 }],
+      progress: 5,
+      error: { code: 'NO_ANSWER', message: null },
+      durationMs: 1000,
+    };
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.installation).to.deep.equal({
+      state: 'idle',
+      kind: null,
+      phases: [],
+      progress: 0,
+      error: null,
+      durationMs: null,
+    });
+    // The setup page stops showing its failure
+    const sentInstallations = sentInstallProgresses().map(({ installation }) => installation);
+    expect(sentInstallations[sentInstallations.length - 1]).to.equal(zigbee2MqttManager.installation);
+  });
+
+  it('should forget the outcome of an installation that finished while the integration was reset', async () => {
+    // Running when disconnect checked it
+    zigbee2MqttManager.installation = {
+      state: 'running',
+      kind: 'install',
+      phases: [],
+      progress: 5,
+      error: null,
+      durationMs: null,
+    };
+    gladys.variable.destroy = fake(async () => {
+      zigbee2MqttManager.installation.state = 'done';
+    });
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.installation.state).to.equal('idle');
+  });
+
+  it('should keep a running installation, which tells its own outcome', async () => {
+    const installation = { state: 'running', kind: 'install', phases: [], progress: 5, error: null, durationMs: null };
+    zigbee2MqttManager.installation = installation;
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.installation).to.equal(installation);
+  });
+
+  it('should forget the outcome of the last prefetch', async () => {
+    zigbee2MqttManager.prefetch = {
+      state: 'failed',
+      progress: 0,
+      freeBytes: 100000000,
+      neededBytes: 236400000,
+      error: { code: 'NOT_ENOUGH_DISK_SPACE', message: null },
+    };
+    // Its failure was just sent: the idle prefetch would be left waiting
+    zigbee2MqttManager.emitInstallProgress();
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.prefetch).to.deep.equal({
+      state: 'idle',
+      progress: 0,
+      freeBytes: null,
+      neededBytes: null,
+      error: null,
+    });
+    // Sent at once, though within the interval since the last send
+    const sentPrefetches = sentInstallProgresses().map(({ prefetch }) => prefetch);
+    expect(sentPrefetches[sentPrefetches.length - 1]).to.equal(zigbee2MqttManager.prefetch);
+    expect(zigbee2MqttManager.installProgressTimer).to.equal(null);
+  });
+
+  it('should send nothing to the setup page when there is nothing to forget', async () => {
+    await zigbee2MqttManager.reset();
+
+    expect(sentInstallProgresses()).to.deep.equal([]);
+  });
+
+  it('should keep a running prefetch, which tells its own outcome', async () => {
+    const prefetch = { state: 'running', progress: 42, freeBytes: null, neededBytes: 214000000, error: null };
+    zigbee2MqttManager.prefetch = prefetch;
+
+    await zigbee2MqttManager.reset();
+
+    expect(zigbee2MqttManager.prefetch).to.equal(prefetch);
   });
 
   it('should throw when folder deletion fails', async () => {
@@ -176,7 +293,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
 
     // Should destroy all variables
-    assert.callCount(gladys.variable.destroy, 15);
+    assert.callCount(gladys.variable.destroy, 18);
     assert.calledOnce(fsRmStub);
   });
 
@@ -189,7 +306,61 @@ describe('zigbee2mqtt reset', () => {
     await zigbee2MqttManager.reset();
 
     assert.calledOnce(cancelFake);
-    assert.callCount(gladys.variable.destroy, 15);
+    assert.callCount(gladys.variable.destroy, 18);
     assert.calledOnce(fsRmStub);
+  });
+
+  it('should refuse a setup sent while it runs, whose configuration it would destroy once its disconnect ended', async () => {
+    // PREPARE
+    const runningOperationsDuringDisconnect = [];
+    gladys.system.stopContainer = fake(async () => {
+      runningOperationsDuringDisconnect.push(zigbee2MqttManager.runningOperations);
+      return true;
+    });
+    let destroyReached;
+    const destroyStarted = new Promise((resolve) => {
+      destroyReached = resolve;
+    });
+    let releaseDestroy;
+    const destroyReleased = new Promise((resolve) => {
+      releaseDestroy = resolve;
+    });
+    // The configuration is being destroyed, as when the reset route was sent from another tab
+    gladys.variable.destroy = fake(async () => {
+      destroyReached();
+      await destroyReleased;
+      return null;
+    });
+    zigbee2MqttManager.getConfiguration = fake.resolves({});
+    zigbee2MqttManager.runInstallation = fake.resolves(null);
+    const resetting = zigbee2MqttManager.reset();
+    await destroyStarted;
+    // EXECUTE
+    const setup = zigbee2MqttManager.setup({ ZIGBEE2MQTT_DRIVER_PATH: 'usb0', ZIGBEE_DONGLE_NAME: 'dongle-name' });
+    // ASSERT
+    // Answered with a 409 by the error middleware
+    await expect(setup).to.be.rejectedWith(
+      ConflictError,
+      'Zigbee2mqtt: cannot save the setup while the integration is busy',
+    );
+    expect(zigbee2MqttManager.installation.state).to.equal('idle');
+    assert.notCalled(zigbee2MqttManager.runInstallation);
+    // Its disconnect counted inside it, then ended: the reset alone is still counted
+    expect(runningOperationsDuringDisconnect).to.deep.equal([2, 2]);
+    expect(zigbee2MqttManager.runningOperations).to.equal(1);
+    releaseDestroy();
+    await resetting;
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
+  });
+
+  it('should stop counting itself when it fails', async () => {
+    // PREPARE
+    gladys.variable.destroy = fake.rejects(new Error('database is locked'));
+    // EXECUTE
+    await expect(zigbee2MqttManager.reset()).to.be.rejectedWith('database is locked');
+    // ASSERT
+    // A setup is accepted again
+    expect(zigbee2MqttManager.runningOperations).to.equal(0);
   });
 });

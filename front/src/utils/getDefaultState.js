@@ -8,6 +8,7 @@ import { DemoSession } from './DemoSession';
 import { GatewaySession } from './GatewaySession';
 import { GatewayHttpClient } from './GatewayHttpClient';
 import { isDarkModeEnabled } from './darkModePreference';
+import { isSidebarCollapsed } from './sidebarPreference';
 
 function getDefaultState() {
   const session = config.gatewayMode ? new GatewaySession() : config.demoMode ? new DemoSession() : new Session();
@@ -38,6 +39,11 @@ function getDefaultState() {
     darkMode = isDarkModeEnabled();
   } catch (e) {}
 
+  // Left navigation: expanded rail by default, collapsed if the user asked
+  // for the full page width on this device — or, until they choose, on a
+  // touch screen narrower than 1200px (utils/sidebarPreference)
+  const sidebarCollapsed = isSidebarCollapsed();
+
   const state = {
     httpClient,
     session,
@@ -46,7 +52,9 @@ function getDefaultState() {
       language
     },
     showDropDown: false,
-    darkMode
+    showCollapsedMenu: false,
+    darkMode,
+    sidebarCollapsed
   };
   return state;
 }

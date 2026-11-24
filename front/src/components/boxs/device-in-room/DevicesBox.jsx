@@ -11,6 +11,8 @@ import {
 } from '../../../../../server/utils/constants';
 import DeviceCard from './DeviceCard';
 import debounce from 'debounce';
+import { getDeviceName } from '../../../utils/device';
+import { COMMAND_CLIENT_ID, getCommandNotSentCause, sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 
 // A dynamic select holds a string state: its widget reads last_value_string
 const isTextSelectFeature = feature =>
@@ -25,7 +27,8 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
       if (isTextSelectFeature(feature)) {
         return {
           ...feature,
-          last_value_string: `${lastValue}`,
+          // null: no state at all (a failed first command puts the feature back there)
+          last_value_string: lastValue === null ? null : `${lastValue}`,
           last_value_changed: lastValueChange
         };
       }
@@ -60,6 +63,7 @@ class DevicesComponent extends Component {
       status: RequestStatus.Getting
     };
     this.wasDisconnected = false;
+    this.pendingCommands = new Map();
   }
 
   handleWebsocketConnected = ({ connected }) => {
@@ -76,40 +80,74 @@ class DevicesComponent extends Component {
     this.getDeviceFeatures();
   };
 
+  // Order and names of loaded features, from the CURRENT box config. Names
+  // are aligned with device_features, so they are looked up by selector: a
+  // selector whose feature no longer exists must not shift the names of the
+  // features after it.
+  sortAndName = deviceFeatures => {
+    const selectors = this.props.box.device_features || [];
+    const names = this.props.box.device_feature_names || [];
+    return [...deviceFeatures]
+      .sort((a, b) => selectors.indexOf(a.selector) - selectors.indexOf(b.selector))
+      .map(deviceFeature => ({ ...deviceFeature, new_label: names[selectors.indexOf(deviceFeature.selector)] }));
+  };
+
   getDeviceFeatures = async () => {
+    // only the latest request commits: in the editor the config changes
+    // under a pending request, and an older response finishing last must
+    // not bring back an older order
+    this.requestId = (this.requestId || 0) + 1;
+    const requestId = this.requestId;
+    // nothing selected: nothing to fetch — an empty device_feature_selectors
+    // filter is no filter at all, and the API would return every device of
+    // the house (a widget emptied in the editor showed them all)
+    if ((this.props.box.device_features || []).length === 0) {
+      this.setState({ deviceFeatures: [], status: RequestStatus.Success });
+      return;
+    }
     this.setState({ status: RequestStatus.Getting });
     try {
       const deviceFeatureSelectors = this.props.box.device_features;
       const devices = await this.props.httpClient.get(`/api/v1/device`, {
         device_feature_selectors: deviceFeatureSelectors.join(',')
       });
+      if (requestId !== this.requestId) {
+        return;
+      }
       const deviceFeaturesFlat = [];
       devices.forEach(device => {
         device.features.forEach(feature => {
           deviceFeaturesFlat.push({ ...feature, device });
         });
       });
-      const deviceFeaturesSorted = deviceFeaturesFlat.sort(
-        (a, b) => deviceFeatureSelectors.indexOf(a.selector) - deviceFeatureSelectors.indexOf(b.selector)
-      );
-      const deviceFeaturesNewNames = this.props.box.device_feature_names;
-      if (deviceFeaturesNewNames) {
-        deviceFeaturesSorted.forEach((deviceFeature, index) => {
-          deviceFeature.new_label = deviceFeaturesNewNames[index];
-        });
-      }
       this.setState({
-        deviceFeatures: deviceFeaturesSorted,
+        deviceFeatures: this.sortAndName(deviceFeaturesFlat),
         status: RequestStatus.Success
       });
     } catch (e) {
+      if (requestId !== this.requestId) {
+        return;
+      }
       this.setState({
         status: RequestStatus.Error
       });
     }
   };
 
+  // A state coming from Gladys while a command is on its way is the state to go back to if
+  // that command cannot be sent: it is newer than the one displayed before the command.
+  keepStateFromGladys = (selector, state) => {
+    const pendingCommand = this.pendingCommands.get(selector);
+    if (pendingCommand) {
+      pendingCommand.stateToGoBackTo = { ...pendingCommand.stateToGoBackTo, ...state };
+    }
+  };
+
   updateDeviceStateWebsocket = payload => {
+    this.keepStateFromGladys(payload.device_feature_selector, {
+      last_value: payload.last_value,
+      last_value_changed: payload.last_value_changed
+    });
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
       deviceFeatures = updateDeviceFeatures(
@@ -124,6 +162,10 @@ class DevicesComponent extends Component {
     }
   };
   updateDeviceTextWebsocket = payload => {
+    this.keepStateFromGladys(payload.device_feature, {
+      last_value_string: payload.last_value_string,
+      last_value_changed: payload.last_value_changed
+    });
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
       deviceFeatures = updateDeviceFeaturesString(
@@ -138,10 +180,8 @@ class DevicesComponent extends Component {
     }
   };
 
-  setValueDevice = async (deviceFeature, value) => {
-    await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-      value
-    });
+  setValueDevice = async (deviceFeature, value, options) => {
+    await sendDeviceFeatureValue(this.props.httpClient, deviceFeature.selector, value, options);
   };
 
   changeAllLightsStatusRoom = async () => {
@@ -157,21 +197,71 @@ class DevicesComponent extends Component {
     });
   };
 
-  updateValue = async (deviceFeature, value) => {
-    const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
-    await this.setState({
-      deviceFeatures
-    });
+  // What is known of a feature while commands for it are on their way: the state to go back
+  // to if one of them cannot be sent, the number of requests not answered yet, and whether a
+  // debounced one has not left yet. Several optimistic updates may precede one request (a
+  // slider is debounced) and several requests may overlap (two taps on a switch): the state
+  // to go back to is the one from before the first of them, or a newer one coming from Gladys,
+  // and it is kept until the last of them has settled.
+  getPendingCommand = deviceFeature => {
+    let pendingCommand = this.pendingCommands.get(deviceFeature.selector);
+    if (!pendingCommand) {
+      const displayed = this.state.deviceFeatures.find(feature => feature.selector === deviceFeature.selector);
+      const { last_value, last_value_string, last_value_changed } = displayed || deviceFeature;
+      pendingCommand = {
+        stateToGoBackTo: { last_value, last_value_string, last_value_changed },
+        requests: 0,
+        debounced: false
+      };
+      this.pendingCommands.set(deviceFeature.selector, pendingCommand);
+    }
+    return pendingCommand;
+  };
+
+  // Resolves with whether the request went through. `speak`: a text to read out loud, a command
+  // and not a state, which the feature does not show (MusicPlayNotificationDeviceFeature.jsx).
+  updateValue = async (deviceFeature, value, { speak = false } = {}) => {
+    const pendingCommand = this.getPendingCommand(deviceFeature);
+    pendingCommand.requests += 1;
+    pendingCommand.debounced = false;
+    if (!speak) {
+      const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
+      await this.setState({
+        deviceFeatures
+      });
+    }
     try {
-      await this.setValueDevice(deviceFeature, value);
+      await this.setValueDevice(deviceFeature, value, { speak });
+      return true;
     } catch (e) {
       console.error(e);
+      // The request did not go through: the command may not have been sent. Same message as a
+      // device Gladys could not drive, with its own cause: DeviceCommandError.jsx says so and
+      // puts the widgets back on the state below.
+      this.props.session.dispatcher.dispatch(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR, {
+        client_id: COMMAND_CLIENT_ID,
+        cause: getCommandNotSentCause(e),
+        device_feature_selector: deviceFeature.selector,
+        device_feature_name: deviceFeature.name,
+        // the name the user reads in the widget
+        device_name: deviceFeature.new_label || getDeviceName(deviceFeature.device, deviceFeature),
+        value,
+        ...(speak ? { speak: true } : {}),
+        ...pendingCommand.stateToGoBackTo
+      });
+      return false;
+    } finally {
+      pendingCommand.requests -= 1;
+      if (pendingCommand.requests === 0 && !pendingCommand.debounced) {
+        this.pendingCommands.delete(deviceFeature.selector);
+      }
     }
   };
 
   setValueDeviceDebounce = debounce(this.updateValue.bind(this), 200);
 
   updateValueWithDebounce = async (deviceFeature, value) => {
+    this.getPendingCommand(deviceFeature).debounced = true;
     const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     this.setState({
       deviceFeatures
@@ -209,9 +299,38 @@ class DevicesComponent extends Component {
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
+  // The editor writes the box config on every keystroke and every move, and
+  // the canvas previews it live: a rename or a reorder only re-labels or
+  // re-sorts the features already loaded — a refetch would flash the loading
+  // skeleton under the user's finger. Only a different SET of features
+  // needs the API.
+  applyNamesAndOrder = () => {
+    const { deviceFeatures } = this.state;
+    if (!deviceFeatures) {
+      return;
+    }
+    this.setState({ deviceFeatures: this.sortAndName(deviceFeatures) });
+  };
+
   componentDidUpdate(previousProps) {
-    const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
-    if (deviceFeaturesChanged) {
+    // compare the raw props: a box without device_features (a widget just
+    // created, or stored that way) would otherwise fall back to a fresh []
+    // on both sides, never equal — and applyNamesAndOrder's setState would
+    // re-render, and land here again, forever
+    if (
+      get(previousProps, 'box.device_features') === get(this.props, 'box.device_features') &&
+      get(previousProps, 'box.device_feature_names') === get(this.props, 'box.device_feature_names')
+    ) {
+      return;
+    }
+    const previousSelectors = get(previousProps, 'box.device_features') || [];
+    const selectors = get(this.props, 'box.device_features') || [];
+    const sameSet =
+      previousSelectors.length === selectors.length &&
+      [...previousSelectors].sort().join(',') === [...selectors].sort().join(',');
+    if (sameSet && this.state.status === RequestStatus.Success) {
+      this.applyNamesAndOrder();
+    } else {
       this.refreshData();
     }
   }

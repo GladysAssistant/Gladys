@@ -1,0 +1,51 @@
+/* Setting up two-factor authentication on a phone (docs/specs/mobile-pages/auth.md, D.3).
+   Light colors only: dark mode is the app-wide inversion. */
+
+/* the secret is compared and copied: fixed-width, and never cut silently */
+:global(.auth-page) input.mobileSecret {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 16px;
+  text-overflow: ellipsis;
+}
+
+.mobileCopy {
+  color: #2f5bd8;
+  font-weight: 600;
+}
+
+.mobileCopy:disabled {
+  opacity: 0.5;
+}
+
+.mobileQrCode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.mobileQrCode img {
+  width: 168px;
+  height: 168px;
+  /* black on white in dark mode too: dark-mode.css inverts every image back to itself */
+  image-rendering: pixelated;
+}
+
+.mobileQrCode p {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #4f5866;
+}
+
+/* inside the card of the secret: the QR code on its own white tile, readable on any wallpaper */
+.mobileQrCode {
+  margin: 0 0 16px;
+}
+
+.mobileQrCode img {
+  padding: 8px;
+  border-radius: 14px;
+  background-color: #fff;
+}

@@ -5,8 +5,12 @@ import update from 'immutability-helper';
 
 import BaseEditBox from '../baseEditBox';
 import SelectDeviceFeature from '../../device/SelectDeviceFeature';
+import { DASHBOARD_BOX_MAX_ITEMS } from '../../../../../server/utils/constants';
 
 const CHIP_TYPES = ['device-feature', 'openings', 'alarm', 'calendar-next-event'];
+// The server refuses a bar holding more chips than this: the editor stops
+// adding chips at the cap and says so, instead of failing on save.
+const MAX_CHIPS = DASHBOARD_BOX_MAX_ITEMS.CHIPS;
 
 class EditChipsBox extends Component {
   updateChips = chips => {
@@ -15,6 +19,9 @@ class EditChipsBox extends Component {
 
   addChip = () => {
     const chips = this.props.box.chips || [];
+    if (chips.length >= MAX_CHIPS) {
+      return;
+    }
     this.updateChips([...chips, {}]);
   };
 
@@ -53,6 +60,7 @@ class EditChipsBox extends Component {
 
   render(props, { houses, calendars, rooms }) {
     const chips = props.box.chips || [];
+    const maxChipsReached = chips.length >= MAX_CHIPS;
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chips">
         <p>
@@ -205,7 +213,12 @@ class EditChipsBox extends Component {
             )}
           </div>
         ))}
-        <button class="btn btn-outline-primary" onClick={this.addChip}>
+        {maxChipsReached && (
+          <div class="alert alert-info">
+            <Text id="dashboard.boxes.chips.maxChipsReached" fields={{ max: MAX_CHIPS }} />
+          </div>
+        )}
+        <button class="btn btn-outline-primary" onClick={this.addChip} disabled={maxChipsReached}>
           <Text id="dashboard.boxes.chips.addChipButton" /> <i class="fe fe-plus" />
         </button>
       </BaseEditBox>

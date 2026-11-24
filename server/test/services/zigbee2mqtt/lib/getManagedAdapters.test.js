@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { ADAPTERS } = require('../../../../services/zigbee2mqtt/adapters');
+const { DISPLAYED_ADAPTERS } = require('../../../../services/zigbee2mqtt/adapters/display');
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const gladys = {
@@ -22,8 +22,8 @@ describe('zigbee2mqtt getManagedAdapters', () => {
     manager = new Zigbee2mqttManager(gladys, mqttLibrary, serviceId);
   });
 
-  it('should get adapters', () => {
+  it('should get adapters, with how to show them', () => {
     const adapters = manager.getManagedAdapters();
-    expect(adapters).deep.eq(ADAPTERS);
+    expect(adapters).deep.eq(DISPLAYED_ADAPTERS);
   });
 });

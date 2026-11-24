@@ -1,6 +1,9 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+import { withMobileViewport } from '../../../../../components/mobile';
+import MobileCalendars from './MobileCalendars';
 import { errorMessage } from './contractUtils';
 
 const LAST_VALUES = 30;
@@ -72,7 +75,30 @@ class CalendarsSection extends Component {
     return granularity === 'day' ? date.toLocaleDateString() : date.toLocaleString();
   };
 
+  setRecalculateFrom = recalculateFrom => this.setState({ recalculateFrom });
+
   render(props, { calendars, loading, error, expanded, entries, recalculateFrom, recalculating, recalculated }) {
+    // on a phone the calendars are rows and their last values open in a sheet
+    // (docs/specs/mobile-pages/energy.md, E)
+    if (props.isMobile) {
+      return (
+        <MobileCalendars
+          calendars={calendars}
+          loading={loading}
+          error={error}
+          expanded={expanded}
+          entries={entries}
+          recalculateFrom={recalculateFrom}
+          recalculating={recalculating}
+          recalculated={recalculated}
+          toggle={this.toggle}
+          setRecalculateFrom={this.setRecalculateFrom}
+          recalculate={this.recalculate}
+          formatDate={this.formatDate}
+          intl={props.intl}
+        />
+      );
+    }
     return (
       <div class="card">
         <div class="card-header">
@@ -208,4 +234,4 @@ class CalendarsSection extends Component {
   }
 }
 
-export default CalendarsSection;
+export default withIntlAsProp(withMobileViewport(CalendarsSection));

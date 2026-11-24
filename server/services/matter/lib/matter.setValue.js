@@ -21,6 +21,7 @@ const {
 } = require('../utils/fanMatterMapping');
 const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
 const { gladysAcModeToMatterSystemMode } = require('../utils/thermostatMatterMapping');
+const { ensureNodeConnected } = require('../utils/ensureNodeConnected');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -95,11 +96,10 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   // Connect if not already connected
-  if (!node.isConnected) {
-    logger.warn(`Matter: Node ${nodeId} is not connected, connecting...`);
-    node.connect();
-    await node.events.initialized;
-    logger.info(`Matter: Node ${nodeId} connected.`);
+  // (bounded wait, so that an offline node never blocks the action or the scene forever)
+  const isConnected = await ensureNodeConnected(node, { nodeId });
+  if (!isConnected) {
+    throw new Error(`Matter: Node ${nodeId} is unreachable, the command could not be sent`);
   }
 
   // Handle binary device (a switch, or the on/off of a light: both are the "binary" type)

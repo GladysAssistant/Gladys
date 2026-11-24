@@ -105,12 +105,11 @@ describe('Dashboard', () => {
     cy.get('[data-cy="edit-dashboard-button"]')
       .should('have.class', 'btn-outline-primary')
       .click();
-    cy.contains('dashboard.editDashboardDeleteButton')
-      .should('have.class', 'btn-outline-danger')
-      .click();
-    cy.contains('dashboard.editDashboardDeleteButton')
-      .should('have.class', 'btn-outline-danger')
-      .click();
+    // deleting is rare and irreversible: it lives at the end of the
+    // dashboard settings, behind a confirmation, not next to Save
+    cy.get('[data-cy="dashboard-settings-button"]').click();
+    cy.get('[data-cy="delete-dashboard-button"]').click();
+    cy.get('[data-cy="delete-dashboard-confirm"]').click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
   });
 });

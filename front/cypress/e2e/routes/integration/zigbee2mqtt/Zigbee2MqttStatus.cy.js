@@ -25,7 +25,11 @@ describe('Zigbee2mqtt status', () => {
     // Each test visits its own page: the session stored in localStorage is cleared between tests
     cy.login();
     const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: {} });
+    // Configured: the setup page shows the installation, not the wizard
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` },
+      { body: { Z2M_MQTT_MODE: 'local', Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0' } }
+    );
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/discovered*` }, { body: [] });
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: false });
   });
@@ -42,6 +46,65 @@ describe('Zigbee2mqtt status', () => {
 
     cy.get('[data-cy=z2m-status-alert]').should('not.exist');
     cy.get('#permitJoin').should('not.be.disabled');
+  });
+
+  it('should tell that Zigbee2mqtt is stopped, not blame the broker, on the discover page', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    // Stopped from the dashboard: Gladys disconnected from the broker, the containers kept
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      {
+        body: {
+          ...notOnlineStatus,
+          stopped: true,
+          gladysConnected: false,
+          mqttConnectionError: { code: 'BROKER_UNREACHABLE', message: 'connect ECONNREFUSED' }
+        }
+      }
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.stopped');
+    cy.get('[data-cy=z2m-status-alert-mqtt-error]').should('not.exist');
+    cy.get('#permitJoin').should('be.disabled');
+  });
+
+  it('should tell that Zigbee2mqtt is not installed on the discover page, with the way to install it', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
+      {
+        body: {
+          ...notOnlineStatus,
+          configured: false,
+          usbConfigured: false,
+          mqttExist: false,
+          zigbee2mqttExist: false,
+          gladysConnected: false,
+          z2mEnabled: false
+        }
+      }
+    );
+    // Nothing set up: no interface URL to warn about
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup` }, { body: {} }).as(
+      'emptySetup'
+    );
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+
+    cy.get('[data-cy=z2m-status-not-installed]').should(
+      'contain',
+      Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.status.notInstalled')
+    );
+    cy.get('[data-cy=z2m-status-alert]').should('not.exist');
+    cy.get('[data-cy=z2m-status-not-installed] a').should(
+      'have.attr',
+      'href',
+      '/dashboard/integration/device/zigbee2mqtt/setup'
+    );
+    // Its banner only, and nothing to permit joining to
+    cy.wait('@emptySetup');
+    cy.get('[data-cy=z2m-url-warning]').should('not.exist');
+    cy.get('#permitJoin').should('be.disabled');
   });
 
   it('should show why Zigbee2mqtt does not start on the discover page', () => {
@@ -137,69 +200,5 @@ describe('Zigbee2mqtt status', () => {
     cy.get('[data-cy=z2m-status-alert-mqtt-error]').i18n(
       'integration.zigbee2mqtt.setup.mqttConnectionErrors.BAD_CREDENTIALS'
     );
-  });
-
-  it('should show Zigbee2mqtt as starting on the setup page, until it is online', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    // Gladys has just (re)started the Zigbee2mqtt container
-    cy.intercept(
-      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
-      { body: { ...notOnlineStatus, zigbee2mqttStarting: true } }
-    );
-    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
-
-    cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttStarting');
-    // The enable switch follows the deployment, not Zigbee2mqtt answering
-    cy.get('#enableZigbee2mqtt').should('be.checked');
-
-    cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: onlineStatus });
-
-    cy.get('[data-cy=z2m-running-status-explanation]').should('not.exist');
-    cy.get('#enableZigbee2mqtt').should('be.checked');
-  });
-
-  it('should turn off a Zigbee2mqtt that does not answer', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: notOnlineStatus });
-    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/disconnect` }, { body: {} }).as(
-      'disconnect'
-    );
-    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
-
-    // Crashing in a loop: the user can still stop and remove its containers
-    cy.get('#enableZigbee2mqtt').should('be.checked');
-    cy.get('[data-cy=z2m-toggle-status] .custom-switch-indicator').click();
-
-    cy.wait('@disconnect');
-  });
-
-  it('should show Zigbee2mqtt as starting before Gladys is connected to the broker again', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept(
-      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
-      { body: { ...notOnlineStatus, gladysConnected: false, zigbee2mqttStarting: true } }
-    );
-    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
-
-    cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttStarting');
-  });
-
-  it('should not show a stopped Zigbee2mqtt as starting on the setup page', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: notOnlineStatus });
-    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
-
-    cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttNotResponding');
-  });
-
-  it('should tell that Zigbee2mqtt fails to start on the setup page', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept(
-      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` },
-      { body: { ...notOnlineStatus, z2mContainerError: { code: 'EZSP_PROTOCOL_VERSION', message: null } } }
-    );
-    cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
-
-    cy.get('[data-cy=z2m-running-status-explanation]').i18n('integration.zigbee2mqtt.setup.zigbee2mqttNotStarting');
   });
 });

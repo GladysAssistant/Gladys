@@ -8,7 +8,8 @@ const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
 const db = require('../../../models');
-const { EVENTS } = require('../../../utils/constants');
+const { isTooMuchStatesError } = require('../../../lib/device/device.destroy');
+const { BadParameters, ConflictError } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -34,20 +35,12 @@ describe('Device.destroy', () => {
     );
     expect(res).to.have.lengthOf(0);
   });
-  it('should destroy device that has too much states', async () => {
-    const eventFake = {
-      emit: fake.returns(0),
-      on: fake.returns(0),
-    };
+  it('should not destroy at once a device that has too much states, and hand it over to the background deletion', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(eventFake, {}, stateManager, serviceManager, {}, {}, job);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 2;
-    device.devicesByPollFrequency[60000] = [
-      {
-        selector: 'test-device',
-      },
-    ];
+    device.destroyAfterStatesPurge = fake.resolves(null);
     // SQLite leftovers (installation which has not run the DuckDB migration yet)
     await db.DeviceFeatureState.create({
       value: 10,
@@ -70,31 +63,140 @@ describe('Device.destroy', () => {
     ]);
     const promise = device.destroy('test-device');
     await assert.isRejected(promise, '5 states in DB. Too much states!');
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    // the device is still there, and its deletion goes on in the background
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+    sinonAssert.calledOnce(device.destroyAfterStatesPurge);
+    const [deviceToDestroy, statesCount] = device.destroyAfterStatesPurge.firstCall.args;
+    expect(deviceToDestroy).to.have.property('selector', 'test-device');
+    expect(statesCount).to.equal(5);
+  });
+  it('should not purge in the background the history of a device being migrated', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 1;
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    device.migrationsInProgress.add('test-device');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date() },
+      { value: 0, created_at: new Date() },
+    ]);
+    const promise = device.destroy('test-device');
+    await assert.isRejected(promise, ConflictError, 'A migration is already in progress for device test-device');
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+    sinonAssert.notCalled(device.destroyAfterStatesPurge);
+  });
+  it('should give the same answer, without counting again, while the device is deleted in the background', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    const testDevice = await db.Device.findOne({ where: { selector: 'test-device' } });
+    // the purge already brought the device under the limit: a second "Delete" must not
+    // delete it under the purge
+    device.devicesBeingDestroyed.set(testDevice.id, { statesCount: 12000 });
+    const promise = device.destroy('test-device');
+    await assert.isRejected(promise, '12000 states in DB. Too much states!');
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+    sinonAssert.notCalled(device.destroyAfterStatesPurge);
+  });
+  it('should not delete the device under a background deletion started while it was counting', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    const testDevice = await db.Device.findOne({ where: { selector: 'test-device' } });
+    // another "Delete" schedules the background deletion while this one counts the states,
+    // and the purge already brought the device under the limit
+    const realQuery = db.sequelize.query.bind(db.sequelize);
+    const query = sinon.stub(db.sequelize, 'query').callsFake(async (...args) => {
+      const result = await realQuery(...args);
+      // only once the states are counted: the lookup of the device goes through here too
+      if (String(args[0]).includes('t_device_feature_state_aggregate')) {
+        device.devicesBeingDestroyed.set(testDevice.id, { statesCount: 12000 });
+      }
+      return result;
+    });
+    try {
+      const promise = device.destroy('test-device');
+      await assert.isRejected(promise, '12000 states in DB. Too much states!');
+    } finally {
+      query.restore();
+    }
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+    sinonAssert.notCalled(device.destroyAfterStatesPurge);
+  });
+  it('should hand over to the background deletion a device the migration holding its lock deletes', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 1;
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    device.migrationsInProgress.add('test-device');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date() },
+      { value: 0, created_at: new Date() },
+    ]);
+    const promise = device.destroy('test-device', { migration: true });
+    await assert.isRejected(promise, BadParameters, '2 states in DB. Too much states!');
+    sinonAssert.calledOnce(device.destroyAfterStatesPurge);
+  });
+  it('should destroy the device for its background deletion', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    const testDevice = await db.Device.findOne({ where: { selector: 'test-device' } });
+    device.devicesBeingDestroyed.set(testDevice.id, { statesCount: 12000 });
+    await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 1);
+    await device.destroy('test-device', {
+      scheduledDeletion: { id: testDevice.id, external_id: testDevice.external_id },
+    });
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).to.equal(null);
+  });
+  it('should not destroy, for a background deletion, another device than the one to delete', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    const testDevice = await db.Device.findOne({ where: { selector: 'test-device' } });
+    // another device took the selector
+    await assert.isRejected(
+      device.destroy('test-device', {
+        scheduledDeletion: { id: 'a2b9ba3a-72b1-4a3e-89e5-4a4e5f0b0d3e', external_id: testDevice.external_id },
+      }),
+      'Device not found',
     );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      'ce9dc798-b09f-4e51-8c16-311cdebf97cd',
+    // the device was taken over by another appliance
+    await assert.isRejected(
+      device.destroy('test-device', {
+        scheduledDeletion: { id: testDevice.id, external_id: 'another-external-id' },
+      }),
+      'Device not found',
     );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      'bb1af3b9-f87d-4d9c-b5be-958cd9d28900',
-    );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      'f07c5b27-9301-4482-a059-9f91329d30e7',
-    );
-    sinonAssert.calledWith(
-      eventFake.emit,
-      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
-      '3b5b4870-145d-4584-bf0e-d97fdcf908b5',
-    );
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+  });
+  it('should not start a second background deletion when the device saved too many states during its purge', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    device.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 2;
+    device.destroyAfterStatesPurge = fake.resolves(null);
+    const testDevice = await db.Device.findOne({ where: { selector: 'test-device' } });
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date() },
+      { value: 0, created_at: new Date() },
+      { value: 1, created_at: new Date() },
+    ]);
+    const promise = device.destroy('test-device', {
+      scheduledDeletion: { id: testDevice.id, external_id: testDevice.external_id },
+    });
+    await assert.isRejected(promise, '3 states in DB. Too much states!');
+    sinonAssert.notCalled(device.destroyAfterStatesPurge);
+    expect(await db.Device.findOne({ where: { selector: 'test-device' } })).not.to.equal(null);
+  });
+  it('should tell the "too much states" answer apart from any other error', async () => {
+    expect(isTooMuchStatesError(new BadParameters('12000 states in DB. Too much states!'))).to.equal(true);
+    expect(isTooMuchStatesError(new BadParameters('Another bad parameter'))).to.equal(false);
+    expect(isTooMuchStatesError(new Error('12000 states in DB. Too much states!'))).to.equal(false);
   });
   it('should destroy a device without features', async () => {
     const stateManager = new StateManager(event);

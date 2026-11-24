@@ -48,7 +48,13 @@ const DeviceTab = ({
         <div class="loader" />
         <div class="dimmer-content row">
           {broadlinkDevices.map((device, index) => (
-            <DeviceBox {...props} device={device} deviceIndex={index} housesWithRooms={housesWithRooms} />
+            <DeviceBox
+              {...props}
+              key={device.external_id}
+              device={device}
+              deviceIndex={index}
+              housesWithRooms={housesWithRooms}
+            />
           ))}
           {broadlinkDevices.length === 0 && <EmptyState id="integration.broadlink.device.noRemoteFound" />}
         </div>

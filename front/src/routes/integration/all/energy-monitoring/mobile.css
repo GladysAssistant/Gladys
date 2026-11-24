@@ -1,0 +1,298 @@
+/* Energy monitoring on a phone (docs/specs/mobile-pages/energy.md): what the kit
+   (components/mobile/kit.css) does not already carry. Light colors only: dark mode is the
+   app-wide inversion filter (the exceptions are at the end of this file). */
+
+/* ---------- consultation pages ---------- */
+
+/* the consultation pages keep the chrome of the integration: their content sits in its container */
+.list {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  color: #1c2334;
+}
+
+.listNoFab {
+  padding-bottom: 16px;
+}
+
+.loading {
+  min-height: 10rem;
+}
+
+/* a card holding a row and what hangs under it (a notice, a second target) */
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* the row of a contract: the link takes the room, the "•••" button sits next to it — two targets,
+   never one inside the other */
+.splitRow {
+  display: flex;
+  align-items: center;
+  padding-right: 12px;
+  background-color: #fff;
+}
+
+.splitRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardNotice {
+  margin: 0 12px 12px;
+}
+
+.pillLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin-top: 2px;
+}
+
+/* a technical key (a calendar, a template) inside a title */
+.code {
+  font-family: Menlo, Consolas, monospace;
+  font-size: 0.9375rem;
+  color: #1c2334;
+  overflow-wrap: anywhere;
+}
+
+.rowError {
+  color: #b42d2d;
+}
+
+/* what a tap on the row does, when it is what the row is waiting for ("Choose a meter") */
+.rowAction {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #2f5bd8;
+}
+
+/* the chips of the kit are 40px high: a filter of the wizard is a full 44px target */
+.filterChip {
+  min-height: 44px;
+}
+
+/* the check of the selected row of a choice */
+.check {
+  flex-shrink: 0;
+  width: 24px;
+  color: #2f5bd8;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+/* the values of a calendar, in its sheet */
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+}
+
+.valueRowDate {
+  color: #4f5866;
+}
+
+.valueRowValue {
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- wizard ---------- */
+
+.stepTitle {
+  margin: 0 0 6px;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #1c2334;
+}
+
+.stepLead {
+  margin: 0 0 16px;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #4f5866;
+}
+
+.templateList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.jsonField {
+  min-height: 18rem;
+  font-family: Menlo, Consolas, monospace;
+  /* 16px: below, iOS zooms into the field on focus */
+  font-size: 16px;
+  line-height: 1.35;
+  -moz-tab-size: 2;
+  tab-size: 2;
+  resize: vertical;
+}
+
+.unitAddon {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.powerUnit {
+  max-width: 6.5rem;
+}
+
+/* the headline of the preview: what the last 7 days would have cost */
+.total {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background-color: #fff;
+  border: 1px solid #e4e8ef;
+}
+
+.totalLabel {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4f5866;
+}
+
+.totalValue {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #1c2334;
+  overflow-wrap: anywhere;
+}
+
+.totalSub {
+  font-size: 0.875rem;
+  color: #4f5866;
+}
+
+/* an amount on the right of a row: never cut, the title gives way */
+.amount {
+  flex-shrink: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #1c2334;
+  white-space: nowrap;
+}
+
+/* ---------- time ranges (the phone control of a `time_intervals` input) ---------- */
+
+.dayBar {
+  display: flex;
+  height: 14px;
+  border-radius: 999px;
+  background-color: rgba(28, 35, 52, 0.1);
+  overflow: hidden;
+}
+
+.daySlot {
+  flex: 1 1 0;
+}
+
+.daySlotOn {
+  background-color: #2f5bd8;
+}
+
+.dayTicks {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0 10px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: #4f5866;
+}
+
+.rangeRow {
+  display: flex;
+  align-items: center;
+  padding-right: 12px;
+  background-color: #fff;
+}
+
+.rangeMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: #1c2334;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rangeMain:focus {
+  outline: none;
+}
+
+.rangeMain:focus-visible {
+  outline: 2px solid #2f5bd8;
+  outline-offset: -2px;
+}
+
+.rangeMain :global(.fe) {
+  color: #4f5866;
+  font-size: 1.125rem;
+}
+
+.rangeHint {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #4f5866;
+}
+
+.rangeFields {
+  display: flex;
+  gap: 8px;
+}
+
+.rangeFields > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.addButton {
+  margin-top: 8px;
+}
+
+/* ---------- Dark mode ---------- */
+
+/* the selected slots of the day keep the accent */
+:global(.dark-mode) .daySlotOn {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+/* dark-mode.css paints every textarea with a solid background: the tariff definition is a field
+   of the kit, a light surface that inverts with the page */
+:global(.dark-mode) textarea.jsonField {
+  background-color: #fff !important;
+}

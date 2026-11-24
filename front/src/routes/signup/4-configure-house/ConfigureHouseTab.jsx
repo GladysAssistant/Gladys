@@ -2,12 +2,13 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import style from '../style.css';
 import AddressSearch from '../../../components/house/AddressSearch';
+import MobileConfigureHouse from './MobileConfigureHouse';
 
 const removeRoomLocal = (index, removeRoom) => () => {
   removeRoom(index);
 };
 
-const ConfigureHouseTab = ({ children, ...props }) => (
+const DesktopConfigureHouseTab = ({ children, ...props }) => (
   <div class="row">
     <div class="col-md-8 mx-auto">
       <h2 class={style.signupTitle}>
@@ -89,5 +90,10 @@ const ConfigureHouseTab = ({ children, ...props }) => (
     </div>
   </div>
 );
+
+// The container tells which layout it renders: it only creates the map of the desktop step
+// when that step is the one shown
+const ConfigureHouseTab = ({ isMobile, ...props }) =>
+  isMobile ? <MobileConfigureHouse {...props} /> : <DesktopConfigureHouseTab {...props} />;
 
 export default ConfigureHouseTab;

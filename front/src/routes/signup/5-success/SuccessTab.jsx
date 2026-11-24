@@ -2,6 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from '../style.css';
+import { withMobileViewport, MobileBottomBar, BigButton, kitStyle } from '../../../components/mobile';
 
 // The signup ends on Gladys itself — what the platform can do and how open
 // it is — rather than on its author: three feature panels (integrations,
@@ -12,7 +13,7 @@ const FEATURES = [
   { key: 'openSource', icon: 'fe-github', tint: style.successFeatureGreen }
 ];
 
-const SuccessTab = () => (
+const DesktopSuccessTab = () => (
   <div class={style.successTab}>
     <h2 class={style.signupTitle}>
       <Text id="signup.success.title" />
@@ -44,4 +45,44 @@ const SuccessTab = () => (
   </div>
 );
 
-export default SuccessTab;
+// The last screen on a phone (docs/specs/mobile-pages/onboarding.md, C.5): the same three
+// panels, stacked, and the way to the dashboard in the bottom bar
+const MobileSuccessTab = () => (
+  <div data-cy="signup-success-mobile">
+    <h1 class={kitStyle.largeTitle}>
+      <Text id="signup.success.title" />
+    </h1>
+    <p class={kitStyle.lead}>
+      <Text id="signup.success.subtitle" />
+    </p>
+    <div class={kitStyle.stack}>
+      {FEATURES.map(feature => (
+        <div key={feature.key} class={style.mobileFeature}>
+          <span class={cx(style.successFeatureIcon, style.mobileFeatureIcon, feature.tint)} aria-hidden="true">
+            <i class={`fe ${feature.icon}`} />
+          </span>
+          <div class={style.mobileFeatureText}>
+            <h2>
+              <Text id={`signup.success.${feature.key}Title`} />
+            </h2>
+            <div>
+              <MarkupText id={`signup.success.${feature.key}Text`} />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p class={style.mobileClosing}>
+      <Text id="signup.success.closing" />
+    </p>
+    <MobileBottomBar>
+      <BigButton variant="primary" href="/dashboard" data-cy="signup-go-to-dashboard">
+        <Text id="signup.success.goToDashboardButton" />
+      </BigButton>
+    </MobileBottomBar>
+  </div>
+);
+
+const SuccessTab = ({ isMobile }) => (isMobile ? <MobileSuccessTab /> : <DesktopSuccessTab />);
+
+export default withMobileViewport(SuccessTab);

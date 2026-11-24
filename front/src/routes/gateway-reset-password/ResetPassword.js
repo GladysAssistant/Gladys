@@ -1,8 +1,10 @@
 import { MarkupText } from 'preact-i18n';
 import ResetPasswordForm from './ResetPasswordForm.js';
 import AuthLayout from '../../components/auth/AuthLayout';
+import MobileResetPassword from './MobileResetPassword';
+import { withMobileViewport } from '../../components/mobile';
 
-const ResetPassword = ({ children, ...props }) => (
+const DesktopResetPassword = ({ children, ...props }) => (
   <AuthLayout titleId="gatewayResetPassword.pageTitle">
     {!props.success && (
       <ResetPasswordForm
@@ -23,7 +25,12 @@ const ResetPassword = ({ children, ...props }) => (
         updatePasswordRepeat={props.updatePasswordRepeat}
         success={props.success}
         errorLink={props.errorLink}
+        errorUnknown={props.errorUnknown}
         invalidRecoveryCode={props.invalidRecoveryCode}
+        invalidTwoFactorCode={props.invalidTwoFactorCode}
+        tooManyTwoFactorAttempts={props.tooManyTwoFactorAttempts}
+        twoFactorResetDone={props.twoFactorResetDone}
+        loading={props.loading}
         resetInProgress={props.resetInProgress}
         requestTwoFactorReset={props.requestTwoFactorReset}
         twoFactorResetStatus={props.twoFactorResetStatus}
@@ -47,4 +54,7 @@ const ResetPassword = ({ children, ...props }) => (
   </AuthLayout>
 );
 
-export default ResetPassword;
+const ResetPassword = ({ isMobile, ...props }) =>
+  isMobile ? <MobileResetPassword {...props} /> : <DesktopResetPassword {...props} />;
+
+export default withMobileViewport(ResetPassword);

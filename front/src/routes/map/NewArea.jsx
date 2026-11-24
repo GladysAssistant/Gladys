@@ -9,6 +9,15 @@ import style from './style.css';
 import dashboardStyle from '../dashboard/style.css';
 import ColorPicker from './ColorPicker';
 import NewAreaMap from './NewAreaMap';
+import MobileNewArea from './MobileNewArea';
+import { DEFAULT_AREA_COLOR } from './areaColors';
+import { withMobileViewport } from '../../components/mobile';
+import { isSheetEntryOnTop } from '../../components/sheet/sheetHistory';
+
+const MAP_PAGE_PATH = '/dashboard/maps';
+
+// the fields of a zone, as they are compared to tell whether something changed
+const pickArea = ({ name, color, radius, latitude, longitude }) => ({ name, color, radius, latitude, longitude });
 
 const NewAreaPage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
@@ -144,11 +153,18 @@ class NewArea extends Component {
   setRadius = e => {
     this.setState({ radius: e.target.value });
   };
+  // the radius as a number: the controls of the phone layout have no event to hand over
+  setRadiusValue = radius => {
+    this.setState({ radius });
+  };
   setLatLong = (latitude, longitude) => {
     this.setState({ latitude, longitude });
   };
-  createArea = async e => {
+  createArea = e => {
     e.preventDefault();
+    return this.saveArea();
+  };
+  saveArea = async () => {
     try {
       await this.setState({ loading: true, createAreaError: false });
       const newArea = {
@@ -163,18 +179,23 @@ class NewArea extends Component {
       } else {
         await this.props.httpClient.post('/api/v1/area', newArea);
       }
-      route('/dashboard/maps');
+      // from a sheet of the phone layout, the entry of the sheet is replaced: "back" from the map
+      // does not come back here
+      route(MAP_PAGE_PATH, isSheetEntryOnTop());
     } catch (e) {
       await this.setState({ loading: false, createAreaError: true });
       console.error(e);
     }
   };
-  deleteArea = async e => {
+  deleteArea = e => {
     e.preventDefault();
+    return this.removeArea();
+  };
+  removeArea = async () => {
     try {
       await this.setState({ loading: true, deleteAreaError: false });
       await this.props.httpClient.delete(`/api/v1/area/${this.props.areaSelector}`);
-      route('/dashboard/maps');
+      route(MAP_PAGE_PATH, isSheetEntryOnTop());
     } catch (e) {
       await this.setState({ loading: false, deleteAreaError: true });
       console.error(e);
@@ -200,6 +221,8 @@ class NewArea extends Component {
         color: area.color,
         latitude: area.latitude,
         longitude: area.longitude,
+        // the zone as stored: what the phone layout compares to before leaving
+        initialArea: pickArea(area),
         loading: false
       });
     } catch (e) {
@@ -210,12 +233,20 @@ class NewArea extends Component {
   constructor(props) {
     super(props);
     this.props = props;
-    this.state = {
+    const newArea = {
       radius: 20,
-      color: '#3498db',
+      color: DEFAULT_AREA_COLOR,
       name: '',
       latitude: null,
-      longitude: null,
+      longitude: null
+    };
+    this.state = {
+      ...newArea,
+      // a zone being edited gets it once loaded (getArea)
+      initialArea: props.areaSelector ? null : newArea,
+      // an existing zone is loading from the first paint: its page must not show, nor take the
+      // edits of, an empty new zone
+      loading: Boolean(props.areaSelector),
       houses: []
     };
   }
@@ -227,8 +258,47 @@ class NewArea extends Component {
   }
   render(
     props,
-    { name, color, radius, latitude, longitude, houses, loading, createAreaError, deleteAreaError, getAreaError }
+    {
+      name,
+      color,
+      radius,
+      latitude,
+      longitude,
+      houses,
+      loading,
+      createAreaError,
+      deleteAreaError,
+      getAreaError,
+      initialArea
+    }
   ) {
+    // On a phone the zone is drawn on a map that fills the screen
+    // (docs/specs/mobile-pages/map-areas.md): same state, same requests
+    if (props.isMobile) {
+      return (
+        <MobileNewArea
+          user={props.user}
+          name={name}
+          color={color}
+          radius={radius}
+          latitude={latitude}
+          longitude={longitude}
+          houses={houses}
+          loading={loading}
+          initialArea={initialArea}
+          createAreaError={createAreaError}
+          deleteAreaError={deleteAreaError}
+          getAreaError={getAreaError}
+          creationMode={props.areaSelector === undefined}
+          setName={this.setName}
+          setColor={this.setColor}
+          setRadiusValue={this.setRadiusValue}
+          setLatLong={this.setLatLong}
+          saveArea={this.saveArea}
+          removeArea={this.removeArea}
+        />
+      );
+    }
     // Same Horizon glass scene as the dashboard: the form is a glass card
     // over the default scene, and .glass-theme + the mapPage scope drive
     // the pill buttons and the mini-map chrome
@@ -268,4 +338,4 @@ class NewArea extends Component {
   }
 }
 
-export default connect('httpClient', actions)(NewArea);
+export default connect('httpClient,user', actions)(withMobileViewport(NewArea));
