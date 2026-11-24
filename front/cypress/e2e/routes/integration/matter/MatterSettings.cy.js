@@ -90,8 +90,8 @@ describe('Matter settings', () => {
   };
 
   beforeEach(() => {
+    // Cypress clears the local storage between tests: the expert mode starts off
     cy.login();
-    cy.window().then(win => win.localStorage.removeItem('matter-settings-expert-mode'));
     cy.intercept({ method: 'GET', url: api('/variable/MATTER_ENABLED') }, { body: { value: 'true' } });
     cy.intercept({ method: 'GET', url: api('/ipv6') }, { body: { has_ipv6: true, ipv6_interfaces: [] } });
     cy.intercept({ method: 'GET', url: api('/node?*') }, req => {

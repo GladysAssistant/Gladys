@@ -293,7 +293,7 @@ describe('Matter devices', () => {
         { node_id: '1234', is_connected: true, status: 'connected', available: true, unreachable_device_paths: [] }
       ]
     });
-    cy.contains('.card', 'Washing machine plug')
+    cy.contains('.col-md-6', 'Washing machine plug')
       .find('[data-cy=matter-device-unavailable]')
       .should('not.exist');
 
@@ -302,7 +302,7 @@ describe('Matter devices', () => {
       type: 'matter.node-status-changed',
       payload: { node_id: '1234', status: 'disconnected', available: false, unreachable_device_paths: [] }
     });
-    cy.contains('.card', 'Washing machine plug')
+    cy.contains('.col-md-6', 'Washing machine plug')
       .find('[data-cy=matter-device-unavailable]')
       .should('contain', i18n.integration.matter.device.unavailable)
       .and('have.attr', 'title', i18n.integration.matter.device.unavailableReason['node-offline']);
@@ -312,7 +312,7 @@ describe('Matter devices', () => {
       type: 'matter.node-status-changed',
       payload: { node_id: '1234', status: 'connected', available: true, unreachable_device_paths: ['2'] }
     });
-    cy.contains('.card', 'Washing machine plug')
+    cy.contains('.col-md-6', 'Washing machine plug')
       .find('[data-cy=matter-device-unavailable]')
       .should('have.attr', 'title', i18n.integration.matter.device.unavailableReason['bridged-unreachable']);
 
@@ -320,7 +320,7 @@ describe('Matter devices', () => {
       type: 'matter.node-status-changed',
       payload: { node_id: '1234', status: 'connected', available: true, unreachable_device_paths: [] }
     });
-    cy.contains('.card', 'Washing machine plug')
+    cy.contains('.col-md-6', 'Washing machine plug')
       .find('[data-cy=matter-device-unavailable]')
       .should('not.exist');
   });
