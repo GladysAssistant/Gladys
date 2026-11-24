@@ -29,13 +29,28 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=z2m-pairing-extend]').should('be.visible');
     cy.get('[data-cy=z2m-pairing-stop]').should('be.visible');
 
-    sendPairing([atStep(readyBulb, 'interviewing'), { ...atStep(readyBulb, 'failed'), ieee_address: '0x03' }]);
-    cy.get('[data-cy=z2m-pairing-row]').should('have.length', 2);
+    const unsupported = {
+      ...atStep(readyBulb, 'unsupported'),
+      ieee_address: '0x04',
+      vendor: 'Lidl',
+      model: 'ZNCZ02LM'
+    };
+    sendPairing([
+      atStep(readyBulb, 'interviewing'),
+      { ...atStep(readyBulb, 'failed'), ieee_address: '0x03' },
+      unsupported
+    ]);
+    cy.get('[data-cy=z2m-pairing-row]').should('have.length', 3);
     cy.get('[data-cy=z2m-pairing-row]')
       .eq(1)
       .should('contain', Cypress._.get(Cypress.env('i18n'), `${T}.failedText`));
+    // Not supported, with its model as on a desktop
+    cy.get('[data-cy=z2m-pairing-row]')
+      .eq(2)
+      .should('contain', 'Lidl ZNCZ02LM')
+      .and('contain', Cypress._.get(Cypress.env('i18n'), `${T}.unsupportedText`));
     // In a button or a link, which holds no list
-    cy.get('[data-cy=z2m-pairing-timeline]').should('have.length', 2);
+    cy.get('[data-cy=z2m-pairing-timeline]').should('have.length', 3);
     cy.get('[data-cy=z2m-pairing-row] ol, [data-cy=z2m-pairing-row] li').should('not.exist');
     fitsTheScreen();
 

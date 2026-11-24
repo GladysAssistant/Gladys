@@ -757,8 +757,15 @@ class PairingWindow extends Component {
     if (status === PAIRING_STATUS.LEFT) {
       return <Text id={`${T}.leftText`} />;
     }
+    // With its model, as on a desktop (D.2)
     if (status === PAIRING_STATUS.UNSUPPORTED) {
-      return <Text id={`${T}.unsupportedText`} />;
+      const model = this.getSubtitle(entry);
+      return (
+        <span data-cy="z2m-pairing-unsupported">
+          {model && <span class="d-block">{model}</span>}
+          <Text id={`${T}.unsupportedText`} />
+        </span>
+      );
     }
     if (status !== PAIRING_STATUS.READY) {
       return this.getSubtitle(entry);

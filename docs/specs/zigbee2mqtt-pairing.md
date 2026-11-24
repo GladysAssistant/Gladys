@@ -191,8 +191,8 @@ device".
     (deleted since): to add again, under its name. The names of the Gladys devices read after the Add
     do not undo it;
   - `ready`, already in Gladys (`device.id`): "Already in Gladys" with a link (a device paired again);
-  - `unsupported` (D60): "Not supported by Zigbee2MQTT" with the model when known and an explanation
-    (Gladys cannot create its features); no Add;
+  - `unsupported` (D60): "Not supported by Zigbee2MQTT" with the model when known (desktop and phone) and
+    an explanation (Gladys cannot create its features); no Add;
   - `failed` (D59): "Interview failed" and the advice: "Bring the device closer to the dongle or to a
     mains-powered device, then put it in pairing mode again"; the row starts over if it joins again;
   - `left`: "Left the network before its identification ended" and the advice to put it in pairing mode
