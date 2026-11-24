@@ -2525,6 +2525,7 @@
         "preparing": "Getting the device ready…",
         "unsupportedText": "Zigbee2MQTT does not support this model: Gladys cannot add it.",
         "failedText": "The interview failed. Bring the device closer to the dongle or to a mains-powered device, then put it in pairing mode again.",
+        "leftText": "The device left the network before its identification ended. Put it in pairing mode again.",
         "add": "Add to Gladys",
         "addError": "Gladys could not add the device. Try again.",
         "added": "Added to Gladys",

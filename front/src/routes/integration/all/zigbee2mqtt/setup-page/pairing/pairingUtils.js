@@ -19,7 +19,8 @@ export const PAIRING_STATUS = {
   INTERVIEWING: 'interviewing',
   READY: 'ready',
   UNSUPPORTED: 'unsupported',
-  FAILED: 'failed'
+  FAILED: 'failed',
+  LEFT: 'left'
 };
 
 /**

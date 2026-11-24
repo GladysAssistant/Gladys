@@ -146,8 +146,26 @@ describe('zigbee2mqtt pairingDevices', () => {
       expect(lastSent()[0]).to.include({ status: 'joined', friendly_name: 'kitchen bulb' });
     });
 
-    it('should forget a device that leaves', () => {
+    it('should tell a device that leaves before its interview ended', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { friendly_name: 'a', ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: '0x99', status: 'started' },
+      });
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_leave', data: { ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_leave', data: { ieee_address: '0x99' } });
+      expect(lastSent().map((entry) => entry.status)).to.deep.equal(['left', 'left']);
+      expect(lastSent()[0]).to.include({ friendly_name: 'a', updated_at: NOW });
+      // Joining again, it starts over
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { ieee_address: IEEE } });
+      expect(lastSent()[0]).to.include({ status: 'joined', friendly_name: 'a' });
+    });
+
+    it('should forget a device that leaves once its interview ended', () => {
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: IEEE, status: 'failed' },
+      });
       zigbee2MqttManager.handleBridgeEvent({ type: 'device_leave', data: { ieee_address: IEEE } });
       expect(lastSent()).to.deep.equal([]);
       expect(zigbee2MqttManager.pairingDevices).to.deep.equal({});
@@ -234,6 +252,14 @@ describe('zigbee2mqtt pairingDevices', () => {
       expect(changed).to.equal(true);
       expect(Object.keys(zigbee2MqttManager.pairingDevices)).to.deep.equal(['0x99']);
       assert.notCalled(gladys.event.emit);
+    });
+
+    it('should keep a device told gone, which is no longer listed', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { ieee_address: IEEE } });
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_leave', data: { ieee_address: IEEE } });
+      const changed = zigbee2MqttManager.updatePairingFromList([]);
+      expect(changed).to.equal(false);
+      expect(zigbee2MqttManager.pairingDevices[IEEE].status).to.equal('left');
     });
 
     it('should take the end of an interview whose event was missed', () => {

@@ -69,6 +69,7 @@ const PAIRING_STATUS = {
   READY: 'ready',
   UNSUPPORTED: 'unsupported',
   FAILED: 'failed',
+  LEFT: 'left',
 };
 
 // Longest joining window Zigbee2mqtt opens, in seconds

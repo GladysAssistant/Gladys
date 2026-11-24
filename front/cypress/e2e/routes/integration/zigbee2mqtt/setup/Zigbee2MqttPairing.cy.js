@@ -355,7 +355,7 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('@addDevice.all').should('have.length', 0);
     });
 
-    it('should tell a device already in Gladys, a device not supported and a failed interview', () => {
+    it('should tell a device already in Gladys, a device not supported, a failed interview and a device gone', () => {
       const inGladys = {
         ...readyBulb,
         ieee_address: '0x01',
@@ -370,9 +370,10 @@ describe('Zigbee2mqtt pairing window', () => {
         description: 'Automatically generated definition'
       };
       const failed = { ...atStep(readyBulb, 'failed'), ieee_address: '0x03' };
-      openPairing({ pairing: [inGladys, unsupported, failed] });
+      const left = { ...atStep(readyBulb, 'left'), ieee_address: '0x04' };
+      openPairing({ pairing: [inGladys, unsupported, failed, left] });
 
-      cy.get('[data-cy=z2m-pairing-row]').should('have.length', 3);
+      cy.get('[data-cy=z2m-pairing-row]').should('have.length', 4);
       cy.get('[data-cy=z2m-pairing-row]')
         .eq(0)
         .within(() => {
@@ -407,9 +408,16 @@ describe('Zigbee2mqtt pairing window', () => {
           cy.get('[data-cy=z2m-pairing-timeline]').should('have.attr', 'aria-live', 'polite');
         });
 
+      cy.get('[data-cy=z2m-pairing-row]')
+        .eq(3)
+        .should('have.attr', 'data-status', 'left')
+        .within(() => {
+          cy.get('[data-cy=z2m-pairing-left]').i18n(`${T}.leftText`);
+        });
+
       // The failed device left the network
-      sendPairing([inGladys, unsupported]);
-      cy.get('[data-cy=z2m-pairing-row]').should('have.length', 2);
+      sendPairing([inGladys, unsupported, left]);
+      cy.get('[data-cy=z2m-pairing-row]').should('have.length', 3);
     });
 
     it('should show the icon of the device when its photo cannot be loaded', () => {

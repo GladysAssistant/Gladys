@@ -95,23 +95,23 @@ opened:
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ieee_address` | key                                                                                                                                           |
 | `friendly_name`| last name told by Zigbee2mqtt (event or `bridge/devices`)                                                                                     |
-| `status`       | `joined`, `interviewing`, `ready`, `unsupported`, `failed`                                                                                    |
+| `status`       | `joined`, `interviewing`, `ready`, `unsupported`, `failed`, `left` (gone before its interview ended)                                         |
 | `model`, `vendor`, `description` | from `definition` once the interview succeeded, else `null`                                                                  |
 | `device`       | `ready` only: the Gladys device as the Discover tab gets it (`getDiscoveredDevices`, with `id` when it is already in Gladys), else `null` |
 | `updated_at`   | ISO date of the last change                                                                                                                   |
 
 ### C.2 Transitions
 
-| Event                                         | No entry                | `joined` / `interviewing` | `ready` / `unsupported` / `failed` |
+| Event                                         | No entry                | `joined` / `interviewing` | `ready` / `unsupported` / `failed` / `left` |
 | --------------------------------------------- | ----------------------- | ------------------------- | ---------------------------------- |
 | `device_joined`                               | create `joined`         | `joined`                  | `joined` (joined again)            |
 | `device_interview` `started`                  | create `interviewing`   | `interviewing`            | `interviewing`                     |
 | `device_interview` `successful`, `supported`  | create `ready`          | `ready`                   | `ready`                            |
 | `device_interview` `successful`, not supported or no `definition` | create `unsupported` | `unsupported` | `unsupported`             |
 | `device_interview` `failed`                   | create `failed`         | `failed`                  | `failed` (a late failure of an earlier interview after `ready` is applied: Zigbee2mqtt says the last word) |
-| `device_leave`                                | —                       | removed                   | removed                            |
+| `device_leave`                                | —                       | `left`                    | removed (`left`: unchanged)        |
 | `bridge/devices`                              | —                       | name updated; the device listed with its interview finished (`interview_completed`, not `interviewing`): `ready` or `unsupported` as `device_interview` `successful` | name updated; `device` computed again (`ready`) |
-| `bridge/devices` without the device (removed from Zigbee2mqtt) | —      | removed                   | removed                            |
+| `bridge/devices` without the device (removed from Zigbee2mqtt) | —      | removed                   | removed, but `left` (no longer listed since it left) |
 | a new window opens (`allowed` false → true, not the same window, B.1) | registry emptied | emptied | emptied |
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
@@ -127,6 +127,8 @@ opened:
 - Closing joining keeps the registry: an interview often ends after the window, and the user may add
   the ready devices later. A new run of Zigbee2mqtt keeps it too, and so does the same window told again
   after a reconnection or an init (B.1).
+- A device leaving before its interview ended stays `left`: its row says why it is gone, until it joins
+  again or a new window opens.
 - An event arriving while joining is closed (a device joining through the Zigbee2mqtt interface) is
   applied all the same.
 - `device` is read when the entry is sent, not stored: the `successful` event and the `bridge/devices`
@@ -189,7 +191,9 @@ device".
   - `unsupported` (D60): "Not supported by Zigbee2MQTT" with the model when known and an explanation
     (Gladys cannot create its features); no Add;
   - `failed` (D59): "Interview failed" and the advice: "Bring the device closer to the dongle or to a
-    mains-powered device, then put it in pairing mode again"; the row starts over if it joins again.
+    mains-powered device, then put it in pairing mode again"; the row starts over if it joins again;
+  - `left`: "Left the network before its identification ended" and the advice to put it in pairing mode
+    again.
 - A device whose photo, name or row once ready is shown is never created without the click on **Add**
   (D6). A name typed by the user is kept when the registry comes again.
 - **Finish** (wizard) / **Close** (dashboard, Discover tab). Closing the window does not close joining

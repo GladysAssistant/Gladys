@@ -106,10 +106,20 @@ function handleBridgeEvent(event) {
   }
   const previous = this.pairingDevices[ieeeAddress];
   if (type === 'device_leave') {
-    if (previous) {
-      delete this.pairingDevices[ieeeAddress];
-      this.emitPairingDevices();
+    if (!previous) {
+      return;
     }
+    // Gone before its interview ended: told, else its row would vanish without a word. Gone after: forgotten
+    if (previous.status === PAIRING_STATUS.JOINED || previous.status === PAIRING_STATUS.INTERVIEWING) {
+      this.pairingDevices[ieeeAddress] = {
+        ...previous,
+        status: PAIRING_STATUS.LEFT,
+        updated_at: new Date().toISOString(),
+      };
+    } else {
+      delete this.pairingDevices[ieeeAddress];
+    }
+    this.emitPairingDevices();
     return;
   }
   const status = getStatus(type, data);
@@ -149,10 +159,11 @@ function handleBridgeEvent(event) {
  */
 function updatePairingFromList(devices) {
   let changed = false;
-  // Removed from Zigbee2mqtt (its interface, a request): no device_leave is sure to come
+  // Removed from Zigbee2mqtt (its interface, a request): no device_leave is sure to come. A device told gone is no
+  // longer listed: it stays told gone
   const listed = new Set(devices.map((device) => device.ieee_address));
   Object.keys(this.pairingDevices).forEach((ieeeAddress) => {
-    if (!listed.has(ieeeAddress)) {
+    if (!listed.has(ieeeAddress) && this.pairingDevices[ieeeAddress].status !== PAIRING_STATUS.LEFT) {
       delete this.pairingDevices[ieeeAddress];
       changed = true;
     }

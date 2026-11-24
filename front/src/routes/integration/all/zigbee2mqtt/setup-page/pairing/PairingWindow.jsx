@@ -50,6 +50,7 @@ const getSteps = status => {
     case PAIRING_STATUS.UNSUPPORTED:
       return ['done', 'done', 'warning'];
     default:
+      // failed, or left the network before its identification ended
       return ['done', 'failed', 'todo'];
   }
 };
@@ -553,6 +554,13 @@ class PairingWindow extends Component {
         </p>
       );
     }
+    if (status === PAIRING_STATUS.LEFT) {
+      return (
+        <p class={style.advice} data-cy="z2m-pairing-left">
+          <Text id={`${T}.leftText`} />
+        </p>
+      );
+    }
     if (status === PAIRING_STATUS.UNSUPPORTED) {
       return (
         <p class={style.advice} data-cy="z2m-pairing-unsupported">
@@ -731,6 +739,9 @@ class PairingWindow extends Component {
     const { status, device } = entry;
     if (status === PAIRING_STATUS.FAILED) {
       return <Text id={`${T}.failedText`} />;
+    }
+    if (status === PAIRING_STATUS.LEFT) {
+      return <Text id={`${T}.leftText`} />;
     }
     if (status === PAIRING_STATUS.UNSUPPORTED) {
       return <Text id={`${T}.unsupportedText`} />;

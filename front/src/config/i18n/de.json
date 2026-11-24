@@ -2769,6 +2769,7 @@
         "preparing": "Gerät wird vorbereitet…",
         "unsupportedText": "Zigbee2MQTT unterstützt dieses Modell nicht: Gladys kann es nicht hinzufügen.",
         "failedText": "Das Interview ist fehlgeschlagen. Bring das Gerät näher an den Stick oder an ein Gerät mit Netzanschluss und versetze es erneut in den Anlernmodus.",
+        "leftText": "Das Gerät hat das Netzwerk verlassen, bevor seine Identifizierung abgeschlossen war. Versetze es erneut in den Anlernmodus.",
         "add": "Zu Gladys hinzufügen",
         "addError": "Gladys konnte das Gerät nicht hinzufügen. Versuche es erneut.",
         "added": "Zu Gladys hinzugefügt",
