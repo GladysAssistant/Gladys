@@ -606,20 +606,14 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     const [config] = zigbee2mqttManager.installMqttContainer.firstCall.args;
-    assert.callCount(zigbee2mqttManager.saveOrDestroyVariable, 6);
+    assert.callCount(zigbee2mqttManager.saveOrDestroyVariable, 5);
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'GLADYS_MQTT_USERNAME', 'gladys');
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'GLADYS_MQTT_PASSWORD', config.mqttPassword);
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_URL', 'mqtt://localhost:1884');
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_USERNAME', 'z2m');
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_PASSWORD', config.z2mMqttPassword);
-    assert.calledWithExactly(
-      zigbee2mqttManager.saveOrDestroyVariable,
-      'Z2M_FRONTEND_AUTH_TOKEN',
-      config.z2mFrontendAuthToken,
-    );
     expect(config.mqttPassword).to.have.lengthOf(20);
     expect(config.z2mMqttPassword).to.have.lengthOf(20);
-    expect(config.z2mFrontendAuthToken).to.have.lengthOf(20);
     assert.callOrder(zigbee2mqttManager.saveOrDestroyVariable, zigbee2mqttManager.installMqttContainer);
   });
 
@@ -632,12 +626,62 @@ describe('zigbee2mqtt init', () => {
       mqttPassword: 'gladys-password',
       z2mMqttUsername: 'z2m',
       z2mMqttPassword: 'z2m-password',
-      z2mFrontendAuthToken: 'interface-password',
     });
     // EXECUTE
     await zigbee2mqttManager.init();
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_URL', 'mqtt://localhost:1884');
+  });
+
+  it('should generate the password of the interface, saved with the configuration once installed', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({ mqttMode: 'local', z2mDriverPath: '/dev/ttyUSB0' });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    const [config] = zigbee2mqttManager.installZ2mContainer.firstCall.args;
+    expect(config.z2mFrontendAuthToken).to.have.lengthOf(20);
+    assert.calledOnceWithExactly(
+      zigbee2mqttManager.saveConfiguration,
+      sinon.match({ z2mFrontendAuthToken: config.z2mFrontendAuthToken }),
+    );
+    // Not saved before the configuration file of Zigbee2mqtt is read: it may hold another one
+    assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_FRONTEND_AUTH_TOKEN');
+  });
+
+  it('should give the password of the interface to an installation older than the broker mode', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({ z2mDriverPath: '/dev/ttyUSB0' });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    const [config] = zigbee2mqttManager.installZ2mContainer.firstCall.args;
+    expect(config.z2mFrontendAuthToken).to.have.lengthOf(20);
+  });
+
+  it('should keep the stored password of the interface', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({
+      mqttMode: 'local',
+      z2mDriverPath: '/dev/ttyUSB0',
+      z2mFrontendAuthToken: 'interface-password',
+    });
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    const [config] = zigbee2mqttManager.installZ2mContainer.firstCall.args;
+    expect(config.z2mFrontendAuthToken).to.equal('interface-password');
+  });
+
+  it('should not save a password of the interface generated for an installation that fails', async () => {
+    // PREPARE
+    zigbee2mqttManager.getConfiguration.resolves({ mqttMode: 'local', z2mDriverPath: '/dev/ttyUSB0' });
+    zigbee2mqttManager.installMqttContainer.rejects(new Error('broker not started'));
+    // EXECUTE
+    await expect(zigbee2mqttManager.init()).to.be.rejectedWith('broker not started');
+    // ASSERT
+    assert.notCalled(zigbee2mqttManager.saveConfiguration);
+    assert.neverCalledWith(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_FRONTEND_AUTH_TOKEN');
   });
 
   it('should keep the MQTT accounts of a broker created by an installation that failed after', async () => {

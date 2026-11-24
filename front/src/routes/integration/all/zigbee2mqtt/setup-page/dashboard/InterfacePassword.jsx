@@ -19,7 +19,13 @@ class InterfacePassword extends Component {
   };
 
   copy = async () => {
-    await navigator.clipboard.writeText(this.props.password);
+    try {
+      await navigator.clipboard.writeText(this.props.password);
+    } catch (e) {
+      // Refused by the browser: the password stays revealed for the user to copy it
+      console.error('Failed to copy the password of the interface', e);
+      return;
+    }
     clearTimeout(this.copyTimer);
     this.setState({ copied: true });
     this.copyTimer = setTimeout(() => this.setState({ copied: false }), 2000);
@@ -30,7 +36,7 @@ class InterfacePassword extends Component {
     clearTimeout(this.copyTimer);
   }
 
-  render({ password }, { revealed, copied }) {
+  render({ password, linked }, { revealed, copied }) {
     const canCopy = typeof window !== 'undefined' && window.isSecureContext && Boolean(navigator.clipboard);
     return (
       <div class="mt-3" data-cy="z2m-dashboard-interface-password">
@@ -67,7 +73,7 @@ class InterfacePassword extends Component {
           )}
         </div>
         <small class="form-text text-muted">
-          <Text id={`${T}.passwordHelp`} />
+          <Text id={linked ? `${T}.passwordHelp` : `${T}.passwordHelpNoLink`} />
         </small>
       </div>
     );

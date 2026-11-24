@@ -161,7 +161,13 @@ class MqttAccess extends Component {
 // tap
 class InterfacePasswordMobile extends Component {
   copy = async () => {
-    await navigator.clipboard.writeText(this.props.password);
+    try {
+      await navigator.clipboard.writeText(this.props.password);
+    } catch (e) {
+      // Refused by the browser: the password can be revealed for the user to copy it
+      console.error('Failed to copy the password of the interface', e);
+      return;
+    }
     this.setState(prevState => ({ copiedKey: (prevState.copiedKey || 0) + 1 }));
   };
 
@@ -180,7 +186,7 @@ class InterfacePasswordMobile extends Component {
     clearTimeout(this.revealTimer);
   }
 
-  render({ password, dictionary }, { revealed, copiedKey }) {
+  render({ password, linked, dictionary }, { revealed, copiedKey }) {
     const canCopy = typeof window !== 'undefined' && window.isSecureContext && Boolean(navigator.clipboard);
     return (
       <div data-cy="z2m-dashboard-interface-password">
@@ -214,7 +220,7 @@ class InterfacePasswordMobile extends Component {
           />
         </MobileGroup>
         <p class={kitStyle.footnote}>
-          <Text id={`${T}.advanced.interface.passwordHelp`} />
+          <Text id={linked ? `${T}.advanced.interface.passwordHelp` : `${T}.advanced.interface.passwordHelpNoLink`} />
         </p>
         <MobileToast
           message={copiedKey ? get(dictionary, `${MQTT_T}.copied`) : null}
@@ -267,7 +273,11 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
                 />
               </MobileField>
               {configuration.z2mFrontendAuthToken && (
-                <InterfacePasswordMobile password={configuration.z2mFrontendAuthToken} dictionary={dictionary} />
+                <InterfacePasswordMobile
+                  password={configuration.z2mFrontendAuthToken}
+                  linked={Boolean(z2mUrl)}
+                  dictionary={dictionary}
+                />
               )}
               {z2mUrl && (
                 <MobileGroup>

@@ -29,6 +29,29 @@ export default function getZ2mUrl(setup, hasGatewayClient = false) {
 }
 
 /**
+ * Address of a device in the Zigbee2mqtt frontend: its page after the query, which may carry the password of the
+ * interface (`?token=`).
+ * @param {string} z2mUrl - Resolved Zigbee2mqtt frontend URL.
+ * @param {string} ieeeAddress - IEEE address of the device.
+ * @returns {string}
+ */
+export function getZ2mDeviceUrl(z2mUrl, ieeeAddress) {
+  const devicePath = `#/device/0/${ieeeAddress}/info`;
+  try {
+    const url = new URL(z2mUrl);
+    // As before the query: the page of the device below the path of the interface
+    if (!url.pathname.endsWith('/')) {
+      url.pathname = `${url.pathname}/`;
+    }
+    url.hash = devicePath;
+    return url.toString();
+  } catch (e) {
+    // An interface URL typed by hand that is not one: linked as is
+    return `${z2mUrl}/${devicePath}`;
+  }
+}
+
+/**
  * Whether to show the missing Z2M URL warning on device/discover pages.
  * @param {object} setup - Setup from API or mapped configuration.
  * @param {boolean} [hasGatewayClient=false] - Whether Gladys Plus gateway client is active.

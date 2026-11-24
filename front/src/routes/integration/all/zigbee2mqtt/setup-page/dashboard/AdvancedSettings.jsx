@@ -377,7 +377,7 @@ class AdvancedSettings extends Component {
                   <Text id={`${T}.advanced.interface.help`} />
                 </small>
                 {configuration.z2mFrontendAuthToken && (
-                  <InterfacePassword password={configuration.z2mFrontendAuthToken} />
+                  <InterfacePassword password={configuration.z2mFrontendAuthToken} linked={Boolean(z2mUrl)} />
                 )}
                 {z2mUrl && (
                   <a href={z2mUrl} target="_blank" rel="noopener noreferrer" data-cy="z2m-dashboard-open-interface">

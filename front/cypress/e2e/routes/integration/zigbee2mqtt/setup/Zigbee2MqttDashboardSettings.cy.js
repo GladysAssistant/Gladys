@@ -196,6 +196,15 @@ describe('Zigbee2mqtt dashboard settings', () => {
       cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('have.text', 'interface-password');
     });
 
+    it('should only tell to paste the password of the interface when Gladys has no link to it', () => {
+      visitDashboard({ setup: { ...localSetup, Z2M_TCP_PORT: null, Z2M_FRONTEND_AUTH_TOKEN: 'interface-password' } });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-open-interface]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-interface-password]')
+        .should('contain', i18nText(`${T}.advanced.interface.passwordHelpNoLink`))
+        .and('not.contain', i18nText(`${T}.advanced.interface.passwordHelp`));
+    });
+
     it('should show no password of the interface when Gladys does not know it', () => {
       visitDashboard();
       cy.get('[data-cy=z2m-dashboard-advanced-link]').click();

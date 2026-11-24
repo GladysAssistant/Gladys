@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import { getZ2mDeviceUrl } from '../utils/getZ2mUrl';
 import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
@@ -150,7 +151,7 @@ class Zigbee2mqttBox extends Component {
         >
           {props.z2mUrl && props.device.ieee_address && (
             <a
-              href={`${props.z2mUrl}/#/device/0/${props.device.ieee_address}/info`}
+              href={getZ2mDeviceUrl(props.z2mUrl, props.device.ieee_address)}
               target="_blank"
               rel="noopener noreferrer"
               class={kitStyle.linkButton}
@@ -249,7 +250,7 @@ class Zigbee2mqttBox extends Component {
                     />
                     {props.z2mUrl && (
                       <a
-                        href={`${props.z2mUrl}/#/device/0/${props.device.ieee_address}/info`}
+                        href={getZ2mDeviceUrl(props.z2mUrl, props.device.ieee_address)}
                         target="_blank"
                         rel="noopener noreferrer"
                         class={`${style.z2mDeviceLink} mt-2 text-muted`}

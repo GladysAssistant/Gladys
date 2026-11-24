@@ -127,6 +127,24 @@ describe('Zigbee2MQTT tabs on a phone', () => {
       cy.get('[data-cy=integration-device-sheet]').should('be.visible');
     };
 
+    it('should open a device in the interface with its password, after the query', () => {
+      cy.intercept(
+        { method: 'GET', url: api('/service/zigbee2mqtt/setup') },
+        {
+          body: {
+            Z2M_MQTT_MODE: 'local',
+            Z2M_ADAPTER_MODE: 'usb',
+            ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+            Z2M_FRONTEND_AUTH_TOKEN: 'interface-password'
+          }
+        }
+      ).as('getSetup');
+      openPlug();
+      cy.get('[data-cy=z2m-device-open-in-z2m]')
+        .should('have.attr', 'href')
+        .and('include', `:8080/?token=interface-password#/device/0/${IEEE}/info`);
+    });
+
     it('should list the devices as rows, with their room and their battery', () => {
       cy.visit(DEVICES_URL);
       cy.wait('@getDevices');
