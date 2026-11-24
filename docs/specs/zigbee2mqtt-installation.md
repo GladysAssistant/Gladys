@@ -740,9 +740,11 @@ A screen of its own, back to the dashboard by "Configuration":
   without one gets it at the next start of Gladys, Zigbee2mqtt restarted once (`auth_token` needs a
   restart). `GET /setup` gives it (`Z2M_FRONTEND_AUTH_TOKEN`, never saved by `POST /setup`); the links
   to the interface (dashboard, advanced settings, device and Discover pages) carry it as `?token=`,
-  which the interface of Zigbee2mqtt 2 (Windfront) reads to open without asking for it. The screen
-  shows it, revealed for 5 s and copied in one click, for an interface opened outside Gladys (a
-  bookmark, another device), which asks for it. An external Zigbee2mqtt is not touched: its interface
+  which the interface of Zigbee2mqtt 2 (Windfront) reads to open without asking for it, except the
+  first time it opens in a browser: Windfront reads `?token=` only once a first refusal told it that
+  the interface asks for a password, so it shows its login screen, and opens at once when the page is
+  reloaded. The screen shows it, revealed for 5 s and copied in one click, with these words, for that
+  first time and for an interface opened outside Gladys (a bookmark, another device). An external Zigbee2mqtt is not touched: its interface
   URL may carry `?token=` itself. Erased by the reset.
 - **External broker**: its form, as the wizard words and orders it (URL, user and password, interface
   URL), "Save" as the primary button and "Cancel" (back to the saved values) once something changed;

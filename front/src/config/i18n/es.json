@@ -2426,7 +2426,7 @@
               "help": "Cambiar el puerto reinicia Zigbee2MQTT; sus datos se conservan.",
               "open": "Abrir la interfaz",
               "password": "Contraseña",
-              "passwordHelp": "La pide la interfaz abierta fuera de Gladys (un marcador, otro dispositivo). El enlace de Gladys la da por sí mismo."
+              "passwordHelp": "El enlace de Gladys se la da a la interfaz. La primera vez que se abre en un navegador, puede pedirla igualmente: recargue la página. Abierta fuera de Gladys (un marcador, otro dispositivo), péguela."
             },
             "broker": {
               "title": "Conexión al broker MQTT"
