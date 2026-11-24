@@ -297,6 +297,16 @@
   max-width: 160px;
 }
 
+.passwordRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.passwordValue {
+  min-width: 0;
+}
+
 .componentState {
   display: inline-flex;
   align-items: center;

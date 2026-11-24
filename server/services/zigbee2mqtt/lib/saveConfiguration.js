@@ -13,6 +13,7 @@ async function saveConfiguration(config) {
 
   const keyValueMap = {
     [CONFIGURATION.Z2M_TCP_PORT]: config.z2mTcpPort,
+    [CONFIGURATION.Z2M_FRONTEND_AUTH_TOKEN]: config.z2mFrontendAuthToken,
     [CONFIGURATION.Z2M_ADAPTER_MODE]: config.z2mAdapterMode,
     [CONFIGURATION.Z2M_NETWORK_ADAPTER_URL]: config.z2mNetworkAdapterUrl,
     [CONFIGURATION.Z2M_NETWORK_ADAPTER_TYPE]: config.z2mNetworkAdapterType,

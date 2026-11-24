@@ -109,13 +109,14 @@ describe('zigbee2mqtt reset', () => {
     assert.calledTwice(gladys.system.stopContainer);
     assert.calledTwice(gladys.system.removeContainer);
 
-    // Should destroy all 16 configuration variables
-    assert.callCount(gladys.variable.destroy, 18);
+    // Should destroy all 19 configuration variables
+    assert.callCount(gladys.variable.destroy, 19);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_BACKUP', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE_DONGLE_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_MODE', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_AUTH_TOKEN', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_ADAPTER_MODE', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_URL', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_TYPE', serviceId);
@@ -293,7 +294,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
 
     // Should destroy all variables
-    assert.callCount(gladys.variable.destroy, 18);
+    assert.callCount(gladys.variable.destroy, 19);
     assert.calledOnce(fsRmStub);
   });
 
@@ -306,7 +307,7 @@ describe('zigbee2mqtt reset', () => {
     await zigbee2MqttManager.reset();
 
     assert.calledOnce(cancelFake);
-    assert.callCount(gladys.variable.destroy, 18);
+    assert.callCount(gladys.variable.destroy, 19);
     assert.calledOnce(fsRmStub);
   });
 

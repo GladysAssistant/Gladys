@@ -41,6 +41,7 @@ describe('zigbee2mqtt saveConfiguration', () => {
       z2mDriverPath: 'z2mDriverPath',
       z2mDongleName: 'z2mDongleName',
       z2mTcpPort: 'z2mTcpPort',
+      z2mFrontendAuthToken: 'z2mFrontendAuthToken',
       z2mAdapterMode: 'z2mAdapterMode',
       z2mNetworkAdapterUrl: 'z2mNetworkAdapterUrl',
       z2mNetworkAdapterType: 'z2mNetworkAdapterType',
@@ -55,9 +56,15 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 12);
+    assert.callCount(gladys.variable.setValue, 13);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_FRONTEND_URL', config.z2mFrontendUrl, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', config.z2mTcpPort, serviceId);
+    assert.calledWithExactly(
+      gladys.variable.setValue,
+      'Z2M_FRONTEND_AUTH_TOKEN',
+      config.z2mFrontendAuthToken,
+      serviceId,
+    );
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_ADAPTER_MODE', config.z2mAdapterMode, serviceId);
     assert.calledWithExactly(
       gladys.variable.setValue,
@@ -86,9 +93,10 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.destroy, 13);
+    assert.callCount(gladys.variable.destroy, 14);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_URL', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_AUTH_TOKEN', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_ADAPTER_MODE', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_URL', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_NETWORK_ADAPTER_TYPE', serviceId);

@@ -2668,7 +2668,9 @@
               "title": "Zigbee2MQTT-Oberfläche",
               "port": "Port",
               "help": "Eine Änderung des Ports startet Zigbee2MQTT neu; seine Daten bleiben erhalten.",
-              "open": "Oberfläche öffnen"
+              "open": "Oberfläche öffnen",
+              "password": "Passwort",
+              "passwordHelp": "Wird von der Oberfläche verlangt, wenn sie außerhalb von Gladys geöffnet wird (Lesezeichen, anderes Gerät). Der Link von Gladys übergibt es selbst."
             },
             "broker": {
               "title": "Verbindung zum MQTT-Broker"

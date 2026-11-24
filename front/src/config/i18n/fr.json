@@ -2801,7 +2801,9 @@
               "title": "Interface Zigbee2MQTT",
               "port": "Port",
               "help": "Changer le port redémarre Zigbee2MQTT ; ses données sont gardées.",
-              "open": "Ouvrir l'interface"
+              "open": "Ouvrir l'interface",
+              "password": "Mot de passe",
+              "passwordHelp": "Demandé par l'interface ouverte hors de Gladys (favori, autre appareil). Le lien de Gladys le donne lui-même."
             },
             "broker": {
               "title": "Connexion au broker MQTT"

@@ -38,7 +38,7 @@ describe('zigbee2mqtt getSetup', () => {
     // EXECUTE
     const config = await zigbee2MqttManager.getSetup();
     // ASSERT
-    assert.callCount(gladys.variable.getValue, 11);
+    assert.callCount(gladys.variable.getValue, 12);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE_DONGLE_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_TCP_PORT', serviceId);
@@ -50,6 +50,7 @@ describe('zigbee2mqtt getSetup', () => {
     assert.calledWithExactly(gladys.variable.getValue, 'GLADYS_MQTT_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_MODE', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_FRONTEND_URL', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_FRONTEND_AUTH_TOKEN', serviceId);
 
     // z2m was not running, we don't reload it
     expect(config).deep.eq({
@@ -64,6 +65,7 @@ describe('zigbee2mqtt getSetup', () => {
       Z2M_MQTT_URL: 'fake',
       GLADYS_MQTT_USERNAME: 'fake',
       Z2M_FRONTEND_URL: 'fake',
+      Z2M_FRONTEND_AUTH_TOKEN: 'fake',
     });
   });
 });

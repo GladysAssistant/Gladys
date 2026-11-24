@@ -28,7 +28,8 @@ const VARIABLE_MAP = {
   Z2M_MQTT_URL: 'mqttUrl',
   GLADYS_MQTT_USERNAME: 'mqttUsername',
   GLADYS_MQTT_PASSWORD: 'mqttPassword',
-  Z2M_FRONTEND_URL: 'z2mFrontendUrl'
+  Z2M_FRONTEND_URL: 'z2mFrontendUrl',
+  Z2M_FRONTEND_AUTH_TOKEN: 'z2mFrontendAuthToken'
 };
 
 // Until the status and the configuration are loaded, or when they cannot be

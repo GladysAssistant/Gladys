@@ -366,8 +366,8 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   }
 
   // Check for requested changes (the port of Gladys is a string, the one of the file a number). Zigbee2mqtt 2 serves
-  // its interface only once enabled: enabled when the file does not say, without password for now; an interface the
-  // user turned off by hand stays off.
+  // its interface only once enabled: enabled when the file does not say; an interface the user turned off by hand stays
+  // off.
   if (Number(config.z2mTcpPort) !== port || frontend.enabled === undefined) {
     // The other settings of the interface (host, auth_token…) are kept
     const { enabled = true, port: previousPort, ...otherSettings } = frontend;
@@ -376,6 +376,18 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
       port: Number(config.z2mTcpPort),
       ...otherSettings,
     };
+    configChanged = true;
+  }
+
+  // The password of the interface: one written by hand in the file wins, and Gladys keeps it; else the one of Gladys is
+  // written. A reference to another file (`!secret.yaml auth_token`) is left as is: Gladys does not know the password.
+  const { auth_token: authToken } = loadedConfig.frontend;
+  if (typeof authToken === 'string' && authToken.startsWith('!')) {
+    config.z2mFrontendAuthToken = null;
+  } else if (typeof authToken === 'string' && authToken !== '') {
+    config.z2mFrontendAuthToken = authToken;
+  } else if (config.z2mFrontendAuthToken) {
+    loadedConfig.frontend.auth_token = config.z2mFrontendAuthToken;
     configChanged = true;
   }
 

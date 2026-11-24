@@ -606,14 +606,20 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     const [config] = zigbee2mqttManager.installMqttContainer.firstCall.args;
-    assert.callCount(zigbee2mqttManager.saveOrDestroyVariable, 5);
+    assert.callCount(zigbee2mqttManager.saveOrDestroyVariable, 6);
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'GLADYS_MQTT_USERNAME', 'gladys');
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'GLADYS_MQTT_PASSWORD', config.mqttPassword);
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_URL', 'mqtt://localhost:1884');
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_USERNAME', 'z2m');
     assert.calledWithExactly(zigbee2mqttManager.saveOrDestroyVariable, 'Z2M_MQTT_PASSWORD', config.z2mMqttPassword);
+    assert.calledWithExactly(
+      zigbee2mqttManager.saveOrDestroyVariable,
+      'Z2M_FRONTEND_AUTH_TOKEN',
+      config.z2mFrontendAuthToken,
+    );
     expect(config.mqttPassword).to.have.lengthOf(20);
     expect(config.z2mMqttPassword).to.have.lengthOf(20);
+    expect(config.z2mFrontendAuthToken).to.have.lengthOf(20);
     assert.callOrder(zigbee2mqttManager.saveOrDestroyVariable, zigbee2mqttManager.installMqttContainer);
   });
 
@@ -626,6 +632,7 @@ describe('zigbee2mqtt init', () => {
       mqttPassword: 'gladys-password',
       z2mMqttUsername: 'z2m',
       z2mMqttPassword: 'z2m-password',
+      z2mFrontendAuthToken: 'interface-password',
     });
     // EXECUTE
     await zigbee2mqttManager.init();

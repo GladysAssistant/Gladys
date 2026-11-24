@@ -252,6 +252,15 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
       generatedVariables[CONFIGURATION.Z2M_MQTT_USERNAME_KEY] = configuration.z2mMqttUsername;
       generatedVariables[CONFIGURATION.Z2M_MQTT_PASSWORD_KEY] = configuration.z2mMqttPassword;
     }
+    // Password of the interface of Zigbee2mqtt, replaced by the one of its configuration file when it holds one
+    if (!configuration.z2mFrontendAuthToken) {
+      configuration.z2mFrontendAuthToken = generate(20, {
+        number: true,
+        lowercase: true,
+        uppercase: true,
+      });
+      generatedVariables[CONFIGURATION.Z2M_FRONTEND_AUTH_TOKEN] = configuration.z2mFrontendAuthToken;
+    }
     // Saved as soon as generated, before the broker is created with these accounts: saved only at the end of init,
     // they would be lost when the installation fails after the creation of the broker, which would then refuse every
     // later try (BAD_CREDENTIALS)

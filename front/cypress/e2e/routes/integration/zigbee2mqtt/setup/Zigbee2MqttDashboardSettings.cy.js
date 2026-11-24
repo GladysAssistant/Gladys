@@ -177,6 +177,35 @@ describe('Zigbee2mqtt dashboard settings', () => {
       cy.get('[data-cy=z2m-dashboard-open-interface]').should('exist');
     });
 
+    it('should open the interface with its password, and show the password for another browser', () => {
+      visitDashboard({ setup: { ...localSetup, Z2M_FRONTEND_AUTH_TOKEN: 'interface-password' } });
+      cy.get('[data-cy=z2m-dashboard-interface]')
+        .should('have.attr', 'href')
+        .and('match', /:12000\/\?token=interface-password$/);
+
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-open-interface]')
+        .should('have.attr', 'href')
+        .and('match', /:12000\/\?token=interface-password$/);
+      cy.get('[data-cy=z2m-dashboard-interface-password]').should(
+        'contain',
+        i18nText(`${T}.advanced.interface.passwordHelp`)
+      );
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('not.contain', 'interface-password');
+      cy.get('[data-cy=z2m-dashboard-interface-password-reveal]').click();
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('have.text', 'interface-password');
+    });
+
+    it('should show no password of the interface when Gladys does not know it', () => {
+      visitDashboard();
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-port]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-interface-password]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-open-interface]')
+        .should('have.attr', 'href')
+        .and('match', /:12000$/);
+    });
+
     it('should reset the integration once confirmed, back to the wizard', () => {
       visitDashboard();
       const serverUrl = Cypress.env('serverUrl');

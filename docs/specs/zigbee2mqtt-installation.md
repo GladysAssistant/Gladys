@@ -730,9 +730,20 @@ A screen of its own, back to the dashboard by "Configuration":
   before Gladys saved one, or changed by hand). The port saved by the end of an installation replaces
   the field unless the user is typing another one. Link to the interface once the port is saved. The
   interface is enabled when the file does not say (`frontend.enabled: true`, without which
-  Zigbee2mqtt 2 does not serve it), without password for now; an `enabled: false` set by hand is kept,
-  and the other settings of `frontend` too. An installation written before gets it at the next start
-  of Gladys, Zigbee2mqtt restarted once.
+  Zigbee2mqtt 2 does not serve it); an `enabled: false` set by hand is kept, and the other settings of
+  `frontend` too. An installation written before gets it at the next start of Gladys, Zigbee2mqtt
+  restarted once.
+- **Interface password** (local mode, always on): init generates it once (20 characters, as the MQTT
+  accounts) in `Z2M_FRONTEND_AUTH_TOKEN`, which `configureContainer` writes as `frontend.auth_token`.
+  A password written by hand in the file wins, and Gladys keeps it; a reference to another file
+  (`'!secret.yaml auth_token'`) is left as is, and Gladys knows no password then. An installation
+  without one gets it at the next start of Gladys, Zigbee2mqtt restarted once (`auth_token` needs a
+  restart). `GET /setup` gives it (`Z2M_FRONTEND_AUTH_TOKEN`, never saved by `POST /setup`); the links
+  to the interface (dashboard, advanced settings, device and Discover pages) carry it as `?token=`,
+  which the interface of Zigbee2mqtt 2 (Windfront) reads to open without asking for it. The screen
+  shows it, revealed for 5 s and copied in one click, for an interface opened outside Gladys (a
+  bookmark, another device), which asks for it. An external Zigbee2mqtt is not touched: its interface
+  URL may carry `?token=` itself. Erased by the reset.
 - **External broker**: its form, as the wizard words and orders it (URL, user and password, interface
   URL), "Save" as the primary button and "Cancel" (back to the saved values) once something changed;
   saved the same way, with the payload of the wizard on every screen size (URL trimmed, an empty user,
@@ -765,7 +776,8 @@ screen layout (`Dashboard.jsx` and `AdvancedSettings.jsx` keep the state and the
 - **Advanced settings**: a focus page, back to "Configuration" from its navigation bar; the port, or
   the fields of the external broker (the password with its reveal button), saved from the bottom bar
   shown once something differs, where a refused save is told; the state of each component as pills;
-  the MQTT access as rows, each value copied in one tap and the password revealed for 5 s; the reset
+  the password of the interface as a row, revealed for 5 s and copied in one tap; the MQTT access as
+  rows, each value copied in one tap and the password revealed for 5 s; the reset
   as a red row confirmed in a sheet. Leaving with something not saved, by the navigation bar or the
   system "back", asks first (save and leave, leave without saving, keep editing).
 - **Change of dongle**: the focus page of the wizard (M.3), its navigation bar back to "Configuration"

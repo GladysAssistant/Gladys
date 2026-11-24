@@ -136,6 +136,18 @@ describe('Zigbee2mqtt dashboard on a phone', () => {
       cy.get('[data-cy=z2m-dashboard]').should('exist');
     });
 
+    it('should show the password of the interface, revealed in one tap', () => {
+      visitDashboard({ setup: { ...localSetup, Z2M_FRONTEND_AUTH_TOKEN: 'interface-password' } });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('not.contain', 'interface-password');
+      cy.get('[data-cy=z2m-dashboard-interface-password-reveal]').click();
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('have.text', 'interface-password');
+      cy.get('[data-cy=z2m-dashboard-open-interface]')
+        .should('have.attr', 'href')
+        .and('match', /:12000\/\?token=interface-password$/);
+      fitsTheScreen();
+    });
+
     it('should save another port from the bottom bar, and only it', () => {
       visitDashboard();
       cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
