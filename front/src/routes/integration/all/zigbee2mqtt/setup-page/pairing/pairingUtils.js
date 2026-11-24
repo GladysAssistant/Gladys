@@ -44,7 +44,9 @@ export const getDevicePhotoUrl = model => (model ? `${PHOTO_URL}/${model.replace
 export const getPairingIcon = device => {
   const features = (device && device.features) || [];
   const isSecondary = feature => SECONDARY_CATEGORIES.includes(feature.category);
-  return getDeviceIcon({ features: [...features.filter(feature => !isSecondary(feature)), ...features.filter(isSecondary)] });
+  return getDeviceIcon({
+    features: [...features.filter(feature => !isSecondary(feature)), ...features.filter(isSecondary)]
+  });
 };
 
 /**
