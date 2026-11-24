@@ -2512,7 +2512,7 @@
         },
         "steps": {
           "joined": "Unido",
-          "interview": "Entrevista",
+          "interview": "Identificación",
           "ready": "Listo",
           "unsupported": "No compatible"
         },
@@ -2525,7 +2525,7 @@
         },
         "preparing": "Preparando el dispositivo…",
         "unsupportedText": "Zigbee2MQTT no admite este modelo: Gladys no puede añadirlo.",
-        "failedText": "La entrevista ha fallado. Acerca el dispositivo a la llave o a un dispositivo conectado a la red eléctrica y vuelve a ponerlo en modo emparejamiento.",
+        "failedText": "La identificación ha fallado. Acerca el dispositivo a la llave o a un dispositivo conectado a la red eléctrica y vuelve a ponerlo en modo emparejamiento.",
         "leftText": "El dispositivo ha salido de la red antes de terminar su identificación. Vuelve a ponerlo en modo emparejamiento.",
         "add": "Añadir a Gladys",
         "addError": "Gladys no pudo añadir el dispositivo. Inténtalo de nuevo.",

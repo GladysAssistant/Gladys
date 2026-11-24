@@ -19,7 +19,7 @@ countdown, no sign that the device joined, that its interview ran or failed. A d
 not support joined and stayed invisible. Users left the Discover tab, opened the Zigbee2mqtt interface
 or gave up.
 
-Now: Gladys follows `bridge/event` and tells, device by device, "joined → interview → ready / failed",
+Now: Gladys follows `bridge/event` and tells, device by device, "joined → identification → ready / failed",
 with a countdown of the joining window; a device that is ready becomes a card to add to Gladys (photo,
 suggested name, room) without leaving the wizard or the dashboard. No device is created without the
 user's click.
@@ -175,7 +175,7 @@ device".
   an earlier one, still running after its 10 s, touches neither the wait nor the outcome of the last.
   In the demo, the answer of the request is enough. Without a known end, no countdown.
 - **Tips** (approach, pairing mode, add it here) while the registry is empty.
-- **One row per entry**, a timeline "Joined → Interview → Ready" (the last step reads "Not supported"
+- **One row per entry**, a timeline "Joined → Identification → Ready" (the last step reads "Not supported"
   for an `unsupported` entry; each step also tells its state —
   done, in progress, failed, not supported, to come — in a text for screen readers, told as it changes:
   a polite live region; in the header, only the title is one, not the countdown):
@@ -194,7 +194,7 @@ device".
   - `ready`, already in Gladys (`device.id`): "Already in Gladys" with a link (a device paired again);
   - `unsupported` (D60): "Not supported by Zigbee2MQTT" with the model when known (desktop and phone) and
     an explanation (Gladys cannot create its features); no Add;
-  - `failed` (D59): "Interview failed" and the advice: "Bring the device closer to the dongle or to a
+  - `failed` (D59): "Identification failed" and the advice: "Bring the device closer to the dongle or to a
     mains-powered device, then put it in pairing mode again"; the row starts over if it joins again;
   - `left`: "Left the network before its identification ended" and the advice to put it in pairing mode
     again.

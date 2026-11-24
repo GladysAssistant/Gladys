@@ -2889,7 +2889,7 @@
         },
         "steps": {
           "joined": "Rejoint",
-          "interview": "Interview",
+          "interview": "Identification",
           "ready": "Prêt",
           "unsupported": "Non pris en charge"
         },
@@ -2902,7 +2902,7 @@
         },
         "preparing": "Préparation de l'appareil…",
         "unsupportedText": "Zigbee2MQTT ne prend pas en charge ce modèle : Gladys ne peut pas l'ajouter.",
-        "failedText": "L'interview a échoué. Rapprochez l'appareil de la clé ou d'un appareil branché sur secteur, puis remettez-le en mode appairage.",
+        "failedText": "L'identification a échoué. Rapprochez l'appareil de la clé ou d'un appareil branché sur secteur, puis remettez-le en mode appairage.",
         "leftText": "L'appareil a quitté le réseau avant la fin de son identification. Remettez-le en mode appairage.",
         "add": "Ajouter à Gladys",
         "addError": "Gladys n'a pas pu ajouter l'appareil. Réessayez.",
