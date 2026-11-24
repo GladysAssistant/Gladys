@@ -188,6 +188,26 @@ describe('Zigbee2mqtt pairing window', () => {
     });
   });
 
+  describe('screen', () => {
+    it('should close on "back", staying on the Zigbee2mqtt page', () => {
+      openPairing();
+      cy.get('[data-cy=z2m-pairing-screen]').should('exist');
+      cy.go('back');
+      cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
+      cy.get('[data-cy=z2m-dashboard-pair]').should('exist');
+      cy.location('pathname').should('eq', '/dashboard/integration/device/zigbee2mqtt/setup');
+    });
+
+    it('should leave its entry of the history when closed by its button', () => {
+      openPairing();
+      cy.get('[data-cy=z2m-pairing-close]').click();
+      cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
+      cy.window()
+        .its('history.state')
+        .should(state => expect((state || {}).gladysZ2mPairing).to.equal(undefined));
+    });
+  });
+
   describe('devices', () => {
     it('should follow a device from its arrival until it is added to Gladys', () => {
       const serverUrl = Cypress.env('serverUrl');

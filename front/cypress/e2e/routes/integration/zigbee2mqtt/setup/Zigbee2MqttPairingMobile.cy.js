@@ -69,6 +69,21 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=z2m-dashboard-pair]').should('exist');
   });
 
+  it('should close the sheet of a device, then the screen, on "back"', () => {
+    visitDashboard();
+    answerPairing({ pairing: [readyBulb] });
+    cy.get('[data-cy=z2m-dashboard-pair]').click();
+    cy.wait('@permitJoin');
+    cy.get('[data-cy=z2m-pairing-row]').click();
+    cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+    cy.go('back');
+    cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+    cy.get('[data-cy=z2m-pairing-screen]').should('be.visible');
+    cy.go('back');
+    cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
+    cy.get('[data-cy=z2m-dashboard-pair]').should('exist');
+  });
+
   it('should not save over a device added to Gladys while its sheet was open', () => {
     const serverUrl = Cypress.env('serverUrl');
     visitDashboard();
