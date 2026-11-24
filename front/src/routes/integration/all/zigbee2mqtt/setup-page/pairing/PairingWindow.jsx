@@ -435,6 +435,7 @@ class PairingWindow extends Component {
           ),
           allowed && (
             <BigButton
+              class={style.extend}
               loading={request === REQUEST.ALLOW}
               disabled={busy}
               onClick={this.allow}
@@ -471,7 +472,7 @@ class PairingWindow extends Component {
           allowed && (
             <button
               type="button"
-              class={cx('btn btn-secondary', { 'btn-loading': request === REQUEST.ALLOW })}
+              class={cx('btn', style.extend, { 'btn-loading': request === REQUEST.ALLOW })}
               onClick={this.allow}
               disabled={busy}
               data-cy="z2m-pairing-extend"

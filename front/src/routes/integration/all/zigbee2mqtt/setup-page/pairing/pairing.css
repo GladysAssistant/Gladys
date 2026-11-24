@@ -110,6 +110,16 @@
   min-width: 0;
 }
 
+/* Extend, on the light green of joining permitted: a white button with a dark green label (contrast above 4.5:1,
+   kept by the inversion of dark mode) */
+.headerButtons .extend,
+.headerButtons .extend:hover,
+.headerButtons .extend:focus {
+  border: 1px solid #1f9d55;
+  background-color: #fff;
+  color: #17703d;
+}
+
 /* ---------- tips, while no device joined ---------- */
 
 .tips {

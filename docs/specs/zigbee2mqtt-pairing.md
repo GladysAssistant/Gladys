@@ -163,7 +163,8 @@ device".
 
 ### D.2 Content
 
-- **Header**: "Joining permitted 3:52" counting down from `remainingSeconds`, **Extend** (`POST
+- **Header**: "Joining permitted 3:52" counting down from `remainingSeconds`, **Extend** (white, dark green
+  label: readable on the green of the open header; `POST
   /permit_join` `{ value: true }`) and **Stop** (`{ value: false }`); closed: "Joining closed" and
   **Permit joining** again. A request waits for Zigbee2mqtt to tell its outcome through
   `zigbee2mqtt.permit-join`, from the click (its answer may come before the one of the request): not
