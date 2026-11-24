@@ -140,8 +140,7 @@ class DashboardMobile extends Component {
     const { state, status, primaryAction, actionStatus, newDeviceCount, tiles, z2mUrl } = view;
     const startupError = state === DASHBOARD_STATE.FAILED ? getStartupError(status) : null;
     const brokerError = state === DASHBOARD_STATE.MQTT_ERROR ? getBrokerError(status) : null;
-    // Until Zigbee2mqtt tells that joining is allowed
-    const busy = actionStatus === RequestStatus.Getting || view.permitJoinWaiting;
+    const busy = actionStatus === RequestStatus.Getting;
     const tooOld = TooOldNotice({ view });
     const dictionary = get(intl, 'dictionary');
     const stopKeys = getStopKeys(view.configuration);
@@ -204,11 +203,6 @@ class DashboardMobile extends Component {
               id={`integration.zigbee2mqtt.setup.installation.success.${status.installation.kind}`}
               fields={{ duration: formatDuration(status.installation.durationMs) }}
             />
-          </MobileNotice>
-        )}
-        {view.permitJoinAllowed && state === DASHBOARD_STATE.ONLINE && (
-          <MobileNotice tone="success" icon="radio" role="status" data-cy="z2m-dashboard-permit-join-allowed">
-            <MarkupText id={`${T}.pairAllowed`} />
           </MobileNotice>
         )}
         {status.updatePending && state !== DASHBOARD_STATE.INSTALLING && (

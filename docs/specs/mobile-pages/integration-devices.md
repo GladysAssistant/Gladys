@@ -30,7 +30,7 @@ they are moved to the same layout, **with the components of section B**.
 | Thermostat            | `thermostat/device-page`                        | —                                              |
 | External integrations | `external-integration/device-page`              | `external-integration/discover-page`           |
 | RTSP cameras          | `rtsp-camera/RtspCamera.jsx` (one page, no tab) | —                                              |
-| Zigbee2MQTT           | `zigbee2mqtt/device-page`                       | `zigbee2mqtt/discover-page` (permit joining)   |
+| Zigbee2MQTT           | `zigbee2mqtt/device-page`                       | `zigbee2mqtt/discover-page` (pair a device)    |
 
 ## B. The pattern (< 768 px)
 
@@ -316,13 +316,13 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   details and, when the address of the interface is known, "Open in Zigbee2MQTT" (a new tab).
   "Edit" leads to the device page (`device-edit.md`). An empty list leads to the Discover tab,
   unless Zigbee2MQTT is not installed.
-- **Discover.** **Permitting joining is the button of the page** — the switch of the desktop
-  header, with the same request (it toggles): "Permit joining"; **while joining is open a
-  waiting notice says so and the button says "Stop joining"**. It is disabled when the switch
-  is (Zigbee2MQTT does not answer, Gladys does not reach the broker, or it is not installed), and
-  shows a spinner while its request runs — a second tap would close what the first one opened. A
-  request that fails says so under the button, until the next one or until the state of the
-  joining changes. "Hide already added devices" is a switch row. A device is added with "Save"
+- **Discover.** **"Pair a device" is the button of the page** — the button of the desktop
+  header: it opens the pairing window on a screen of its own (`zigbee2mqtt-pairing.md`, D.1),
+  which asks for joining and follows each device; "back" and "Close" lead back to the list. It is
+  disabled when Zigbee2MQTT does not answer, Gladys does not reach the broker, or it is not
+  installed. The tab itself lists the devices of the network not in Gladys yet (a former pairing,
+  the Zigbee2MQTT interface, another installation) and those to update. "Hide already added
+  devices" is a switch row. A device is added with "Save"
   or updated with "Update", as on the card; its sheet shows the topic and the IEEE address, and
   "Open in Zigbee2MQTT" as on the "Devices" tab. A device that exposes nothing besides a battery
   is "Not supported": its sheet says so and holds "Suggest this device" (a GitHub issue, in a new
@@ -369,9 +369,9 @@ other layout: an unsaved change there does not survive the swap.
   `front/cypress/e2e/routes/integration/zigbee2mqtt/Zigbee2MqttTabsMobile.cy.js`: the status of
   Zigbee2MQTT first (not answering, not installed); a device renamed and saved, a failed save
   kept in the sheet, a deletion confirmed, a refused one explained; a discovered device added,
-  an unsupported one; the permit joining button — its request, the open state, a failure, and
-  disabled while Zigbee2MQTT does not answer or is not installed; the "hide already added
-  devices" switch; the cards and the switch kept on a wider screen.
+  an unsupported one; the "Pair a device" button — the pairing window it opens and the way back,
+  and disabled while Zigbee2MQTT does not answer or is not installed; the "hide already added
+  devices" switch; the cards and the button kept on a wider screen.
 - The checks of README E on every tab of the table of A, in a phone emulation with a real touch
   screen (iPhone 13, 320 px, landscape, light and dark): no horizontal scroll, no field below
   16 px, no target below 44 px, the drag of a sheet.

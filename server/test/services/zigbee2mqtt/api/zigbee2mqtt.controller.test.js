@@ -28,7 +28,8 @@ const zigbee2mqttManager = {
   installZ2mContainer: fake.resolves(true),
   disconnect: fake.returns(true),
   setPermitJoin: fake.returns(true),
-  getPermitJoin: fake.returns(true),
+  getPermitJoin: fake.returns({ allowed: true, remainingSeconds: 241 }),
+  getPairingDevices: fake.returns([{ ieee_address: '0x01', status: 'joined' }]),
   reset: fake.resolves(true),
   stop: fake.resolves(),
   start: fake.resolves(),
@@ -324,7 +325,18 @@ describe('zigbee2mqtt API', () => {
 
     await controller['get /api/v1/service/zigbee2mqtt/permit_join'].controller(req, res);
     assert.calledOnce(zigbee2mqttManager.getPermitJoin);
-    assert.calledWith(res.json, true);
+    assert.calledWith(res.json, { allowed: true, remainingSeconds: 241 });
+  });
+
+  it('get /api/v1/service/zigbee2mqtt/pairing', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/zigbee2mqtt/pairing'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.getPairingDevices, 'default-meter-feature-id');
+    assert.calledWith(res.json, [{ ieee_address: '0x01', status: 'joined' }]);
   });
 
   it('post /api/v1/service/zigbee2mqtt/reset', async () => {

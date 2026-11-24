@@ -31,7 +31,10 @@ describe('Zigbee2mqtt status', () => {
       { body: { Z2M_MQTT_MODE: 'local', Z2M_ADAPTER_MODE: 'usb', ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0' } }
     );
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/discovered*` }, { body: [] });
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: false });
+    cy.intercept(
+      { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` },
+      { body: { allowed: false, remainingSeconds: null } }
+    );
   });
 
   it('should tell that Zigbee2mqtt does not answer on the discover page, until it is online', () => {
@@ -40,12 +43,27 @@ describe('Zigbee2mqtt status', () => {
     cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
 
     cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.notRunning');
-    cy.get('#permitJoin').should('be.disabled');
+    cy.get('[data-cy=z2m-discover-pair]').should('be.disabled');
 
     cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: onlineStatus });
 
     cy.get('[data-cy=z2m-status-alert]').should('not.exist');
-    cy.get('#permitJoin').should('not.be.disabled');
+    cy.get('[data-cy=z2m-discover-pair]').should('not.be.disabled');
+  });
+
+  it('should tell that Zigbee2mqtt no longer answers on the pairing screen opened from the discover page', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/status` }, { body: onlineStatus });
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` }, { body: [] });
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} });
+    cy.visit('/dashboard/integration/device/zigbee2mqtt/discover');
+    cy.get('[data-cy=z2m-discover-pair]').click();
+    cy.get('[data-cy=z2m-pairing-header]').should('not.have.attr', 'data-state', 'not-answering');
+
+    // The status banner of the list is no longer shown: the screen follows the status all the same
+    cy.sendWebSocket({ type: 'zigbee2mqtt.status-change', payload: notOnlineStatus });
+
+    cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'not-answering');
   });
 
   it('should tell that Zigbee2mqtt is stopped, not blame the broker, on the discover page', () => {
@@ -66,7 +84,7 @@ describe('Zigbee2mqtt status', () => {
 
     cy.get('[data-cy=z2m-status-alert]').i18n('integration.zigbee2mqtt.status.stopped');
     cy.get('[data-cy=z2m-status-alert-mqtt-error]').should('not.exist');
-    cy.get('#permitJoin').should('be.disabled');
+    cy.get('[data-cy=z2m-discover-pair]').should('be.disabled');
   });
 
   it('should tell that Zigbee2mqtt is not installed on the discover page, with the way to install it', () => {
@@ -104,7 +122,7 @@ describe('Zigbee2mqtt status', () => {
     // Its banner only, and nothing to permit joining to
     cy.wait('@emptySetup');
     cy.get('[data-cy=z2m-url-warning]').should('not.exist');
-    cy.get('#permitJoin').should('be.disabled');
+    cy.get('[data-cy=z2m-discover-pair]').should('be.disabled');
   });
 
   it('should show why Zigbee2mqtt does not start on the discover page', () => {

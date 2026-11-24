@@ -1,9 +1,7 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
-import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { RequestStatus } from '../../../../../../utils/consts';
 import { ADAPTER_MODE } from '../constants';
 import { formatDuration } from './format';
 import { STEP, INSTALL_VIEW } from './constants';
@@ -13,7 +11,6 @@ import KeyChip from './KeyChip';
 import style from './wizard.css';
 
 const T = 'integration.zigbee2mqtt.setup.wizard';
-export const DISCOVER_URL = '/dashboard/integration/device/zigbee2mqtt/discover';
 
 // 1 to 4: the dongle, the installation, the network ready, the first device
 export const getStepNumber = view => {
@@ -149,74 +146,25 @@ const StepReady = ({ view, actions }) => {
   );
 };
 
-const TIPS = ['approach', 'mode', 'add'];
-
-const StepPair = ({ view, actions }) => {
-  const { permitJoinStatus } = view;
-  const allowed = permitJoinStatus === RequestStatus.Success;
-  return (
-    <div data-cy="z2m-wizard-pair-step">
-      <div class="mb-3">
-        <h3 class="mb-1">
-          <Text id={`${T}.pair.title`} />
-        </h3>
-        <p class="text-muted mb-0">
-          <Text id={`${T}.pair.text`} />
-        </p>
-      </div>
-      <ol class={style.tips}>
-        {TIPS.map((tip, index) => (
-          <li key={tip} class={style.tipCard}>
-            <span class={style.tipNumber}>{index + 1}</span>
-            <strong>
-              <Text id={`${T}.pair.tips.${tip}.title`} />
-            </strong>
-            <span class="text-muted">
-              <Text id={`${T}.pair.tips.${tip}.text`} />
-            </span>
-          </li>
-        ))}
-      </ol>
-      {permitJoinStatus === RequestStatus.Error && (
-        <div class="alert alert-danger" data-cy="z2m-wizard-permit-join-error">
-          <Text id={`${T}.pair.allowError`} />
-        </div>
-      )}
-      {allowed ? (
-        <div>
-          <div class="alert alert-success" role="status" data-cy="z2m-wizard-permit-join-allowed">
-            <MarkupText id={`${T}.pair.allowed`} />
-          </div>
-          <div class={style.buttons}>
-            <Link href={DISCOVER_URL} class="btn btn-primary" data-cy="z2m-wizard-go-to-discover">
-              <Text id={`${T}.pair.goToDiscover`} />
-              <i class="fe fe-arrow-right ml-2" aria-hidden="true" />
-            </Link>
-            <button type="button" class="btn btn-link" onClick={actions.finish} data-cy="z2m-wizard-finish">
-              <Text id={`${T}.pair.finish`} />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div class={style.buttons}>
-          <button
-            type="button"
-            class={cx('btn btn-primary', { 'btn-loading': permitJoinStatus === RequestStatus.Getting })}
-            onClick={actions.allowJoining}
-            disabled={permitJoinStatus === RequestStatus.Getting}
-            data-cy="z2m-wizard-allow-joining"
-          >
-            <i class="fe fe-radio mr-2" aria-hidden="true" />
-            <Text id={`${T}.pair.allow`} />
-          </button>
-          <button type="button" class="btn btn-link" onClick={actions.finish} data-cy="z2m-wizard-finish">
-            <Text id={`${T}.pair.finishWithoutPairing`} />
-          </button>
-        </div>
-      )}
+// ④ The first device: the pairing window (docs/specs/zigbee2mqtt-pairing.md, D)
+const StepPair = ({ view, actions }) => (
+  <div data-cy="z2m-wizard-pair-step">
+    <div class="mb-3">
+      <h3 class="mb-1">
+        <Text id={`${T}.pair.title`} />
+      </h3>
+      <p class="text-muted mb-0">
+        <Text id={`${T}.pair.text`} />
+      </p>
     </div>
-  );
-};
+    {view.pairingWindow}
+    <div class={cx(style.buttons, 'mt-4')}>
+      <button type="button" class="btn btn-primary" onClick={actions.finish} data-cy="z2m-wizard-finish">
+        <Text id={`${T}.pair.finish`} />
+      </button>
+    </div>
+  </div>
+);
 
 // The title of the wizard: install, connect to an external broker, or change the coordinator of an installation
 export const getTitle = view => {

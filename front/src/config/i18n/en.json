@@ -2280,26 +2280,7 @@
           "pair": {
             "title": "Pair your first device",
             "text": "Bulb, plug, sensor… Gladys permits joining for 4 minutes.",
-            "tips": {
-              "approach": {
-                "title": "Bring the device closer",
-                "text": "Within 2 meters of the dongle, while it pairs."
-              },
-              "mode": {
-                "title": "Put it in pairing mode",
-                "text": "Often a long press (5 s) on its button. A bulb: switch it on and off 5 to 6 times in a row."
-              },
-              "add": {
-                "title": "Add it to Gladys",
-                "text": "It shows up in the Discover tab: give it a name and a room."
-              }
-            },
-            "allow": "Permit joining",
-            "allowed": "<strong>Joining permitted for 4 minutes.</strong> Put your device in pairing mode: it will show up in the Discover tab as soon as it has joined the network.",
-            "allowError": "Gladys could not permit joining. Try again.",
-            "goToDiscover": "Go to Discover",
-            "finish": "Finish",
-            "finishWithoutPairing": "Finish without pairing"
+            "finish": "Finish"
           },
           "mobile": {
             "otherChoices": "Another dongle or another setup",
@@ -2398,7 +2379,6 @@
             "one": "1 new device to add to Gladys",
             "other": "{{count}} new devices to add to Gladys"
           },
-          "pairAllowed": "<strong>Joining permitted for 4 minutes.</strong> Your devices will show up in the Discover tab.",
           "updatePending": "An update of Zigbee2MQTT is waiting: its images could not be downloaded. It will run on the next start.",
           "actionErrors": {
             "busy": "An installation is running, or the integration is busy: try again in a moment.",
@@ -2488,13 +2468,8 @@
       },
       "discover": {
         "title": "Zigbee2MQTT discover",
-        "permitJoin": "Permit joining",
-        "stopPermitJoin": "Stop joining",
-        "permitJoinOpen": "Joining is open: put your device in pairing mode, it shows up below as soon as it has joined the network.",
-        "permitJoinError": "Gladys could not permit joining. Try again.",
-        "stopPermitJoinError": "Gladys could not stop joining. Try again.",
         "hideExistingDevices": "Hide already added devices",
-        "noDeviceDiscovered": "No new device discovered, please click on scan button.",
+        "noDeviceDiscovered": "No new device in the network. To add one, click “Pair a device”.",
         "noNewDevice": "No new device found.",
         "serverNoResponse": "Gladys server is not available.",
         "serverNoResponseWebSocker": "Gladys server is not available. Please refresh the page.",
@@ -2517,7 +2492,61 @@
       "updateButton": "Update",
       "alreadyExistsButton": "Already created",
       "saveError": "There was an error saving the device.",
-      "documentation": "Zigbee2MQTT documentation"
+      "documentation": "Zigbee2MQTT documentation",
+      "pairing": {
+        "open": "Joining permitted",
+        "closed": "Joining closed",
+        "brokerLost": "Gladys is not connected to the MQTT broker: joining cannot be permitted",
+        "notAnswering": "Zigbee2MQTT does not answer: joining cannot be permitted",
+        "allow": "Permit joining",
+        "extend": "Extend",
+        "stop": "Stop",
+        "close": "Close",
+        "allowError": "Gladys could not permit joining. Try again.",
+        "stopError": "Gladys could not stop joining. Try again.",
+        "loadError": "Gladys could not read the devices being paired.",
+        "tips": {
+          "approach": {
+            "title": "Bring the device closer",
+            "text": "Within 2 meters of the dongle, while it pairs."
+          },
+          "mode": {
+            "title": "Put it in pairing mode",
+            "text": "Often a long press (5 s) on its button. A bulb: switch it on and off 5 to 6 times in a row."
+          },
+          "add": {
+            "title": "Add it to Gladys",
+            "text": "It shows up here: give it a name and a room."
+          }
+        },
+        "steps": {
+          "joined": "Joined",
+          "interview": "Identification",
+          "ready": "Ready",
+          "unsupported": "Not supported"
+        },
+        "stepStates": {
+          "done": "(done)",
+          "running": "(in progress)",
+          "failed": "(failed)",
+          "warning": "(not supported)",
+          "todo": "(to come)"
+        },
+        "preparing": "Getting the device ready…",
+        "unsupportedText": "Zigbee2MQTT does not support this model: Gladys cannot add it.",
+        "failedText": "The identification failed. Bring the device closer to the dongle or to a mains-powered device, then put it in pairing mode again.",
+        "leftText": "The device left the network before its identification ended. Put it in pairing mode again.",
+        "add": "Add to Gladys",
+        "addError": "Gladys could not add the device. Try again.",
+        "added": "Added to Gladys",
+        "alreadyInGladys": "Already in Gladys",
+        "openDevice": "Open the device",
+        "more": "Joining is still permitted: put another device in pairing mode to add it too.",
+        "toAdd": {
+          "one": "1 ready device is not added yet: it stays here until you add it.",
+          "other": "{{count}} ready devices are not added yet: they stay here until you add them."
+        }
+      }
     },
     "nodeRed": {
       "title": "Node-RED",
