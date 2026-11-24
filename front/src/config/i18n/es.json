@@ -2280,26 +2280,7 @@
           "pair": {
             "title": "Empareja tu primer dispositivo",
             "text": "Bombilla, enchufe, sensor… Gladys permite la incorporación durante 4 minutos.",
-            "tips": {
-              "approach": {
-                "title": "Acerca el dispositivo",
-                "text": "A menos de 2 metros de la llave, durante el emparejamiento."
-              },
-              "mode": {
-                "title": "Ponlo en modo de emparejamiento",
-                "text": "A menudo una pulsación larga (5 s) en su botón. Una bombilla: enciéndela y apágala 5 o 6 veces seguidas."
-              },
-              "add": {
-                "title": "Añádelo a Gladys",
-                "text": "Aparece en la pestaña Descubrir: dale un nombre y una habitación."
-              }
-            },
-            "allow": "Permitir la incorporación",
-            "allowed": "<strong>Incorporación permitida durante 4 minutos.</strong> Pon tu dispositivo en modo de emparejamiento: aparecerá en la pestaña Descubrir en cuanto se haya unido a la red.",
-            "allowError": "Gladys no ha podido permitir la incorporación. Vuelve a intentarlo.",
-            "goToDiscover": "Ir a Descubrir",
-            "finish": "Terminar",
-            "finishWithoutPairing": "Terminar sin emparejar"
+            "finish": "Terminar"
           },
           "mobile": {
             "otherChoices": "Otra llave u otra instalación",
@@ -2398,7 +2379,6 @@
             "one": "1 nuevo dispositivo para añadir a Gladys",
             "other": "{{count}} nuevos dispositivos para añadir a Gladys"
           },
-          "pairAllowed": "<strong>Incorporación permitida durante 4 minutos.</strong> Tus dispositivos aparecerán en la pestaña Descubrir.",
           "updatePending": "Una actualización de Zigbee2MQTT espera: sus imágenes no se pudieron descargar. Se hará en el próximo arranque.",
           "actionErrors": {
             "busy": "Hay una instalación en curso, o la integración está ocupada: vuelve a intentarlo en un momento.",
@@ -2488,13 +2468,8 @@
       },
       "discover": {
         "title": "Descubrimiento de Zigbee2MQTT",
-        "permitJoin": "Permitir la incorporación",
-        "stopPermitJoin": "Detener la incorporación",
-        "permitJoinOpen": "La incorporación está abierta: pon tu dispositivo en modo de emparejamiento, aparecerá abajo en cuanto se haya unido a la red.",
-        "permitJoinError": "Gladys no ha podido permitir la incorporación. Vuelve a intentarlo.",
-        "stopPermitJoinError": "Gladys no ha podido detener la incorporación. Vuelve a intentarlo.",
         "hideExistingDevices": "Ocultar dispositivos ya añadidos",
-        "noDeviceDiscovered": "No se descubrió ningún dispositivo nuevo; haga clic en el botón de búsqueda.",
+        "noDeviceDiscovered": "Ningún dispositivo nuevo en la red. Para añadir uno, haz clic en «Emparejar un dispositivo».",
         "noNewDevice": "No se encontró ningún dispositivo nuevo.",
         "serverNoResponse": "El servidor Gladys no está disponible.",
         "serverNoResponseWebSocker": "El servidor Gladys no está disponible. Actualice la página.",
@@ -2517,7 +2492,61 @@
       "updateButton": "Actualizar",
       "alreadyExistsButton": "Ya creado",
       "saveError": "Se produjo un error al guardar el dispositivo.",
-      "documentation": "Documentación de Zigbee2MQTT"
+      "documentation": "Documentación de Zigbee2MQTT",
+      "pairing": {
+        "open": "Incorporación permitida",
+        "closed": "Incorporación cerrada",
+        "brokerLost": "Gladys no está conectada al broker MQTT: no se puede permitir la incorporación",
+        "notAnswering": "Zigbee2MQTT no responde: no se puede permitir la incorporación",
+        "allow": "Permitir la incorporación",
+        "extend": "Prolongar",
+        "stop": "Detener",
+        "close": "Cerrar",
+        "allowError": "Gladys no pudo permitir la incorporación. Inténtalo de nuevo.",
+        "stopError": "Gladys no pudo detener la incorporación. Inténtalo de nuevo.",
+        "loadError": "Gladys no pudo leer los dispositivos en emparejamiento.",
+        "tips": {
+          "approach": {
+            "title": "Acerca el dispositivo",
+            "text": "A menos de 2 metros de la llave, durante el emparejamiento."
+          },
+          "mode": {
+            "title": "Ponlo en modo emparejamiento",
+            "text": "A menudo una pulsación larga (5 s) en su botón. Una bombilla: enciéndela y apágala 5 o 6 veces seguidas."
+          },
+          "add": {
+            "title": "Añádelo a Gladys",
+            "text": "Aparece aquí: dale un nombre y una habitación."
+          }
+        },
+        "steps": {
+          "joined": "Unido",
+          "interview": "Identificación",
+          "ready": "Listo",
+          "unsupported": "No compatible"
+        },
+        "stepStates": {
+          "done": "(completado)",
+          "running": "(en curso)",
+          "failed": "(fallido)",
+          "warning": "(no compatible)",
+          "todo": "(pendiente)"
+        },
+        "preparing": "Preparando el dispositivo…",
+        "unsupportedText": "Zigbee2MQTT no admite este modelo: Gladys no puede añadirlo.",
+        "failedText": "La identificación ha fallado. Acerca el dispositivo a la llave o a un dispositivo conectado a la red eléctrica y vuelve a ponerlo en modo emparejamiento.",
+        "leftText": "El dispositivo ha salido de la red antes de terminar su identificación. Vuelve a ponerlo en modo emparejamiento.",
+        "add": "Añadir a Gladys",
+        "addError": "Gladys no pudo añadir el dispositivo. Inténtalo de nuevo.",
+        "added": "Añadido a Gladys",
+        "alreadyInGladys": "Ya está en Gladys",
+        "openDevice": "Abrir el dispositivo",
+        "more": "El emparejamiento sigue permitido: pon otro dispositivo en modo emparejamiento para añadirlo también.",
+        "toAdd": {
+          "one": "1 dispositivo listo aún no se ha añadido: se queda aquí hasta que lo añadas.",
+          "other": "{{count}} dispositivos listos aún no se han añadido: se quedan aquí hasta que los añadas."
+        }
+      }
     },
     "nodeRed": {
       "title": "Node-RED",

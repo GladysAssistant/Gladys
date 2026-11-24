@@ -1,4 +1,3 @@
-import { Component } from 'preact';
 import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
@@ -19,108 +18,36 @@ import {
 import {
   MobileIntegrationTab,
   MobileListLoader,
-  MobileWaitingNotice,
   MobileTextNotice,
   integrationMobileStyle
 } from '../../../../../components/integration/mobile';
 
-/**
- * @description Permit joining as the button of the page on a phone
- * (docs/specs/mobile-pages/integration-devices.md, E): the request of the desktop switch, which
- * toggles — so the button waits for its answer, a second tap would close what the first one
- * opened. While joining is open it says so, and the button closes it.
- */
-class MobilePermitJoin extends Component {
-  state = {
-    busy: false,
-    // the sentence of the last toggle that failed, until the next one, and the state of the joining it failed on: a
-    // newer state, pushed live, makes it outdated
-    failedKey: null,
-    failedOn: null
-  };
+const PAIR = 'integration.zigbee2mqtt.setup.dashboard.actions.pair';
 
-  componentWillUnmount() {
-    this.unmounted = true;
-  }
-
-  isOpen = () => Boolean(this.props.permitJoin) && !this.props.disabled;
-
-  toggle = async () => {
-    if (this.state.busy) {
-      return;
-    }
-    const failedKey = this.isOpen()
-      ? 'integration.zigbee2mqtt.discover.stopPermitJoinError'
-      : 'integration.zigbee2mqtt.discover.permitJoinError';
-    this.setState({ busy: true, failedKey: null });
-    let failed = false;
-    try {
-      // the state of the joining comes back live (PERMIT_JOIN), as for the switch
-      await this.props.togglePermitJoin();
-    } catch (e) {
-      console.error(e);
-      failed = true;
-    }
-    if (!this.unmounted) {
-      this.setState({
-        busy: false,
-        failedKey: failed ? failedKey : null,
-        failedOn: Boolean(this.props.permitJoin)
-      });
-    }
-  };
-
-  render({ disabled, permitJoin }, { busy, failedKey: lastFailedKey, failedOn }) {
-    const open = this.isOpen();
-    const failedKey = failedOn === Boolean(permitJoin) ? lastFailedKey : null;
-    return (
-      <div>
-        <div class={integrationMobileStyle.block}>
-          <BigButton
-            variant={open ? 'dangerSoft' : 'primary'}
-            icon={open ? 'square' : 'radio'}
-            onClick={this.toggle}
-            loading={busy}
-            disabled={disabled}
-            data-cy="z2m-discover-permit-join"
-          >
-            <Text
-              id={
-                open ? 'integration.zigbee2mqtt.discover.stopPermitJoin' : 'integration.zigbee2mqtt.discover.permitJoin'
-              }
-            />
-          </BigButton>
-        </div>
-        {open && (
-          <MobileWaitingNotice data-cy="z2m-discover-permit-join-open">
-            <Text id="integration.zigbee2mqtt.discover.permitJoinOpen" />
-          </MobileWaitingNotice>
-        )}
-        {failedKey && (
-          <MobileNotice tone="danger" icon="alert-circle" role="alert" data-cy="z2m-discover-permit-join-error">
-            <Text id={failedKey} />
-          </MobileNotice>
-        )}
-      </div>
-    );
-  }
-}
+// Pairing is the pairing window (docs/specs/zigbee2mqtt-pairing.md, D.1): not while Zigbee2mqtt does not answer, Gladys
+// does not reach the broker, or it is not installed
+const canPair = props => Boolean(props.zigbee2mqttConnected && props.gladysConnected) && props.z2mConfigured !== false;
 
 // The discovery on a phone (docs/specs/mobile-pages/integration-devices.md): the status of
-// Zigbee2MQTT first, permitting joining as the button of the page, then one row per device found
-// (pushed live). Same props as the card below.
+// Zigbee2MQTT first, "Pair a device" as the button of the page, then one row per device of the network not in Gladys
+// yet (pushed live). Same props as the card below.
 const MobileDiscoverTab = props => {
   const devices = props.zigbee2mqttDevices || [];
   const loading = Boolean(props.discoverZigbee2mqtt);
   return (
     <MobileIntegrationTab dataCy="z2m-discover-mobile">
       <CheckStatus isMobile />
-      <MobilePermitJoin
-        permitJoin={props.permitJoin}
-        togglePermitJoin={props.togglePermitJoin}
-        // the conditions of the desktop switch
-        disabled={!props.zigbee2mqttConnected || !props.gladysConnected || props.z2mConfigured === false}
-      />
+      <div class={integrationMobileStyle.block}>
+        <BigButton
+          variant="primary"
+          icon="radio"
+          onClick={props.openPairing}
+          disabled={!canPair(props)}
+          data-cy="z2m-discover-pair"
+        >
+          <Text id={PAIR} />
+        </BigButton>
+      </div>
       <div class={integrationMobileStyle.block}>
         <MobileGroup>
           <MobileRow
@@ -184,21 +111,16 @@ const DiscoverTab = ({ children, ...props }) => (
         <Text id="integration.zigbee2mqtt.discover.title" />
       </h1>
       <div class="page-options d-flex">
-        <label class="custom-switch">
-          <input
-            type="checkbox"
-            id="permitJoin"
-            name="permitJoin"
-            class="custom-switch-input"
-            checked={props.permitJoin}
-            onClick={props.togglePermitJoin}
-            disabled={!props.zigbee2mqttConnected || !props.gladysConnected || props.z2mConfigured === false}
-          />
-          <span class="custom-switch-indicator" />
-          <span class="custom-switch-description">
-            <Text id="integration.zigbee2mqtt.discover.permitJoin" />
-          </span>
-        </label>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onClick={props.openPairing}
+          disabled={!canPair(props)}
+          data-cy="z2m-discover-pair"
+        >
+          <i class="fe fe-radio mr-2" aria-hidden="true" />
+          <Text id={PAIR} />
+        </button>
       </div>
     </div>
     <ul class="list-group list-group-flush">

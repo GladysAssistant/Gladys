@@ -2280,6 +2280,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
+    // the devices seen joining since joining last opened, and where each stands
+    PAIRING: 'zigbee2mqtt.pairing',
     // the progress of an installation, sent at most twice a second
     INSTALL_PROGRESS: 'zigbee2mqtt.install-progress',
   },

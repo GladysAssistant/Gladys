@@ -50,6 +50,9 @@ function disconnectFromBroker() {
   this.mqttConnectionError = null;
   // Values of another broker, or of a previous run, are not saved when a device is created
   this.lastReceivedStates = {};
+  // Gladys no longer hears Zigbee2mqtt: whether joining is allowed, and the devices it saw joining, describe nothing
+  this.updatePermitJoin(false);
+  this.clearPairingDevices();
   clearTimeout(this.healthCheckTimer);
   this.healthCheckTimer = null;
   // Disabled, Zigbee2mqtt is not started again when its dongle comes back

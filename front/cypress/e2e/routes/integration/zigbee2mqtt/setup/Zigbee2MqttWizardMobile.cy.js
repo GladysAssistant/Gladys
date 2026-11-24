@@ -14,6 +14,7 @@ import {
   answerSetup,
   visitWizard
 } from './wizardFixtures';
+import { answerPairing, sendPermitJoin } from './pairingFixtures';
 
 // The setup wizard on a phone (docs/specs/zigbee2mqtt-installation.md, M.3)
 describe('Zigbee2mqtt setup wizard on a phone', () => {
@@ -29,7 +30,6 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
   });
 
   it('should install the recognized dongle from the bottom bar, then permit joining', () => {
-    const serverUrl = Cypress.env('serverUrl');
     visitWizard();
     // A focus page: its own navigation bar leads back to the integrations
     cy.get('[data-cy=z2m-wizard-mobile]').should('exist');
@@ -60,28 +60,18 @@ describe('Zigbee2mqtt setup wizard on a phone', () => {
     cy.get('[data-cy=z2m-wizard-ready]').should('exist');
     cy.get('[data-cy=z2m-wizard-summary-firmware]').should('contain', '7.4.4.0');
 
-    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/service/zigbee2mqtt/permit_join` }, { body: {} }).as(
-      'permitJoin'
-    );
+    answerPairing();
     cy.get('[data-cy=z2m-wizard-pair]').click();
-    cy.get('[data-cy=z2m-wizard-allow-joining]').click();
+    // Step ④ is the pairing window, which asks for joining as it opens (docs/specs/zigbee2mqtt-pairing.md, D)
+    cy.get('[data-cy=z2m-wizard-pair-step] [data-cy=z2m-pairing]').should('exist');
     cy.wait('@permitJoin')
       .its('request.body')
       .should('deep.equal', { value: true });
-    // Allowed once Zigbee2mqtt tells so, told above the tips: in sight with the bottom bar
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('not.exist');
-    cy.sendWebSocket({ type: 'zigbee2mqtt.permit-join', payload: true });
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').should('be.visible');
-    cy.get('[data-cy=z2m-wizard-permit-join-allowed]').then(([notice]) => {
-      cy.get('[data-cy=z2m-wizard-bottom-bar]').should(([bar]) => {
-        expect(notice.getBoundingClientRect().bottom).to.be.at.most(bar.getBoundingClientRect().top);
-      });
-    });
-    cy.get('[data-cy=z2m-wizard-go-to-discover]').should(
-      'have.attr',
-      'href',
-      '/dashboard/integration/device/zigbee2mqtt/discover'
-    );
+    sendPermitJoin({ allowed: true, remainingSeconds: 254 });
+    cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
+    cy.get('[data-cy=z2m-pairing-extend]').should('be.visible');
+    cy.get('[data-cy=z2m-pairing-tips]').should('exist');
+    cy.get('[data-cy=z2m-wizard-bottom-bar] [data-cy=z2m-wizard-finish]').should('be.visible');
   });
 
   it('should choose the dongle by hand from the other choices, its port in a sheet', () => {

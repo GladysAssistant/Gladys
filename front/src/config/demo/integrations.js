@@ -463,7 +463,54 @@ const integrations = {
     }
   ],
   'get /api/v1/service/zigbee2mqtt': {},
-  'get /api/v1/service/zigbee2mqtt/permit_join': true,
+  'get /api/v1/service/zigbee2mqtt/permit_join': { allowed: false, remainingSeconds: null },
+  // The Zigbee2mqtt devices of Gladys: the names the pairing window does not suggest again
+  'get /api/v1/service/zigbee2mqtt/device': [],
+  // docs/specs/zigbee2mqtt-pairing.md, C.3: a device ready to add, one in its interview
+  'get /api/v1/service/zigbee2mqtt/pairing': [
+    {
+      ieee_address: '0x00158d0009a1b2c3',
+      friendly_name: '0x00158d0009a1b2c3',
+      status: 'ready',
+      model: 'WSDCGQ11LM',
+      vendor: 'Aqara',
+      description: 'Temperature and humidity sensor',
+      updated_at: '2026-11-20T10:00:00.000Z',
+      device: {
+        name: '0x00158d0009a1b2c3',
+        external_id: 'zigbee2mqtt:0x00158d0009a1b2c3',
+        selector: 'zigbee2mqtt-0x00158d0009a1b2c3',
+        model: 'WSDCGQ11LM',
+        ieee_address: '0x00158d0009a1b2c3',
+        should_poll: false,
+        features: [
+          {
+            name: 'Temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            external_id: 'zigbee2mqtt:0x00158d0009a1b2c3:temperature-sensor:decimal:temperature',
+            selector: 'zigbee2mqtt-0x00158d0009a1b2c3-temperature-sensor-decimal-temperature',
+            read_only: true,
+            has_feedback: false,
+            min: -40,
+            max: 125,
+            unit: 'celsius'
+          }
+        ],
+        params: []
+      }
+    },
+    {
+      ieee_address: '0x84ba20fffe1d2e3f',
+      friendly_name: '0x84ba20fffe1d2e3f',
+      status: 'interviewing',
+      model: null,
+      vendor: null,
+      description: null,
+      updated_at: '2026-11-20T10:00:05.000Z',
+      device: null
+    }
+  ],
   'get /api/v1/service/zigbee2mqtt/discovered': [
     {
       name: 'Aqara Sensor',
