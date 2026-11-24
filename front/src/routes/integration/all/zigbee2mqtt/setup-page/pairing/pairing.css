@@ -98,11 +98,16 @@
   gap: 8px;
 }
 
-/* On a phone, the buttons go under the state, full width */
+/* On a phone, the buttons go under the state, side by side across the width */
 .headerMobile .headerButtons {
   flex: 1 1 100%;
-  flex-direction: column;
+  flex-wrap: nowrap;
   align-items: stretch;
+}
+
+.headerMobile .headerButtons > * {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 /* ---------- tips, while no device joined ---------- */

@@ -28,6 +28,12 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
     cy.get('[data-cy=z2m-pairing-extend]').should('be.visible');
     cy.get('[data-cy=z2m-pairing-stop]').should('be.visible');
+    // Side by side: the header leaves room for the devices
+    cy.get('[data-cy=z2m-pairing-extend]').then(extend => {
+      cy.get('[data-cy=z2m-pairing-stop]').should(stop => {
+        expect(stop[0].getBoundingClientRect().top).to.equal(extend[0].getBoundingClientRect().top);
+      });
+    });
 
     const unsupported = {
       ...atStep(readyBulb, 'unsupported'),
