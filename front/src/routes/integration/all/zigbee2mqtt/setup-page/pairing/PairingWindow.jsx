@@ -10,9 +10,8 @@ import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { stripDeviceStatesForSave } from '../../../../../../utils/device';
 import { MobileGroup, MobileRow, MobileNotice, MobilePill, BigButton } from '../../../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../../../components/integration/mobile';
-import { getDeviceIcon } from '../../../../../../components/integration/mobile/utils';
 import { PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS } from '../constants';
-import { PAIRING_STATUS, getDevicePhotoUrl, suggestName, formatCountdown } from './pairingUtils';
+import { PAIRING_STATUS, getDevicePhotoUrl, getPairingIcon, suggestName, formatCountdown } from './pairingUtils';
 import style from './pairing.css';
 
 const T = 'integration.zigbee2mqtt.pairing';
@@ -32,7 +31,7 @@ class DevicePhoto extends Component {
         {url && url !== failedUrl ? (
           <img src={url} alt="" loading="lazy" referrerpolicy="no-referrer" onError={this.showIcon} />
         ) : (
-          <i class={`fe fe-${getDeviceIcon(device)}`} aria-hidden="true" />
+          <i class={`fe fe-${getPairingIcon(device)}`} aria-hidden="true" />
         )}
       </span>
     );
@@ -710,6 +709,7 @@ class PairingWindow extends Component {
         <MobileDeviceItem
           key={entry.ieee_address}
           device={{ ...device, name: card.name, room_id: card.roomId || null }}
+          icon={getPairingIcon(device)}
           houses={this.state.houses}
           subtitle={this.getSubtitle(entry)}
           pills={timeline}
@@ -738,7 +738,7 @@ class PairingWindow extends Component {
     return (
       <MobileRow
         key={entry.ieee_address}
-        icon={getDeviceIcon(device)}
+        icon={getPairingIcon(device)}
         title={this.getTitle(entry, card)}
         subtitle={this.renderMobileOutcome(entry, card)}
         meta={timeline}

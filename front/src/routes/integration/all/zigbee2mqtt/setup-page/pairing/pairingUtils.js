@@ -1,6 +1,7 @@
 import get from 'get-value';
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
+import { getDeviceIcon } from '../../../../../../components/integration/mobile/utils';
 
 // docs/specs/zigbee2mqtt-pairing.md
 
@@ -31,6 +32,20 @@ export const PAIRING_STATUS = {
  * getDevicePhotoUrl('LED1545G12'); // 'https://www.zigbee2mqtt.io/images/devices/LED1545G12.png'
  */
 export const getDevicePhotoUrl = model => (model ? `${PHOTO_URL}/${model.replace(/[:\s/]/g, '-')}.png` : null);
+
+/**
+ * @description The icon of a device category, from what the device is (a sensor), not from its battery that may come
+ * first: the same feature as the suggested name (D.4).
+ * @param {object} device - The Gladys device, with its features.
+ * @returns {string} The name of the icon.
+ * @example
+ * getPairingIcon({ features: [{ category: 'battery', type: 'integer' }, { category: 'light', type: 'binary' }] });
+ */
+export const getPairingIcon = device => {
+  const features = (device && device.features) || [];
+  const isSecondary = feature => SECONDARY_CATEGORIES.includes(feature.category);
+  return getDeviceIcon({ features: [...features.filter(feature => !isSecondary(feature)), ...features.filter(isSecondary)] });
+};
 
 /**
  * @description The name Gladys suggests for a device that joined (D.4): "<category> <vendor>", suffixed when taken.

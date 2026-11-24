@@ -197,6 +197,8 @@ device".
     mains-powered device, then put it in pairing mode again"; the row starts over if it joins again;
   - `left`: "Left the network before its identification ended" and the advice to put it in pairing mode
     again.
+- The icon of a device (photo not loaded, phone rows) is the one of its first feature that is not a
+  secondary one (D.4), not of its battery.
 - A device whose photo, name or row once ready is shown is never created without the click on **Add**
   (D6). A name typed by the user is kept when the registry comes again.
 - **Finish** (wizard) / **Close** (dashboard, Discover tab). Closing the window does not close joining

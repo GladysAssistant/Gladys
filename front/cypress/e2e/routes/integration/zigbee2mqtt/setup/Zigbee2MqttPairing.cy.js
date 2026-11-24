@@ -471,10 +471,13 @@ describe('Zigbee2mqtt pairing window', () => {
         { method: 'GET', url: 'https://www.zigbee2mqtt.io/images/devices/NO-PHOTO.png' },
         { statusCode: 404 }
       ).as('photo');
-      openPairing({ pairing: [{ ...readyBulb, model: 'NO PHOTO' }] });
+      // Its battery first: the icon is the one of what it is, a light
+      const battery = { name: 'battery', category: 'battery', type: 'integer' };
+      const device = { ...readyBulb.device, features: [battery, ...readyBulb.device.features] };
+      openPairing({ pairing: [{ ...readyBulb, model: 'NO PHOTO', device }] });
       cy.wait('@photo');
       cy.get('[data-cy=z2m-pairing-photo] img').should('not.exist');
-      cy.get('[data-cy=z2m-pairing-photo] i.fe').should('exist');
+      cy.get('[data-cy=z2m-pairing-photo] i.fe-sun').should('exist');
     });
 
     it('should keep what a message told over the devices read when the window opened', () => {
