@@ -229,7 +229,8 @@ Zigbee2mqtt.
   a message is more recent than a request still running (request numbered, answer dropped if a message
   came meanwhile). A `zigbee2mqtt.pairing` message clears the failure to read the list.
 - Opened while Zigbee2mqtt does not answer, the window asks for joining once it answers again, unless
-  the user asked something meanwhile.
+  the user asked something meanwhile. Zigbee2mqtt answering again after an outage clears the failure of
+  a request told before it, and asks for joining again when that failure was one to permit it.
 - The countdown is a timer of the component, stopped on unmount and when joining closes; it shows 0:00
   until Zigbee2mqtt tells joining closed.
 - An Add in flight keeps its card busy; its answer is applied only if the component is still mounted;

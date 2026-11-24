@@ -375,10 +375,20 @@ class PairingWindow extends Component {
     }
   }
 
-  // Opened while Zigbee2mqtt did not answer: joining asked once it does, unless the user asked something meanwhile
-  componentDidUpdate(previousProps) {
-    if (this.props.online && !previousProps.online && !this.joiningAsked) {
+  // Zigbee2mqtt answers again: joining asked when it never was (opened while Zigbee2mqtt did not answer) or when the
+  // last attempt failed, which the outage likely caused; the failure of a stop is no longer current either
+  answersAgain = () => {
+    const { request, requestError } = this.state;
+    if (!request && (!this.joiningAsked || requestError === REQUEST.ALLOW)) {
       this.allow();
+    } else if (requestError) {
+      this.setState({ requestError: null });
+    }
+  };
+
+  componentDidUpdate(previousProps) {
+    if (this.props.online && !previousProps.online) {
+      this.answersAgain();
     }
   }
 

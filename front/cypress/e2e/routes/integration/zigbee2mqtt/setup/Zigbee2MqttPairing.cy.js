@@ -186,6 +186,24 @@ describe('Zigbee2mqtt pairing window', () => {
       sendStatus(onlineStatus);
       cy.get('[data-cy=z2m-pairing-allow]').should('exist');
     });
+
+    it('should ask joining again, without the failure told before, once Zigbee2mqtt answers again', () => {
+      openPairing({ permitJoinResponse: { statusCode: 400, body: {} } });
+      cy.get('[data-cy=z2m-pairing-request-error]').i18n(`${T}.allowError`);
+      // Zigbee2mqtt was going down: once back, it answers
+      cy.intercept(
+        { method: 'POST', url: `${Cypress.env('serverUrl')}/api/v1/service/zigbee2mqtt/permit_join` },
+        { body: {} }
+      ).as('permitJoin');
+      sendStatus(notAnsweringStatus);
+      cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'not-answering');
+      sendStatus(onlineStatus);
+      cy.wait('@permitJoin');
+      cy.get('[data-cy=z2m-pairing-allow]').should('have.class', 'btn-loading');
+      sendPermitJoin({ allowed: true, remainingSeconds: 254 });
+      cy.get('[data-cy=z2m-pairing-header]').should('have.attr', 'data-state', 'open');
+      cy.get('[data-cy=z2m-pairing-request-error]').should('not.exist');
+    });
   });
 
   describe('screen', () => {
