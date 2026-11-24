@@ -2,6 +2,8 @@
 
 This file documents Matter cluster compatibility in the Gladys Matter integration.
 
+The behavior and contracts of the integration (readable names, node sheet, unavailable devices, node API, WebSocket message) are specified in [docs/specs/matter.md](docs/specs/matter.md).
+
 - `matter.js` source: `@matter/main` / `@matter/types` `0.17.9`
 - Clusters exposed by `matter.js`: **132**
 - Clusters handled by Gladys today: **33**

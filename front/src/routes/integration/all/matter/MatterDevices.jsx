@@ -358,7 +358,7 @@ class MatterDevices extends Component {
       // the core writes (energy watermarks) may have moved since the page was loaded
       const allGladysDevices = await this.getAllGladysMatterDevices();
       const existingGladysDevice = findGladysDeviceByExternalId(allGladysDevices, externalId);
-      // a new device is named in the language of the user (docs/specs/matter.md)
+      // a new device is named in the language of the user (server/services/matter/docs/specs/matter.md)
       const deviceToSave = existingGladysDevice
         ? mergePairedDeviceIntoGladysDevice(existingGladysDevice, device, this.getDictionary())
         : nameNewDevice(device, this.getDictionary());

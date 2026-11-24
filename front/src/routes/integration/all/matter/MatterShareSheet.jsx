@@ -8,7 +8,7 @@ import { formatManualPairingCode } from './matterUtils';
 import style from './style.css';
 
 /**
- * @description Shares a node with another ecosystem (docs/specs/matter.md): Gladys opens a
+ * @description Shares a node with another ecosystem (server/services/matter/docs/specs/matter.md): Gladys opens a
  * commissioning window on the node, and this sheet shows the QR code and the manual code the
  * other app asks for, until the window closes.
  */

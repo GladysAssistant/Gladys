@@ -49,7 +49,7 @@ The paired card (and its phone row) is titled with the suggested name. "Add to G
 
 ### A.3 Updates keep the names
 
-"Update in Gladys" and "Replace the existing device" (`energy-hierarchy.md`, F, Matter) keep the name of the device and **the names of its features already in Gladys**. A feature matches by `external_id`, or by the replaced `external_id` on a replacement. Only a feature new to Gladys gets a suggested name. Devices created before this change are never renamed.
+"Update in Gladys" and "Replace the existing device" (`docs/specs/energy-hierarchy.md`, F, Matter) keep the name of the device and **the names of its features already in Gladys**. A feature matches by `external_id`, or by the replaced `external_id` on a replacement. Only a feature new to Gladys gets a suggested name. Devices created before this change are never renamed.
 
 ## B. Node status and unavailable devices
 
@@ -90,7 +90,7 @@ A Gladys device (`matter:<nodeId>:<devicePath>`) is unavailable:
 - with reason `node-offline` when its node is not available;
 - with reason `bridged-unreachable` when its path is, or is under, the path of an unreachable bridged device.
 
-A command to a device its bridge reports unreachable is refused at once (`matter.setValue`, "unreachable"): the command-failure toast of the dashboard says so (`dashboard-flexible-layout-and-widgets.md`). A command to an offline node still tries to reconnect it for a bounded time (`ensureNodeConnected`).
+A command to a device its bridge reports unreachable is refused at once (`matter.setValue`, "unreachable"): the command-failure toast of the dashboard says so (`docs/specs/dashboard-flexible-layout-and-widgets.md`). A command to an offline node still tries to reconnect it for a bounded time (`ensureNodeConnected`).
 
 ### B.4 WebSocket
 
@@ -177,7 +177,7 @@ An error that is not a `400`/`404` is sent as an `Error500` with its message, so
 
 ## D. Front
 
-- **Devices tab.** Every device whose node or bridge makes it unavailable shows "Unavailable" (`data-cy=matter-device-unavailable`) on its card, and on its paired card. The reason is a tooltip on desktop, and a notice in the sheet of the phone row (`mobile-pages/integration-devices.md`, E). The status of the nodes comes from `GET /node`, then follows `matter.node-status-changed`.
+- **Devices tab.** Every device whose node or bridge makes it unavailable shows "Unavailable" (`data-cy=matter-device-unavailable`) on its card, and on its paired card. The reason is a tooltip on desktop, and a notice in the sheet of the phone row (`docs/specs/mobile-pages/integration-devices.md`, E). The status of the nodes comes from `GET /node`, then follows `matter.node-status-changed`.
 - **Settings tab.** The nodes are rows (`MatterNodeList.jsx`). Each row shows the network as its icon, the name, vendor · product, firmware and the number of Gladys devices, and the status pill: "Connected", "Reconnecting" during the grace delay, "Offline". A row opens the **sheet of the node** (`MatterNodeSheet.jsx`, a `BottomSheet`, a centered dialog on desktop), live through the WebSocket:
   - groups: Status, Appliance, Network, Controllers with access, Devices;
   - actions: "Identify"; "Share with another app" (admin) opens a second sheet with the QR code, the manual code and a countdown; "Remove this node" (admin) opens the confirmation of the decommission (linked devices, "also delete them") and closes the sheet. The outcome is shown above the list.

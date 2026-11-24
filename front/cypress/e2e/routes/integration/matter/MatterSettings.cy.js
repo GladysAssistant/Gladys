@@ -1,5 +1,5 @@
 // Matter settings page: the nodes as the user knows them, the sheet of a node and its actions, and the
-// endpoint and cluster tree in expert mode (docs/specs/matter.md)
+// endpoint and cluster tree in expert mode (server/services/matter/docs/specs/matter.md)
 describe('Matter settings', () => {
   const serverUrl = Cypress.env('serverUrl');
   const api = path => `${serverUrl}/api/v1/service/matter${path}`;

@@ -13,7 +13,7 @@ export const NodeStatusPill = ({ node }) => {
 };
 
 /**
- * @description The nodes, as the user knows them (docs/specs/matter.md): a row per node with its
+ * @description The nodes, as the user knows them (server/services/matter/docs/specs/matter.md): a row per node with its
  * name, its product, its firmware and its status; the row opens the sheet of the node.
  */
 const MatterNodeList = ({ nodes, getNodeName, onOpenNode }) => (

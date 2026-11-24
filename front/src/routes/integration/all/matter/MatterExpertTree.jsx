@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-// The endpoints and clusters of a node, for the expert mode of the settings page (docs/specs/matter.md)
+// The endpoints and clusters of a node, for the expert mode of the settings page
+// (server/services/matter/docs/specs/matter.md)
 const DeviceDisplay = ({
   device,
   nodeId,

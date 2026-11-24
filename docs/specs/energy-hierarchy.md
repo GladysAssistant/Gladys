@@ -213,7 +213,7 @@ presentation is owned by [`mobile-pages/energy.md`](mobile-pages/energy.md), sec
   newly derived features onto those ids. When a paired device updates the device that already
   has its `external_id` ("Update"), or replaces it (new node id), the front posts the paired
   features and params merged into the existing device — its `id`, `selector`, `name`, `room_id`,
-  the names of the features it already has (`matter.md`, A.3) and the params Matter does not
+  the names of the features it already has (`server/services/matter/docs/specs/matter.md`, A.3) and the params Matter does not
   provide are kept — so that the
   `ENERGY_INDEX_LAST_PROCESSED_<featureId>` watermark of the consumption job survives (on a
   replacement, the features take over the existing ids, so the watermark still names its index),

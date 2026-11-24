@@ -19,7 +19,7 @@ export const UNAVAILABLE_REASONS = {
 
 /**
  * @description The status of each node, by node id, as GET /node and the
- * `matter.node-status-changed` message give it (docs/specs/matter.md).
+ * `matter.node-status-changed` message give it (server/services/matter/docs/specs/matter.md).
  * @param {Array} nodes - The nodes.
  * @returns {Map} The status of each node.
  * @example
@@ -85,7 +85,7 @@ export const getDeviceAvailability = (device, nodesStatus) => {
 /**
  * @description The name Gladys suggests for a device paired in Matter, in the language of the user,
  * from the naming hints of the server: "Living room plug – Outlet 2", "Office sensor – Humidity", or
- * the product alone when it is the only device of its product (docs/specs/matter.md).
+ * the product alone when it is the only device of its product (server/services/matter/docs/specs/matter.md).
  * @param {object} device - The paired device, with matter_naming { product, role, index, count, alone }.
  * @param {object} dictionary - The dictionary of the language of the user.
  * @returns {string} The name.
@@ -179,7 +179,7 @@ export const keepFeatureNames = (pairedFeatures, findExistingFeature, dictionary
 };
 
 // How the status of a node is shown: a reconnecting node stays "reconnecting" during the grace
-// delay of the server, then is offline (docs/specs/matter.md)
+// delay of the server, then is offline (server/services/matter/docs/specs/matter.md)
 export const getNodeStatusDisplay = node => {
   if (node.status === 'connected') {
     return { key: 'connected', tone: 'success' };

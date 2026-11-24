@@ -43,9 +43,9 @@ const InformationRow = ({ title, value, mono, dataCy }) =>
   ) : null;
 
 /**
- * @description The sheet of a Matter node (docs/specs/matter.md): its status and last contact, the
- * appliance (firmware…), its network and signal, the controllers which have access to it, its
- * devices, and the actions: identify, share with another ecosystem, remove.
+ * @description The sheet of a Matter node (server/services/matter/docs/specs/matter.md): its status
+ * and last contact, the appliance (firmware…), its network and signal, the controllers which have
+ * access to it, its devices, and the actions: identify, share with another ecosystem, remove.
  */
 class MatterNodeSheet extends Component {
   state = {

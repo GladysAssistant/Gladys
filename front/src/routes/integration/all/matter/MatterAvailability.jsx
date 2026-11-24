@@ -5,7 +5,7 @@ import { UNAVAILABLE_REASONS } from './matterUtils';
 
 const getIcon = reason => (reason === UNAVAILABLE_REASONS.BRIDGED_UNREACHABLE ? 'fe-link-2' : 'fe-wifi-off');
 
-// Why a Matter device is unavailable, in words (docs/specs/matter.md)
+// Why a Matter device is unavailable, in words (server/services/matter/docs/specs/matter.md)
 export const UnavailableReason = ({ reason }) => <Text id={`integration.matter.device.unavailableReason.${reason}`} />;
 
 // The desktop tag of an unavailable device, its reason as a tooltip
