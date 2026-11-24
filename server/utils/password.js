@@ -1,3 +1,4 @@
+const { randomInt } = require('crypto');
 const bcrypt = require('bcrypt');
 const { BadParameters } = require('./coreErrors');
 
@@ -23,7 +24,8 @@ const generate = (length = 20, options = undefined) => {
   const availableCharsLength = availableChars.length;
   let password = '';
   for (let i = 0; i < length; i += 1) {
-    password += availableChars[Math.floor(Math.random() * availableCharsLength)];
+    // Cryptographically secure: the passwords protect the brokers and interfaces Gladys installs
+    password += availableChars[randomInt(availableCharsLength)];
   }
   return password;
 };

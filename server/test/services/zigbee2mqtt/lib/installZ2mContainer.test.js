@@ -320,6 +320,22 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.callOrder(gladys.variable.setValue, gladys.system.restartContainer);
   });
 
+  it('should restart Zigbee2mqtt with its password even when Gladys fails to save it', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mFrontendAuthToken: 'interface-password' };
+    gladys.variable = { setValue: fake.rejects(new Error('database locked')), destroy: fake.resolves(null) };
+    gladys.system.getContainers = fake.resolves([container]);
+    zigbee2mqttManager.configureContainer = fake.resolves({ configChanged: true, adapterChanged: false });
+    sinon.stub(logger, 'error');
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledWithMatch(logger.error, 'Zigbee2mqtt: failed to save the password of its interface:');
+    logger.error.restore();
+    // The file asks for the password: restarted, Zigbee2mqtt protects its interface; the next start reads it back
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+  });
+
   it('should forget the password of the interface the file reads from another file', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0', z2mFrontendAuthToken: null };

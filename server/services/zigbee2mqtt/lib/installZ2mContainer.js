@@ -181,9 +181,14 @@ async function installZ2mContainer(config, setupMode = false) {
     throw e;
   }
   // The password of the interface the file now asks for, saved before Zigbee2mqtt restarts with it: a failure after
-  // would leave Gladys without it (null for a reference to another file, unknown to Gladys)
+  // would leave Gladys without it (null for a reference to another file, unknown to Gladys). Its own failure does not
+  // stop the installation, which restarts Zigbee2mqtt with the file written: the next start takes it from the file.
   if (config.z2mFrontendAuthToken !== undefined) {
-    await this.saveOrDestroyVariable(CONFIGURATION.Z2M_FRONTEND_AUTH_TOKEN, config.z2mFrontendAuthToken);
+    try {
+      await this.saveOrDestroyVariable(CONFIGURATION.Z2M_FRONTEND_AUTH_TOKEN, config.z2mFrontendAuthToken);
+    } catch (e) {
+      logger.error('Zigbee2mqtt: failed to save the password of its interface:', e);
+    }
   }
 
   try {

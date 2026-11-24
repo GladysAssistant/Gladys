@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './dashboard.css';
@@ -47,24 +47,30 @@ class InterfacePassword extends Component {
           <code class={cx('text-break mr-auto', style.passwordValue)} data-cy="z2m-dashboard-interface-password-value">
             {revealed ? password : '••••••••••••••••••••'}
           </code>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary py-0 px-2 flex-shrink-0"
-            aria-pressed={revealed ? 'true' : 'false'}
-            onClick={this.toggleReveal}
-            data-cy="z2m-dashboard-interface-password-reveal"
-          >
-            <i class={cx('fe', { 'fe-eye': !revealed, 'fe-eye-off': revealed })} />
-          </button>
-          {canCopy && (
+          <Localizer>
             <button
               type="button"
               class="btn btn-sm btn-outline-secondary py-0 px-2 flex-shrink-0"
-              onClick={this.copy}
-              data-cy="z2m-dashboard-interface-password-copy"
+              aria-label={<Text id="mobileKit.togglePassword" />}
+              aria-pressed={revealed ? 'true' : 'false'}
+              onClick={this.toggleReveal}
+              data-cy="z2m-dashboard-interface-password-reveal"
             >
-              <i class="fe fe-copy" />
+              <i class={cx('fe', { 'fe-eye': !revealed, 'fe-eye-off': revealed })} aria-hidden="true" />
             </button>
+          </Localizer>
+          {canCopy && (
+            <Localizer>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary py-0 px-2 flex-shrink-0"
+                aria-label={<Text id="integration.zigbee2mqtt.setup.dashboard.mobile.copy" />}
+                onClick={this.copy}
+                data-cy="z2m-dashboard-interface-password-copy"
+              >
+                <i class="fe fe-copy" aria-hidden="true" />
+              </button>
+            </Localizer>
           )}
           {copied && (
             <small class="text-success flex-shrink-0">

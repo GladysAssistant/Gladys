@@ -192,7 +192,9 @@ describe('Zigbee2mqtt dashboard settings', () => {
         i18nText(`${T}.advanced.interface.passwordHelp`)
       );
       cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('not.contain', 'interface-password');
-      cy.get('[data-cy=z2m-dashboard-interface-password-reveal]').click();
+      cy.get('[data-cy=z2m-dashboard-interface-password-reveal]')
+        .should('have.attr', 'aria-label', i18nText('mobileKit.togglePassword'))
+        .click();
       cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('have.text', 'interface-password');
     });
 
