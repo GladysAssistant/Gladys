@@ -2757,7 +2757,8 @@
         "steps": {
           "joined": "Beigetreten",
           "interview": "Interview",
-          "ready": "Bereit"
+          "ready": "Bereit",
+          "unsupported": "Nicht unterstützt"
         },
         "stepStates": {
           "done": "(erledigt)",

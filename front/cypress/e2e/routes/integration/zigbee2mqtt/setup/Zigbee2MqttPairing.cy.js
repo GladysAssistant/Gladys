@@ -415,6 +415,10 @@ describe('Zigbee2mqtt pairing window', () => {
             .and('not.contain', 'Automatically generated definition');
           cy.get('[data-cy=z2m-pairing-unsupported]').i18n(`${T}.unsupportedText`);
           cy.get('[data-cy=z2m-pairing-add]').should('not.exist');
+          // The last step says it in words, not by its colour only
+          cy.get('[data-cy=z2m-pairing-timeline] li')
+            .eq(2)
+            .i18n(`${T}.steps.unsupported`);
         });
       cy.get('[data-cy=z2m-pairing-row]')
         .eq(2)

@@ -19,6 +19,7 @@ const T = 'integration.zigbee2mqtt.pairing';
 const TIPS = ['approach', 'mode', 'add'];
 const EDIT_URL = '/dashboard/integration/device/zigbee2mqtt/edit';
 const REQUEST = { ALLOW: 'allow', STOP: 'stop' };
+const STEPS = ['joined', 'interview', 'ready'];
 
 // The photo of a device model; the icon of its category without Internet or without known photo (D58)
 class DevicePhoto extends Component {
@@ -55,6 +56,9 @@ const getSteps = status => {
   }
 };
 
+// The label of a step: the last one says "Not supported" in words, not only by its colour
+const getStepLabel = (step, index) => (index === 2 && step === 'warning' ? 'unsupported' : STEPS[index]);
+
 // `inline` on a phone: in the row, a button or a link, which holds no list. A live region: a step that changes is told
 // to a screen reader (the countdown is not in it)
 const Timeline = ({ status, inline }) => {
@@ -65,7 +69,7 @@ const Timeline = ({ status, inline }) => {
       {getSteps(status).map((step, index) => (
         <Step key={index} class={cx(style.timelineStep, style[`timeline-${step}`])}>
           <span class={style.timelineDot} aria-hidden="true" />
-          <Text id={`${T}.steps.${['joined', 'interview', 'ready'][index]}`} />
+          <Text id={`${T}.steps.${getStepLabel(step, index)}`} />
           {/* What the dot and the colours tell, for a screen reader */}
           <span class="sr-only">
             {' '}

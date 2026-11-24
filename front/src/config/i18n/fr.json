@@ -2890,7 +2890,8 @@
         "steps": {
           "joined": "Rejoint",
           "interview": "Interview",
-          "ready": "Prêt"
+          "ready": "Prêt",
+          "unsupported": "Non pris en charge"
         },
         "stepStates": {
           "done": "(terminé)",

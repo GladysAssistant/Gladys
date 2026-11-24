@@ -2513,7 +2513,8 @@
         "steps": {
           "joined": "Joined",
           "interview": "Interview",
-          "ready": "Ready"
+          "ready": "Ready",
+          "unsupported": "Not supported"
         },
         "stepStates": {
           "done": "(done)",

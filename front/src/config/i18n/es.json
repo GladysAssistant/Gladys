@@ -2513,7 +2513,8 @@
         "steps": {
           "joined": "Unido",
           "interview": "Entrevista",
-          "ready": "Listo"
+          "ready": "Listo",
+          "unsupported": "No compatible"
         },
         "stepStates": {
           "done": "(completado)",
