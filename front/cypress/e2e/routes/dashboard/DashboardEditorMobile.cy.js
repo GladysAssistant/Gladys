@@ -45,7 +45,7 @@ describe('Dashboard editor on a phone', () => {
     cy.visit('/dashboard/phone/edit');
 
     // the canvas looks like the dashboard: no toolbar until a widget is selected
-    cy.get('[data-cy="move-to-box-0-0"]').should('not.be.visible');
+    cy.get('[data-widget-wrapper][data-x="0"][data-y="0"]').should('not.have.attr', 'data-selected');
     cy.get('[data-cy="widget-tap-0-0"]').click();
     cy.get('[data-widget-wrapper][data-x="0"][data-y="0"]').should('have.attr', 'data-selected', 'true');
     cy.get('[data-cy="edit-panel"]').should('not.exist');

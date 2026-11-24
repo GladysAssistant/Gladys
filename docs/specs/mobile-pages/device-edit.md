@@ -32,7 +32,7 @@ room**, and **choose which features keep their history**.
   dashboards to choose from, and adds the device's main features (all but battery, signal and
   internal temperature — a light lands as one row) to a "devices" widget of the chosen dashboard
   or to a new one at its top or bottom, saved at once. A toast confirms, with a "See" link to that
-  dashboard. The desktop card carries the same action as a button under Save. It is not part of
+  dashboard, which goes through the leave guard below when something is unsaved. The desktop card carries the same action as a button under Save. It is not part of
   the device's own save: nothing in the bottom bar changes.
 - **"N features"**: one row per feature, in one group — the icon of its type, its name (the
   label of its type when it has none), its type and its unit, and whether its history is kept

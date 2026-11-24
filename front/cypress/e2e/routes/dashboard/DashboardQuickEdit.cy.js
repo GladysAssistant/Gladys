@@ -22,7 +22,8 @@ describe('Dashboard in-place editing', () => {
       cy.wrap($element).trigger('pointerdown', options);
       // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(700);
-      cy.wrap($element).trigger('pointerup', options);
+      // the menu is open by now, its sheet covers the widget: the finger is lifted where it is
+      cy.wrap($element).trigger('pointerup', { ...options, force: true });
     });
   };
 

@@ -95,7 +95,12 @@ const EditableBoxPreview = ({ children, ...props }) => {
     >
       {/* the toolbar is a group named after the widget: VoiceOver reads
           "Weather, group — Move up, button…" instead of four nameless buttons */}
-      <div class={style.previewToolbar} role="group" aria-labelledby={titleId}>
+      <div
+        class={style.previewToolbar}
+        role="group"
+        aria-labelledby={titleId}
+        onFocusIn={() => !isSelected && props.selectBox && props.selectBox(x, y)}
+      >
         <span class={style.previewTitle} data-preview-title id={titleId}>
           <span class={style.previewType}>
             {box.type ? <Text id={`dashboard.boxTitle.${box.type}`} /> : <Text id="dashboard.editorNewWidget" />}

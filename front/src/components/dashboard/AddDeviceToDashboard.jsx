@@ -14,7 +14,8 @@ import { getMainFeatures } from '../../utils/deviceWidgetSuggestions';
  * its main features (all but battery, signal...: getMainFeatures; a light lands as one row), in a
  * "devices" widget of the chosen dashboard or a new one ("Where to add it?", AddToDashboardSheet).
  * A toast confirms, with a link to that dashboard. Only for a device already saved: a device being
- * created has no feature on the server yet. variant: 'row' (phone page) or 'button' (desktop card).
+ * created has no feature on the server yet. variant: 'row' (phone page) or 'button' (desktop card);
+ * onNavigate: how the page leaves to that dashboard (its leave guard), route() otherwise.
  */
 class AddDeviceToDashboard extends Component {
   state = {
@@ -37,10 +38,18 @@ class AddDeviceToDashboard extends Component {
     });
   };
 
+  // the page hosting the row may guard its exits (unsaved changes on the phone device page):
+  // "See" goes through that guard, like the page's own links
   see = () => {
     const { toast } = this.state;
-    if (toast) {
-      route(`/dashboard/${toast.selector}`);
+    if (!toast) {
+      return;
+    }
+    const url = `/dashboard/${toast.selector}`;
+    if (this.props.onNavigate) {
+      this.props.onNavigate(url);
+    } else {
+      route(url);
     }
   };
 

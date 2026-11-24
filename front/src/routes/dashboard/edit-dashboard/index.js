@@ -615,6 +615,9 @@ class EditDashboard extends Component {
       columnWidths: snapshot.columnWidths,
       sectionMobileOrders: snapshot.sectionMobileOrders,
       undoRemoval: null,
+      // the positions are the ones before the removal again: a selection made since would point
+      // at another widget
+      selectedBoxPosition: null,
       hasUnsavedChanges: true
     });
   };
@@ -1114,6 +1117,7 @@ class EditDashboard extends Component {
         openBoxSettings={this.openBoxSettings}
         selectedBoxPosition={selectedBoxPosition}
         onWidgetTap={this.onWidgetTap}
+        selectBox={this.selectBox}
         clearSelection={this.clearSelection}
         openDashboardSettings={this.openDashboardSettings}
         openNewDashboard={this.openNewDashboard}

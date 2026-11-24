@@ -310,6 +310,12 @@ class Dashboard extends Component {
 
   // A change made from the dashboard itself (QuickEditor) is already saved: the page shows it
   onDashboardSaved = dashboard => {
+    // a configuration fetch started before the save is older than it: its answer must not
+    // overwrite the saved dashboard (fetchDashboardConfig drops a superseded generation)
+    if (dashboard && dashboard.selector) {
+      const generation = (this.dashboardConfigGenerations.get(dashboard.selector) || 0) + 1;
+      this.dashboardConfigGenerations.set(dashboard.selector, generation);
+    }
     this.storeDashboardConfig(dashboard);
     if (dashboard && dashboard.selector === this.state.currentDashboardSelector) {
       this.setState({ currentDashboard: dashboard });

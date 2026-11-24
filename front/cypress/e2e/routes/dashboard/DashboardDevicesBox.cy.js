@@ -211,7 +211,6 @@ describe('Dashboard Devices Box editor', () => {
     cy.contains('Empty');
     // the page is responsive: the editor opens and the widget can be removed
     cy.visit('/dashboard/test/edit');
-    cy.get('[data-cy="widget-tap-0-0"]').click();
     cy.get('[data-cy="remove-box-0-0"]').click();
     cy.get('[data-widget-wrapper][data-x="0"]').should('have.length', 0);
   });

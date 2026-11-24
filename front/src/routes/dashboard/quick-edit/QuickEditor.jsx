@@ -23,6 +23,8 @@ const PRESS_FEEDBACK_MS = 150;
 // Beyond this travel the finger is scrolling (or swiping to another dashboard): no long press
 const PRESS_MAX_TRAVEL_PX = 10;
 const UNDO_TOAST_MS = 5000;
+// A context menu this soon after a touch on a widget is the long press's own (Android)
+const CONTEXT_MENU_AFTER_TOUCH_MS = 1500;
 const FLASH_MS = 1600;
 // Where holding a finger already means something: a slider, a color wheel, a field, a camera
 const NO_LONG_PRESS =
@@ -82,11 +84,16 @@ class QuickEditor extends Component {
 
   // ------------------------------------------------------------ long press
   onPointerDown = event => {
-    if (event.pointerType === 'mouse' || !event.isPrimary || this.props.tabletMode || this.isBusy()) {
+    if (event.pointerType === 'mouse' || !event.isPrimary || this.props.tabletMode) {
       return;
     }
     const slot = event.target.closest ? event.target.closest('[data-box-slot]') : null;
-    if (!slot || event.target.closest(NO_LONG_PRESS)) {
+    if (!slot) {
+      return;
+    }
+    // a finger on a widget: the context menu the system may open for it is ours to prevent
+    this.lastTouchPressAt = Date.now();
+    if (event.target.closest(NO_LONG_PRESS) || this.isBusy()) {
       return;
     }
     this.cancelPress();
@@ -125,9 +132,11 @@ class QuickEditor extends Component {
     }
   };
 
-  // Android opens its own context menu (and iOS a callout) on a long press: not on a widget
+  // Android opens its own context menu on a long press: not on a widget. Only after a finger (or
+  // a pen) went down on it: a right click on a computer keeps the browser's menu
   onContextMenu = event => {
-    if (event.target.closest && event.target.closest('[data-box-slot]') && !this.props.tabletMode) {
+    const touchPress = this.press || Date.now() - (this.lastTouchPressAt || 0) < CONTEXT_MENU_AFTER_TOUCH_MS;
+    if (touchPress && event.target.closest && event.target.closest('[data-box-slot]') && !this.props.tabletMode) {
       event.preventDefault();
     }
   };
@@ -307,7 +316,7 @@ class QuickEditor extends Component {
       ) : (
         this.describeAdded(count, firstName, widgetName)
       ),
-      { selector: after.selector, boxes: before.boxes }
+      { selector: after.selector, boxes: before.boxes, savedBoxes: after.boxes }
     );
     this.flashWidget(
       position,
@@ -316,12 +325,34 @@ class QuickEditor extends Component {
   };
 
   // ------------------------------------------------------------ saving
-  save = async (change, expected, message, flashPosition, flashSelectors) => {
+  // One save at a time: each one reads the dashboard again, so a save started while another is
+  // still writing would build its change on the boxes before it, and drop it
+  saveQueue = Promise.resolve();
+
+  enqueueSave = task => {
+    const previous = this.saveQueue;
+    const run = (async () => {
+      // the queue never rejects (below): the previous save is only waited for
+      await previous;
+      return task();
+    })();
+    this.saveQueue = (async () => {
+      try {
+        await run;
+      } catch (e) {} // eslint-disable-line no-empty
+    })();
+    return run;
+  };
+
+  save = (change, expected, message, flashPosition, flashSelectors) =>
+    this.enqueueSave(() => this.runSave(change, expected, message, flashPosition, flashSelectors));
+
+  runSave = async (change, expected, message, flashPosition, flashSelectors) => {
     const selector = this.props.currentDashboard.selector;
     try {
       const { before, after } = await updateDashboardWidgets(this.props.httpClient, selector, change, expected);
       this.props.onDashboardSaved(after);
-      this.showToast(message, { selector, boxes: before.boxes });
+      this.showToast(message, { selector, boxes: before.boxes, savedBoxes: after.boxes });
       if (flashPosition) {
         this.flashWidget(flashPosition, flashSelectors);
       }
@@ -333,18 +364,25 @@ class QuickEditor extends Component {
     }
   };
 
-  undo = async () => {
+  // Undo puts the widgets back as they were, unless the dashboard changed since the change it
+  // undoes (restoreDashboardWidgets checks): it would erase that later change too
+  undo = () => {
     const { toast } = this.state;
     if (!toast || !toast.undo) {
-      return;
+      return null;
     }
-    try {
-      const restored = await restoreDashboardWidgets(this.props.httpClient, toast.undo.selector, toast.undo.boxes);
-      this.props.onDashboardSaved(restored);
-    } catch (e) {
-      console.error(e);
-      this.showToast(<Text id="quickEdit.saveError" />);
-    }
+    const { selector, boxes, savedBoxes } = toast.undo;
+    return this.enqueueSave(async () => {
+      try {
+        const restored = await restoreDashboardWidgets(this.props.httpClient, selector, boxes, savedBoxes);
+        this.props.onDashboardSaved(restored);
+      } catch (e) {
+        console.error(e);
+        this.showToast(
+          <Text id={e.name === 'DashboardChangedError' ? 'quickEdit.changedError' : 'quickEdit.saveError'} />
+        );
+      }
+    });
   };
 
   showToast = (message, undo) => {
@@ -403,12 +441,20 @@ class QuickEditor extends Component {
     document.removeEventListener('contextmenu', this.onContextMenu);
   }
 
-  // another dashboard: nothing open can still be about this one
+  // another dashboard (the pager, a pill of the dock): nothing open can still be about this one —
+  // the widget menu, the devices sheet, the "+" menu and the add flow, whose "Where to add it?"
+  // holds the dashboard it loaded
   componentWillReceiveProps(nextProps) {
     const selector = get(nextProps, 'currentDashboard.selector');
-    if (selector !== get(this.props, 'currentDashboard.selector') && (this.state.menu || this.state.devicesSheet)) {
+    if (selector === get(this.props, 'currentDashboard.selector')) {
+      return;
+    }
+    if (this.state.menu || this.state.devicesSheet || this.state.addStep) {
       this.markMenuTarget(null);
-      this.setState({ menu: null, devicesSheet: null });
+      this.setState({ menu: null, devicesSheet: null, addStep: null });
+    }
+    if (nextProps.addMenuOpen) {
+      nextProps.closeAddMenu();
     }
   }
 
@@ -600,6 +646,7 @@ class QuickEditor extends Component {
           onClose={this.closeAdd}
           onBack={this.backToPicker}
           onAdded={this.onAdded}
+          enqueueSave={this.enqueueSave}
         />
       </div>
     );

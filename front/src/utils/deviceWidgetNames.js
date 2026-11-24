@@ -100,7 +100,16 @@ const getSmartFeatureName = (dictionary, entry, items = []) => {
   }
   const taken = name =>
     others.some(other => !sharesRowWith(entry, other.entry) && (other.name || other.defaultName) === name);
-  return candidates.find(name => name && !taken(name)) || defaultName;
+  const chosen = candidates.find(name => name && !taken(name));
+  if (chosen) {
+    return chosen;
+  }
+  // two devices with the same name: the generated label alone would read the same on two rows
+  let unique = defaultName;
+  for (let index = 2; taken(unique); index += 1) {
+    unique = `${defaultName} ${index}`;
+  }
+  return unique;
 };
 
 /**

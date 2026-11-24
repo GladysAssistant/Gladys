@@ -1943,7 +1943,8 @@
 /* In-place editing: a long press on a widget opens its menu. On touch screens the dashboard is
    a control surface, not a text: no text selection nor iOS callout under a finger kept down */
 @media (pointer: coarse) {
-  .boxSlot {
+  .boxSlot,
+  .boxSlot > * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;

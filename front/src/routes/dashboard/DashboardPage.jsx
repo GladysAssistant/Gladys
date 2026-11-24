@@ -245,7 +245,9 @@ const DashboardPage = ({ children, ...props }) => {
                   )}
                   {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
                 </DashboardSwiper>
-                {!props.dashboardNotConfigured && (
+                {/* mounted for an empty dashboard too: the "+" of the dock opens its menu, and the
+                    Undo of the removal of the last widget must outlive that widget */}
+                {props.currentDashboard && (
                   <QuickEditor
                     currentDashboard={props.currentDashboard}
                     tabletMode={props.tabletMode}

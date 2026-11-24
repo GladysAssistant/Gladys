@@ -142,6 +142,17 @@ class MobileUpdateDevice extends Component {
     this.setState({ leaveOpen: true });
   };
 
+  // leaving to another page from a control of this one (the "See" of "Add to a dashboard"):
+  // the same guard as the page's links
+  navigateTo = href => {
+    this.leaveHref = href;
+    if (this.isDirty()) {
+      this.setState({ leaveOpen: true });
+    } else {
+      this.leave();
+    }
+  };
+
   onBack = () => {
     this.leaveHref = null;
     if (this.isDirty()) {
@@ -314,7 +325,7 @@ class MobileUpdateDevice extends Component {
 
                 {/* the device goes to a dashboard from here: no picker to search it in */}
                 <div class="mt-3">
-                  <AddDeviceToDashboard device={device} />
+                  <AddDeviceToDashboard device={device} onNavigate={this.navigateTo} />
                 </div>
 
                 <MobileSectionHeader

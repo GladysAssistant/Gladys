@@ -90,7 +90,10 @@ const holdElementAt = (findElement, offset) => {
     if (!element) {
       return;
     }
-    const delta = element.getBoundingClientRect().top - Math.max(TOP_INSET_PX, offset);
+    // a tall widget the user was in the middle of keeps its (negative) offset: the same rows stay
+    // in view, rather than going back to its top
+    const target = Number.isFinite(offset) ? offset : TOP_INSET_PX;
+    const delta = element.getBoundingClientRect().top - target;
     if (Math.abs(delta) > 1) {
       window.scrollBy(0, delta);
     }

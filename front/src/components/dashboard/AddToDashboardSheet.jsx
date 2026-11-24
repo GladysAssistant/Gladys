@@ -103,7 +103,10 @@ class AddToDashboardSheet extends Component {
   // neighbours. A feature already in the widget is not added twice.
   buildDevicesBox = (box, featuresBySelector) => {
     const selectors = get(box, 'device_features') || [];
-    const names = get(box, 'device_feature_names') || [];
+    // one name per selector, whatever the stored array holds: the new names land at the index of
+    // their own selector
+    const storedNames = get(box, 'device_feature_names') || [];
+    const names = selectors.map((selector, index) => storedNames[index]);
     const existing = selectors.map((selector, index) => ({
       selector,
       entry: featuresBySelector[selector],
@@ -130,17 +133,25 @@ class AddToDashboardSheet extends Component {
     }
     const featuresBySelector = this.getFeaturesBySelector();
     const { box, added } = this.buildDevicesBox(target.box, featuresBySelector);
-    const position = target.box ? { x: target.x, y: target.y } : getEdgePosition(dashboard.boxes, target.edge);
+    // a new widget goes at the top or the bottom of the dashboard as saved now (read again by
+    // updateDashboardWidgets), not as it was when the sheet opened
+    let position = target.box ? { x: target.x, y: target.y } : null;
+    const enqueueSave = this.props.enqueueSave || (task => task());
     this.setState({ saving: true, error: null });
     try {
-      const { before, after } = await updateDashboardWidgets(
-        this.props.httpClient,
-        dashboard.selector,
-        sections =>
-          target.box
-            ? replaceBoxInSections(sections, position.x, position.y, box)
-            : insertBoxInSections(sections, position.x, position.y, box),
-        target.box ? [{ x: target.x, y: target.y, box: target.box }] : []
+      const { before, after } = await enqueueSave(() =>
+        updateDashboardWidgets(
+          this.props.httpClient,
+          dashboard.selector,
+          sections => {
+            if (target.box) {
+              return replaceBoxInSections(sections, position.x, position.y, box);
+            }
+            position = getEdgePosition(sections, target.edge);
+            return insertBoxInSections(sections, position.x, position.y, box);
+          },
+          target.box ? [{ x: target.x, y: target.y, box: target.box }] : []
+        )
       );
       this.setState({ saving: false });
       this.props.onAdded({

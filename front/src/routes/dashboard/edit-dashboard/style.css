@@ -1479,8 +1479,19 @@
     margin-bottom: 1rem;
   }
 
-  .selectionCanvas:not(.compactCanvas) .previewWrapper:not(.previewWrapperSelected) .previewToolbar {
-    display: none;
+  /* visually hidden, not removed: the keyboard and the screen readers still reach the toolbar
+     (the tap overlay is aria-hidden), and focusing it selects the widget (EditableBoxPreview) */
+  .selectionCanvas:not(.compactCanvas) .previewWrapper:not(.previewWrapperSelected):not(:focus-within) .previewToolbar {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* the selected widget's toolbar: a frosted capsule, not a bare row of buttons */
