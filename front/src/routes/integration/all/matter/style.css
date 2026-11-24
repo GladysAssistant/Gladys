@@ -38,3 +38,32 @@
 .pairedDeviceLoadingContent {
   height: 5rem;
 }
+
+.shareContent {
+  text-align: center;
+}
+
+.shareQrCode {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  margin: 0 auto 1rem;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.shareCode {
+  font-family: monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.sheetBlock {
+  margin-bottom: 1rem;
+}
+
+.mono {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}

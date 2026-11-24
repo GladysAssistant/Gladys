@@ -4226,8 +4226,6 @@
         "saveButton": "Save",
         "error": "An error occurred while saving settings",
         "nodesTitle": "Matter Nodes",
-        "nodeIdLabel": "Node ID",
-        "nodeDetailsLabel": "Node Details",
         "actionsLabel": "Actions",
         "decommissionButton": "Decommission",
         "decommission": {
@@ -4261,7 +4259,21 @@
           "confirmButton": "Yes, reset everything",
           "cancelButton": "Cancel",
           "error": "An error occurred while resetting the integration."
-        }
+        },
+        "node": {
+          "ids": "Node ID: {{nodeId}} | Vendor ID: {{vendorId}} | Product ID: {{productId}}",
+          "device": "Device: {{name}} (endpoint {{number}})",
+          "childEndpoint": "Child endpoint:",
+          "clusterId": "Cluster ID",
+          "clusterName": "Cluster name",
+          "attributes": "Attributes",
+          "commands": "Commands",
+          "showKeys": "Show keys",
+          "hideKeys": "Hide keys",
+          "allKeys": "All keys:"
+        },
+        "expertMode": "Expert mode",
+        "expertModeDescription": "Shows the endpoints and clusters of each node, and the export of the nodes."
       },
       "device": {
         "title": "Matter Devices",
@@ -4274,7 +4286,126 @@
         "deviceHasUpdates": "This device already exists in Gladys with new or updated features. You can update it using the button below.",
         "deviceAlreadyExist": "A device with the same unique identifier already exists. You can update it using the button below.",
         "replaceExisting": "Update existing device",
-        "nodeDisconnected": "Disconnected"
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "unavailableReason": {
+          "node-offline": "The node no longer answers",
+          "bridged-unreachable": "The bridge reports this device as unreachable"
+        }
+      },
+      "roles": {
+        "outlet": "Outlet",
+        "light": "Light",
+        "switch": "Switch",
+        "button": "Button",
+        "temperature": "Temperature",
+        "humidity": "Humidity",
+        "illuminance": "Illuminance",
+        "occupancy": "Presence",
+        "contact": "Opening",
+        "leak": "Water leak",
+        "rain": "Rain",
+        "freeze": "Freeze",
+        "cover": "Shutter",
+        "thermostat": "Thermostat",
+        "airConditioner": "Air conditioner",
+        "fan": "Fan",
+        "airPurifier": "Air purifier",
+        "airQuality": "Air quality",
+        "lock": "Lock",
+        "vacuum": "Vacuum",
+        "energy": "Energy"
+      },
+      "node": {
+        "unnamed": "Node {{nodeId}}",
+        "status": {
+          "connected": "Connected",
+          "reconnecting": "Reconnecting",
+          "offline": "Offline"
+        },
+        "firmwareShort": "Firmware {{version}}",
+        "linkedDevicesCount": {
+          "singular": "{{count}} Gladys device",
+          "plural": "{{count}} Gladys devices"
+        },
+        "sections": {
+          "status": "Status",
+          "appliance": "Appliance",
+          "network": "Network",
+          "controllers": "Controllers with access",
+          "devices": "Devices",
+          "actions": "Actions"
+        },
+        "statusLabel": "Status",
+        "lastContact": "Last contact",
+        "never": "Unknown",
+        "manufacturer": "Manufacturer",
+        "product": "Product",
+        "label": "Label",
+        "firmware": "Firmware",
+        "hardware": "Hardware version",
+        "serialNumber": "Serial number",
+        "identifiers": "Identifiers",
+        "network": {
+          "type": "Network",
+          "types": {
+            "wifi": "Wi-Fi",
+            "thread": "Thread",
+            "ethernet": "Ethernet",
+            "unknown": "Unknown"
+          },
+          "signal": "Signal",
+          "threadRole": "Thread role",
+          "threadRoles": {
+            "unspecified": "Unspecified",
+            "unassigned": "Unassigned",
+            "sleepy-end-device": "Sleepy end device",
+            "end-device": "End device",
+            "reed": "Router-eligible end device",
+            "router": "Router",
+            "leader": "Leader"
+          },
+          "channel": "channel {{channel}}",
+          "powerSource": "Power",
+          "powerSources": {
+            "battery": "Battery",
+            "mains": "Mains"
+          },
+          "ipAddresses": "IP addresses"
+        },
+        "signal": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "fair": "Fair",
+          "weak": "Weak"
+        },
+        "controllers": {
+          "unknown": "The controllers are listed while the node is connected.",
+          "unknownController": "Controller (vendor {{vendorId}})",
+          "thisController": "This Gladys"
+        },
+        "noGladysDevices": "No device of this node is in Gladys yet: add them from the Devices tab.",
+        "bridgedDevices": "Devices of the bridge",
+        "reachable": "Reachable",
+        "unreachable": "Unreachable",
+        "unavailableNotice": "This node no longer answers: its devices are unavailable. Check that it is powered and within range of its network.",
+        "cachedNotice": "The node is not connected right now: the values shown are the last known ones.",
+        "loadError": "The information of this node could not be loaded.",
+        "identify": "Identify",
+        "identifySuccess": "The appliance identifies itself for 15 seconds (it blinks or beeps, depending on the model).",
+        "identifyError": "The node could not identify itself.",
+        "share": {
+          "button": "Share with another app",
+          "title": "Share with another app",
+          "opening": "Opening a pairing window on the node…",
+          "error": "The node could not be shared.",
+          "description": "In Apple Home, Google Home, Alexa or SmartThings, add a Matter device and scan this code, or type the code below. <b>Gladys keeps controlling the appliance.</b>",
+          "remaining": "The code expires in {{minutes}}:{{seconds}}.",
+          "expired": "The pairing window is closed: share the node again to get a new code.",
+          "close": "Close"
+        },
+        "remove": "Remove this node",
+        "removeTitle": "Remove this node?"
       },
       "discoverDeviceDescr": "Add a new Matter device",
       "nameLabel": "Name",

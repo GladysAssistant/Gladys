@@ -4226,8 +4226,6 @@
         "saveButton": "Guardar",
         "error": "Se produjo un error al guardar la configuración",
         "nodesTitle": "Nodos Matter",
-        "nodeIdLabel": "ID del nodo",
-        "nodeDetailsLabel": "Detalles del nodo",
         "actionsLabel": "Acciones",
         "decommissionButton": "Retirar",
         "decommission": {
@@ -4261,7 +4259,21 @@
           "confirmButton": "Sí, restablecer todo",
           "cancelButton": "Cancelar",
           "error": "Se produjo un error al restablecer la integración."
-        }
+        },
+        "node": {
+          "ids": "ID del nodo: {{nodeId}} | ID del fabricante: {{vendorId}} | ID del producto: {{productId}}",
+          "device": "Dispositivo: {{name}} (endpoint {{number}})",
+          "childEndpoint": "Endpoint hijo:",
+          "clusterId": "ID del clúster",
+          "clusterName": "Nombre del clúster",
+          "attributes": "Atributos",
+          "commands": "Comandos",
+          "showKeys": "Mostrar claves",
+          "hideKeys": "Ocultar claves",
+          "allKeys": "Todas las claves:"
+        },
+        "expertMode": "Modo experto",
+        "expertModeDescription": "Muestra los endpoints y clústeres de cada nodo, y la exportación de los nodos."
       },
       "device": {
         "title": "Dispositivos Matter",
@@ -4274,7 +4286,126 @@
         "deviceHasUpdates": "Este dispositivo ya existe en Gladys con funciones nuevas o actualizadas. Puede actualizarlo con el botón de abajo.",
         "deviceAlreadyExist": "Ya existe un dispositivo con el mismo identificador único. Puede actualizarlo con el botón de abajo.",
         "replaceExisting": "Actualizar dispositivo existente",
-        "nodeDisconnected": "Desconectado"
+        "available": "Disponible",
+        "unavailable": "No disponible",
+        "unavailableReason": {
+          "node-offline": "El nodo ya no responde",
+          "bridged-unreachable": "El puente indica que este dispositivo no es accesible"
+        }
+      },
+      "roles": {
+        "outlet": "Toma",
+        "light": "Luz",
+        "switch": "Interruptor",
+        "button": "Botón",
+        "temperature": "Temperatura",
+        "humidity": "Humedad",
+        "illuminance": "Luminosidad",
+        "occupancy": "Presencia",
+        "contact": "Apertura",
+        "leak": "Fuga de agua",
+        "rain": "Lluvia",
+        "freeze": "Helada",
+        "cover": "Persiana",
+        "thermostat": "Termostato",
+        "airConditioner": "Aire acondicionado",
+        "fan": "Ventilador",
+        "airPurifier": "Purificador",
+        "airQuality": "Calidad del aire",
+        "lock": "Cerradura",
+        "vacuum": "Aspiradora",
+        "energy": "Energía"
+      },
+      "node": {
+        "unnamed": "Nodo {{nodeId}}",
+        "status": {
+          "connected": "Conectado",
+          "reconnecting": "Reconectando",
+          "offline": "Sin conexión"
+        },
+        "firmwareShort": "Firmware {{version}}",
+        "linkedDevicesCount": {
+          "singular": "{{count}} dispositivo Gladys",
+          "plural": "{{count}} dispositivos Gladys"
+        },
+        "sections": {
+          "status": "Estado",
+          "appliance": "Aparato",
+          "network": "Red",
+          "controllers": "Controladores con acceso",
+          "devices": "Dispositivos",
+          "actions": "Acciones"
+        },
+        "statusLabel": "Estado",
+        "lastContact": "Último contacto",
+        "never": "Desconocido",
+        "manufacturer": "Fabricante",
+        "product": "Producto",
+        "label": "Etiqueta",
+        "firmware": "Firmware",
+        "hardware": "Versión de hardware",
+        "serialNumber": "Número de serie",
+        "identifiers": "Identificadores",
+        "network": {
+          "type": "Red",
+          "types": {
+            "wifi": "Wi-Fi",
+            "thread": "Thread",
+            "ethernet": "Ethernet",
+            "unknown": "Desconocida"
+          },
+          "signal": "Señal",
+          "threadRole": "Rol Thread",
+          "threadRoles": {
+            "unspecified": "Sin especificar",
+            "unassigned": "Sin asignar",
+            "sleepy-end-device": "Dispositivo final en reposo",
+            "end-device": "Dispositivo final",
+            "reed": "Dispositivo final apto para router",
+            "router": "Router",
+            "leader": "Líder"
+          },
+          "channel": "canal {{channel}}",
+          "powerSource": "Alimentación",
+          "powerSources": {
+            "battery": "Batería",
+            "mains": "Red eléctrica"
+          },
+          "ipAddresses": "Direcciones IP"
+        },
+        "signal": {
+          "excellent": "Excelente",
+          "good": "Buena",
+          "fair": "Regular",
+          "weak": "Débil"
+        },
+        "controllers": {
+          "unknown": "Los controladores se muestran cuando el nodo está conectado.",
+          "unknownController": "Controlador (fabricante {{vendorId}})",
+          "thisController": "Este Gladys"
+        },
+        "noGladysDevices": "Ningún dispositivo de este nodo está aún en Gladys: añádelos desde la pestaña Dispositivos.",
+        "bridgedDevices": "Dispositivos del puente",
+        "reachable": "Accesible",
+        "unreachable": "No accesible",
+        "unavailableNotice": "Este nodo ya no responde: sus dispositivos no están disponibles. Comprueba que está alimentado y al alcance de su red.",
+        "cachedNotice": "El nodo no está conectado ahora mismo: los valores mostrados son los últimos conocidos.",
+        "loadError": "No se pudo cargar la información de este nodo.",
+        "identify": "Identificar",
+        "identifySuccess": "El aparato se identifica durante 15 segundos (parpadea o pita, según el modelo).",
+        "identifyError": "El nodo no pudo identificarse.",
+        "share": {
+          "button": "Compartir con otra aplicación",
+          "title": "Compartir con otra aplicación",
+          "opening": "Abriendo una ventana de emparejamiento en el nodo…",
+          "error": "No se pudo compartir el nodo.",
+          "description": "En Apple Casa, Google Home, Alexa o SmartThings, añade un dispositivo Matter y escanea este código, o introduce el código de abajo. <b>Gladys sigue controlando el aparato.</b>",
+          "remaining": "El código caduca en {{minutes}}:{{seconds}}.",
+          "expired": "La ventana de emparejamiento está cerrada: vuelve a compartir el nodo para obtener un nuevo código.",
+          "close": "Cerrar"
+        },
+        "remove": "Quitar este nodo",
+        "removeTitle": "¿Quitar este nodo?"
       },
       "discoverDeviceDescr": "Añadir un nuevo dispositivo Matter",
       "nameLabel": "Nombre",

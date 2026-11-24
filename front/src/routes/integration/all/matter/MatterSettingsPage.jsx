@@ -3,125 +3,33 @@ import { Component } from 'preact';
 import { RequestStatus } from '../../../../utils/consts';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
+import get from 'get-value';
 import MatterPage from './MatterPage';
+import MatterNodeList from './MatterNodeList';
+import MatterNodeSheet from './MatterNodeSheet';
+import MatterExpertTree from './MatterExpertTree';
+import { MobileSwitch } from '../../../../components/mobile';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
+import { getNodeDisplayName } from './matterUtils';
 
-const DeviceDisplay = ({
-  device,
-  nodeId,
-  collapsedDevices,
-  visibleKeys,
-  toggleDevice,
-  toggleKeys,
-  parentPath = ''
-}) => {
-  const devicePath = parentPath ? `${parentPath}-${device.number}` : `${nodeId}-${device.number}`;
-  const isCollapsed = collapsedDevices[devicePath];
-  const level = parentPath.split('-').length - 1;
+// The expert mode (the endpoint and cluster tree) is a convenience of this browser only
+const EXPERT_MODE_STORAGE_KEY = 'matter-settings-expert-mode';
 
-  return (
-    <div class={cx('mb-4', { 'ms-4': level > 0 })}>
-      <div class="d-flex align-items-center cursor-pointer mb-3" onClick={() => toggleDevice(devicePath)}>
-        <i
-          class={cx('fe me-2', {
-            'fe-chevron-right': isCollapsed,
-            'fe-chevron-down': !isCollapsed
-          })}
-        />
-        <h6 class="mb-0">
-          {level > 0 && <span class="text-muted me-2">Child Endpoint:</span>}
-          Device: {device.name} (Endpoint: {device.number})
-        </h6>
-      </div>
+const readExpertMode = () => {
+  try {
+    return window.localStorage.getItem(EXPERT_MODE_STORAGE_KEY) === 'true';
+  } catch (e) {
+    return false;
+  }
+};
 
-      {!isCollapsed && (
-        <>
-          <div class="table-responsive">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Cluster ID</th>
-                  <th>Cluster Name</th>
-                  <th>Attributes</th>
-                  <th>Commands</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {device.cluster_clients.map(cluster => {
-                  const clusterKey = `${devicePath}-${cluster.id}`;
-                  const areKeysVisible = visibleKeys[clusterKey];
-
-                  return (
-                    <>
-                      <tr>
-                        <td>{cluster.id}</td>
-                        <td>{cluster.name}</td>
-                        <td>
-                          <ul class="list-unstyled mb-0">
-                            {cluster.attributes.map(attr => (
-                              <li>
-                                <small>{attr}</small>
-                              </li>
-                            ))}
-                          </ul>
-                        </td>
-                        <td>
-                          <ul class="list-unstyled mb-0">
-                            {cluster.commands.map(cmd => (
-                              <li>
-                                <small>{cmd}</small>
-                              </li>
-                            ))}
-                          </ul>
-                        </td>
-                        <td>
-                          <button class="btn btn-outline-secondary btn-sm" onClick={() => toggleKeys(clusterKey)}>
-                            {areKeysVisible ? 'Hide Keys' : 'Show Keys'}
-                          </button>
-                        </td>
-                      </tr>
-                      {areKeysVisible && (
-                        <tr>
-                          <td colspan="5" class="bg-light">
-                            <div class="p-2">
-                              <small class="text-muted">All Keys:</small>
-                              <div class="row mt-2">
-                                {cluster.all_keys.map(key => (
-                                  <div class="col-lg-3 col-md-4 col-sm-6">
-                                    <small>{key}</small>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {device.child_endpoints && device.child_endpoints.length > 0 && (
-            <div class="mt-4">
-              {device.child_endpoints.map(childDevice => (
-                <DeviceDisplay
-                  device={childDevice}
-                  nodeId={nodeId}
-                  collapsedDevices={collapsedDevices}
-                  visibleKeys={visibleKeys}
-                  toggleDevice={toggleDevice}
-                  toggleKeys={toggleKeys}
-                  parentPath={devicePath}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
+const saveExpertMode = expertMode => {
+  try {
+    window.localStorage.setItem(EXPERT_MODE_STORAGE_KEY, String(expertMode));
+  } catch (e) {
+    // private window or blocked storage: the mode is only kept for this visit
+  }
 };
 
 // Gladys errors are JSON objects carrying `error` or `code`. An HTML error page from a proxy (ex: 504),
@@ -208,8 +116,9 @@ class MatterSettingsPage extends Component {
       nodes: [],
       loadingNodes: true,
       decommissioningNodes: {},
-      nodeToDecommission: null,
-      deleteGladysDevices: false,
+      // the node whose sheet is open
+      selectedNodeId: null,
+      expertMode: readExpertMode(),
       // outcome of each decommission, by node id: several nodes can be decommissioned at the same time
       decommissionFeedbacks: {},
       collapsedDevices: {},
@@ -222,7 +131,37 @@ class MatterSettingsPage extends Component {
 
   componentDidMount() {
     this.init();
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.MATTER.NODE_STATUS_CHANGED,
+      this.handleNodeStatusChanged
+    );
   }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.MATTER.NODE_STATUS_CHANGED,
+      this.handleNodeStatusChanged
+    );
+  }
+
+  // the status of a node, live: the list and the open sheet follow it
+  handleNodeStatusChanged = payload => {
+    this.setState(prevState => ({
+      nodes: prevState.nodes.map(node =>
+        node.node_id === payload.node_id
+          ? {
+              ...node,
+              status: payload.status,
+              available: payload.available,
+              last_contact: payload.last_contact,
+              unreachable_device_paths: payload.unreachable_device_paths
+            }
+          : node
+      )
+    }));
+  };
+
+  getNodeName = node => getNodeDisplayName(node, get(this.props, 'intl.dictionary'));
 
   init = async () => {
     await this.setState({ loading: true });
@@ -285,12 +224,17 @@ class MatterSettingsPage extends Component {
   fetchNodes = async () => {
     this.setState({ loadingNodes: true });
     try {
-      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node', { with_gladys_devices: true });
+      const query = { with_gladys_devices: true };
+      // the endpoint and cluster tree is only read in expert mode
+      if (this.state.expertMode) {
+        query.with_clusters = true;
+      }
+      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node', query);
 
       // Initialize all devices as collapsed
       const collapsedDevices = {};
       nodes.forEach(node => {
-        node.devices.forEach(device => {
+        (node.devices || []).forEach(device => {
           const deviceKey = `${node.node_id}-${device.number}`;
           collapsedDevices[deviceKey] = true;
         });
@@ -327,16 +271,19 @@ class MatterSettingsPage extends Component {
     }
   };
 
-  askDecommissionNode = nodeId => {
-    this.setState({ nodeToDecommission: nodeId, deleteGladysDevices: false });
+  openNode = nodeId => {
+    this.setState({ selectedNodeId: nodeId });
   };
 
-  cancelDecommissionNode = () => {
-    this.setState({ nodeToDecommission: null });
+  closeNode = () => {
+    this.setState({ selectedNodeId: null });
   };
 
-  toggleDeleteGladysDevices = () => {
-    this.setState(prevState => ({ deleteGladysDevices: !prevState.deleteGladysDevices }));
+  toggleExpertMode = async () => {
+    const expertMode = !this.state.expertMode;
+    saveExpertMode(expertMode);
+    await this.setState({ expertMode });
+    await this.loadNodes();
   };
 
   setDecommissionFeedback = (nodeId, feedback) => {
@@ -351,21 +298,23 @@ class MatterSettingsPage extends Component {
     });
   };
 
-  decommissionNode = async node => {
+  // asked from the sheet of the node, once the user confirmed
+  decommissionNode = async (node, deleteGladysDevices) => {
     const nodeId = node.node_id;
     // synchronous guard: setState is asynchronous, a double click would otherwise send two requests
     if (this.decommissionsInProgress.has(nodeId)) {
       return;
     }
     this.decommissionsInProgress.add(nodeId);
-    const name = `${node.node_information.vendor_name} - ${node.node_information.product_name}`;
+    const name = this.getNodeName(node);
     // only the devices the user saw in the confirmation are sent: the server deletes nothing else
-    const gladysDeviceSelectors = this.state.deleteGladysDevices
+    const gladysDeviceSelectors = deleteGladysDevices
       ? getLinkedGladysDevices(node).map(gladysDevice => gladysDevice.selector)
       : [];
     this.setDecommissionFeedback(nodeId, null);
     this.setState(prevState => ({
-      nodeToDecommission: null,
+      // the node is leaving: its sheet closes, the outcome is shown above the list
+      selectedNodeId: null,
       decommissioningNodes: {
         ...prevState.decommissioningNodes,
         [nodeId]: true
@@ -508,8 +457,8 @@ class MatterSettingsPage extends Component {
       loading,
       loadingNodes,
       decommissioningNodes,
-      nodeToDecommission,
-      deleteGladysDevices,
+      selectedNodeId,
+      expertMode,
       decommissionFeedbacks,
       collapsedDevices,
       visibleKeys,
@@ -518,7 +467,7 @@ class MatterSettingsPage extends Component {
       resetting,
       resetError
     } = this.state;
-    const isAdmin = this.props.user && this.props.user.role === 'admin';
+    const selectedNode = nodes.find(node => node.node_id === selectedNodeId);
 
     return (
       <MatterPage user={this.props.user}>
@@ -577,7 +526,7 @@ class MatterSettingsPage extends Component {
                       <h4 class="mb-0">
                         <Text id="integration.matter.settings.nodesTitle" />
                       </h4>
-                      {nodes && nodes.length > 0 && (
+                      {expertMode && nodes && nodes.length > 0 && (
                         <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm flex-shrink-0 ml-2">
                           <i class="fe fe-download" />
                           <span class="d-none d-sm-inline-block ml-2">
@@ -597,106 +546,13 @@ class MatterSettingsPage extends Component {
 
                     <div
                       class={cx('dimmer', {
-                        active: loadingNodes
+                        active: loadingNodes || Object.values(decommissioningNodes).some(Boolean)
                       })}
                     >
                       <div class="loader" />
                       <div class="dimmer-content">
                         {nodes && nodes.length > 0 ? (
-                          <div class="table-responsive">
-                            {nodes.map(node => (
-                              <div class={cx('card mb-4', { 'dimmer active': decommissioningNodes[node.node_id] })}>
-                                {decommissioningNodes[node.node_id] && <div class="loader" />}
-                                <div class="dimmer-content">
-                                  <div class="card-header">
-                                    <div class="d-flex justify-content-between align-items-start w-100">
-                                      <div style="min-width: 0;">
-                                        <h5 class="mb-0">
-                                          {node.node_information.vendor_name} - {node.node_information.product_name}
-                                        </h5>
-                                        <small class="text-muted" style="overflow-wrap: break-word;">
-                                          Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} |
-                                          Product ID: {node.node_information.product_id}
-                                        </small>
-                                      </div>
-                                      {isAdmin && (
-                                        <button
-                                          onClick={() => this.askDecommissionNode(node.node_id)}
-                                          class={cx('btn btn-danger btn-sm flex-shrink-0 ml-2', {
-                                            loading: decommissioningNodes[node.node_id]
-                                          })}
-                                          disabled={
-                                            decommissioningNodes[node.node_id] || nodeToDecommission === node.node_id
-                                          }
-                                        >
-                                          <Text id="integration.matter.settings.decommissionButton" />
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-                                  {nodeToDecommission === node.node_id && (
-                                    <div class="card-body border-bottom">
-                                      <div class="alert alert-danger mb-3">
-                                        <MarkupText id="integration.matter.settings.decommission.confirmMessage" />
-                                      </div>
-                                      {getLinkedGladysDevices(node).length > 0 && (
-                                        <div class="mb-3">
-                                          <Text id="integration.matter.settings.decommission.linkedDevices" />
-                                          <ul>
-                                            {getLinkedGladysDevices(node).map(gladysDevice => (
-                                              <li key={gladysDevice.selector}>{gladysDevice.name}</li>
-                                            ))}
-                                          </ul>
-                                          <label class="custom-control custom-checkbox">
-                                            <input
-                                              type="checkbox"
-                                              class="custom-control-input"
-                                              checked={deleteGladysDevices}
-                                              onChange={this.toggleDeleteGladysDevices}
-                                            />
-                                            <span class="custom-control-label">
-                                              <Text id="integration.matter.settings.decommission.deleteDevicesLabel" />
-                                            </span>
-                                          </label>
-                                          <small class="form-text text-muted">
-                                            <Text id="integration.matter.settings.decommission.deleteDevicesHelp" />
-                                          </small>
-                                        </div>
-                                      )}
-                                      <div>
-                                        <button
-                                          class="btn btn-danger"
-                                          onClick={() => this.decommissionNode(node)}
-                                          disabled={decommissioningNodes[node.node_id]}
-                                        >
-                                          <Text id="integration.matter.settings.decommission.confirmButton" />
-                                        </button>
-                                        <button
-                                          class="btn ml-2"
-                                          onClick={this.cancelDecommissionNode}
-                                          disabled={decommissioningNodes[node.node_id]}
-                                        >
-                                          <Text id="integration.matter.settings.decommission.cancelButton" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  )}
-                                  <div class="card-body">
-                                    {node.devices.map(device => (
-                                      <DeviceDisplay
-                                        device={device}
-                                        nodeId={node.node_id}
-                                        collapsedDevices={collapsedDevices}
-                                        visibleKeys={visibleKeys}
-                                        toggleDevice={this.toggleDevice}
-                                        toggleKeys={this.toggleKeys}
-                                      />
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                          <MatterNodeList nodes={nodes} getNodeName={this.getNodeName} onOpenNode={this.openNode} />
                         ) : (
                           <div class="alert alert-secondary">
                             <Text id="integration.matter.settings.noNodesFound" />
@@ -704,7 +560,47 @@ class MatterSettingsPage extends Component {
                         )}
                       </div>
                     </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+                      <div>
+                        <div>
+                          <Text id="integration.matter.settings.expertMode" />
+                        </div>
+                        <small class="text-muted">
+                          <Text id="integration.matter.settings.expertModeDescription" />
+                        </small>
+                      </div>
+                      <MobileSwitch
+                        checked={expertMode}
+                        onChange={this.toggleExpertMode}
+                        label={get(this.props, 'intl.dictionary.integration.matter.settings.expertMode')}
+                        dataCy="matter-expert-mode"
+                      />
+                    </div>
+
+                    {expertMode && nodes && nodes.length > 0 && (
+                      <MatterExpertTree
+                        nodes={nodes}
+                        collapsedDevices={collapsedDevices}
+                        visibleKeys={visibleKeys}
+                        toggleDevice={this.toggleDevice}
+                        toggleKeys={this.toggleKeys}
+                        getNodeName={this.getNodeName}
+                      />
+                    )}
                   </div>
+
+                  <MatterNodeSheet
+                    open={Boolean(selectedNode)}
+                    nodeId={selectedNodeId}
+                    node={selectedNode}
+                    httpClient={this.props.httpClient}
+                    user={this.props.user}
+                    intl={this.props.intl}
+                    decommissioning={Boolean(selectedNode && decommissioningNodes[selectedNode.node_id])}
+                    onDecommission={this.decommissionNode}
+                    onClose={this.closeNode}
+                  />
 
                   <div class="form-group">
                     <button onClick={this.disableMatter} class="btn btn-danger" disabled={saving}>
@@ -762,4 +658,4 @@ class MatterSettingsPage extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(MatterSettingsPage);
+export default withIntlAsProp(connect('httpClient,user,session', {})(MatterSettingsPage));
