@@ -2775,7 +2775,11 @@
         "addError": "Gladys konnte das Gerät nicht hinzufügen. Versuche es erneut.",
         "added": "Zu Gladys hinzugefügt",
         "alreadyInGladys": "Bereits in Gladys",
-        "openDevice": "Gerät öffnen"
+        "openDevice": "Gerät öffnen",
+        "toAdd": {
+          "one": "1 bereites Gerät ist noch nicht hinzugefügt: Es bleibt hier, bis du es hinzufügst.",
+          "other": "{{count}} bereite Geräte sind noch nicht hinzugefügt: Sie bleiben hier, bis du sie hinzufügst."
+        }
       }
     },
     "nodeRed": {

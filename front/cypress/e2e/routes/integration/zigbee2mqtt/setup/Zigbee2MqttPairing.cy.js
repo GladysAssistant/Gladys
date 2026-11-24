@@ -256,6 +256,8 @@ describe('Zigbee2mqtt pairing window', () => {
       );
       // "<category> <vendor>", the name taken suffixed
       cy.get('[data-cy=z2m-pairing-name]').should('have.value', 'Light IKEA 2');
+      // Not added yet: told under the rows
+      cy.get('[data-cy=z2m-pairing-to-add]').should('contain', '1');
       cy.get('[data-cy=z2m-pairing-room]').select('Kitchen');
 
       // The device read again before it is added: attached to the main electric meter, which the message is not
@@ -290,6 +292,7 @@ describe('Zigbee2mqtt pairing window', () => {
         '/dashboard/integration/device/zigbee2mqtt/edit/light-ikea-2'
       );
       cy.get('[data-cy=z2m-pairing-card]').should('not.exist');
+      cy.get('[data-cy=z2m-pairing-to-add]').should('not.exist');
     });
 
     it('should keep the name the user typed when the device list comes again', () => {

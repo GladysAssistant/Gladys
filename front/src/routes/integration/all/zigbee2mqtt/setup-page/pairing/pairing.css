@@ -139,6 +139,12 @@
   font-weight: 600;
 }
 
+/* ---------- under the rows ---------- */
+
+.toAdd {
+  margin-top: 12px;
+}
+
 /* ---------- one row per device ---------- */
 
 .rows {

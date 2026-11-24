@@ -201,7 +201,9 @@ device".
   (D6). A name typed by the user is kept when the registry comes again.
 - **Finish** (wizard) / **Close** (dashboard, Discover tab). Closing the window does not close joining
   (it closes by itself); the registry stays on the server. Back on the dashboard or the Discover tab,
-  the devices of the network not in Gladys are read again: the ones just added are no longer new.
+  the devices of the network not in Gladys are read again: the ones just added are no longer new. While
+  ready devices are not added, a notice under the rows counts them and says they stay in the window until
+  added (C.2): nothing blocks the close.
 - The screen of its own holds an entry of the history: "back" (browser, Android button, iOS swipe) closes
   it, back to the dashboard or the Discover tab, not out of the Zigbee2mqtt page; on a phone, a "back"
   with the sheet of a device open closes the sheet first. Closed by its button, it leaves its entry.

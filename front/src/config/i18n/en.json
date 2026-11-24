@@ -2531,7 +2531,11 @@
         "addError": "Gladys could not add the device. Try again.",
         "added": "Added to Gladys",
         "alreadyInGladys": "Already in Gladys",
-        "openDevice": "Open the device"
+        "openDevice": "Open the device",
+        "toAdd": {
+          "one": "1 ready device is not added yet: it stays here until you add it.",
+          "other": "{{count}} ready devices are not added yet: they stay here until you add them."
+        }
       }
     },
     "nodeRed": {

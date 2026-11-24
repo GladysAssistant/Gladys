@@ -773,8 +773,18 @@ class PairingWindow extends Component {
     );
   }
 
+  // The ready devices the user has not added yet: they stay in the window (and in the Discover tab) until added
+  countToAdd = () =>
+    this.state.entries.filter(entry => {
+      const card = this.state.cards[entry.ieee_address];
+      return (
+        entry.status === PAIRING_STATUS.READY && entry.device && entry.device.id === undefined && card && !card.added
+      );
+    }).length;
+
   render({ isMobile, online }, { entries, loadError }) {
     const empty = entries.length === 0;
+    const toAdd = this.countToAdd();
     return (
       <div class={style.pairing} data-cy="z2m-pairing">
         {this.renderHeader()}
@@ -789,6 +799,16 @@ class PairingWindow extends Component {
             <MobileGroup class={style.mobileList}>{entries.map(this.renderMobileRow)}</MobileGroup>
           ) : (
             <ul class={style.rows}>{entries.map(this.renderDesktopRow)}</ul>
+          ))}
+        {toAdd > 0 &&
+          (isMobile ? (
+            <MobileNotice icon="info" role="status" class={style.toAdd} data-cy="z2m-pairing-to-add">
+              <Text id={`${T}.toAdd`} plural={toAdd} fields={{ count: toAdd }} />
+            </MobileNotice>
+          ) : (
+            <div class="alert alert-info mt-3 mb-0" role="status" data-cy="z2m-pairing-to-add">
+              <Text id={`${T}.toAdd`} plural={toAdd} fields={{ count: toAdd }} />
+            </div>
           ))}
       </div>
     );
