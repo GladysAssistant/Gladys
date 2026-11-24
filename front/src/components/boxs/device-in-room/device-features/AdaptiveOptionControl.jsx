@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { registerAdaptiveControl, scheduleReflow } from './acAdaptiveControls';
+import { toSelectValue } from '../../../../utils/selectValue';
 import style from './AdaptiveOptionControl.css';
 
 /**
@@ -121,9 +122,9 @@ class AdaptiveOptionControl extends Component {
           {/* adaptive-option-select: hook for the dashboard widget's width cap, which
               must not reach the selects that are always their row's control. */}
           <div class="form-group mb-0 adaptive-option-select" ref={this.setSelect}>
-            <select value={value} onChange={this.updateFromSelect} class="form-control form-control-sm">
+            <select value={toSelectValue(value)} onChange={this.updateFromSelect} class="form-control form-control-sm">
               {options.map(option => (
-                <option value={option.value} key={option.value}>
+                <option value={toSelectValue(option.value)} key={option.value}>
                   {this.renderLabel(option)}
                 </option>
               ))}

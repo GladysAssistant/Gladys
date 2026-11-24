@@ -2,6 +2,7 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { toSelectValue } from '../../../../utils/selectValue';
 import { getFanFeatureOptions } from '../../../../../../server/utils/constants';
 
 const FanLabeledSelectDeviceFeature = ({ children, ...props }) => {
@@ -24,9 +25,13 @@ const FanLabeledSelectDeviceFeature = ({ children, ...props }) => {
       <td class="py-0">
         <div class="d-flex justify-content-end">
           <div class="form-group mb-0">
-            <select value={deviceFeature.last_value} onChange={updateValue} class="form-control form-control-sm">
+            <select
+              value={toSelectValue(deviceFeature.last_value)}
+              onChange={updateValue}
+              class="form-control form-control-sm"
+            >
               {options.map(value => (
-                <option key={value} value={value}>
+                <option key={value} value={toSelectValue(value)}>
                   <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />
                 </option>
               ))}
