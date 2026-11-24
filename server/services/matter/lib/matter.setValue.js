@@ -22,6 +22,7 @@ const {
 const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
 const { gladysAcModeToMatterSystemMode } = require('../utils/thermostatMatterMapping');
 const { ensureNodeConnected } = require('../utils/ensureNodeConnected');
+const { isDevicePathUnder } = require('../utils/getMatterAvailability');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -93,6 +94,13 @@ async function setValue(gladysDevice, gladysFeature, value) {
   const targetDevice = findDeviceRecursively(rootDevice, devicePath.slice(1));
   if (!targetDevice) {
     throw new Error(`Device not found for path ${devicePath.join(':')}`);
+  }
+
+  // A bridge which says it can not reach the bridged device would only answer with an error
+  const unreachableDevicePaths = this.unreachableDevicePaths.get(nodeId.toString()) || new Set();
+  const targetPath = devicePath.join(':');
+  if (Array.from(unreachableDevicePaths).some((unreachablePath) => isDevicePathUnder(targetPath, unreachablePath))) {
+    throw new Error(`Matter: Device ${targetPath} of node ${nodeId} is unreachable, the command could not be sent`);
   }
 
   // Connect if not already connected

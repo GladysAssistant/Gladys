@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const logger = require('../../../utils/logger');
 const { getGladysDevicesOfNode } = require('../utils/getGladysDevicesOfNode');
+const { getBasicInformation, getNodeName, getNetworkType } = require('../utils/matterNodeInformation');
 
 const convertDevice = (device) => {
   const clusterClients = [];
@@ -32,15 +33,18 @@ const convertDevice = (device) => {
 };
 
 /**
- * @description Get the nodes.
+ * @description Get the nodes, with what the user needs to know about each of them: its name, its
+ * connection status, its firmware and its network. The endpoint and cluster tree (expert mode) is
+ * only listed when asked.
  * @param {object} [options] - Options.
  * @param {boolean} [options.withGladysDevices] - Also list the Gladys devices created from each node
  * (shown before a decommission).
+ * @param {boolean} [options.withClusters] - Also list the endpoints and clusters of each node.
  * @returns {Promise<Array>} The nodes.
  * @example
  * const nodes = await matterHandler.getNodes({ withGladysDevices: true });
  */
-async function getNodes({ withGladysDevices = false } = {}) {
+async function getNodes({ withGladysDevices = false, withClusters = false } = {}) {
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
   const filteredNodeDetails = nodeDetails.filter((nodeDetail) => {
     if (!nodeDetail.deviceData || !nodeDetail.deviceData.basicInformation) {
@@ -51,22 +55,31 @@ async function getNodes({ withGladysDevices = false } = {}) {
   });
   return Promise.mapSeries(filteredNodeDetails, async (nodeDetail) => {
     const node = await this.commissioningController.getNode(nodeDetail.nodeId);
-    const devices = node.getDevices();
+    const basicInformation = getBasicInformation(node, nodeDetail);
+    const nodeStatus = this.getNodeStatus(nodeDetail.nodeId, node);
     return {
       node_id: nodeDetail.nodeId.toString(),
+      name: getNodeName(basicInformation),
       is_connected: node.isConnected,
+      status: nodeStatus.status,
+      available: nodeStatus.available,
+      last_contact: nodeStatus.last_contact,
+      unreachable_device_paths: nodeStatus.unreachable_device_paths,
+      network_type: getNetworkType(node),
       ...(withGladysDevices && {
         gladys_devices: getGladysDevicesOfNode(this.gladys.stateManager, nodeDetail.nodeId),
       }),
-      devices: devices.map((device) => {
-        return convertDevice(device);
+      ...(withClusters && {
+        devices: node.getDevices().map((device) => convertDevice(device)),
       }),
       node_information: {
-        vendor_name: nodeDetail.deviceData.basicInformation.vendorName,
-        product_name: nodeDetail.deviceData.basicInformation.productName,
-        product_id: nodeDetail.deviceData.basicInformation.productId,
-        product_label: nodeDetail.deviceData.basicInformation.productLabel,
-        vendor_id: nodeDetail.deviceData.basicInformation.vendorId,
+        vendor_name: basicInformation.vendorName,
+        product_name: basicInformation.productName,
+        product_id: basicInformation.productId,
+        product_label: basicInformation.productLabel,
+        vendor_id: basicInformation.vendorId,
+        node_label: basicInformation.nodeLabel,
+        software_version: basicInformation.softwareVersionString,
       },
     };
   });

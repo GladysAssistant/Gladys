@@ -4,6 +4,9 @@
  */
 async function stop() {
   if (this.commissioningController) {
+    // the nodes are closed with the controller: their status is not followed anymore
+    this.unwatchNode();
+    this.clearNodeStatuses();
     await this.commissioningController.close();
   }
 }

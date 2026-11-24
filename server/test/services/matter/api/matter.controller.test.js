@@ -1,7 +1,7 @@
 const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const MatterController = require('../../../../services/matter/api/matter.controller');
-const { BadParameters, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { BadParameters, NotFoundError, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { Error500 } = require('../../../../utils/httpErrors');
 
 const { assert, fake } = sinon;
@@ -37,6 +37,9 @@ describe('MatterController', () => {
       }),
       listenToStateChange: fake.resolves(null),
       reset: fake.resolves(null),
+      getNodeDetails: fake.resolves({ node_id: '1234', name: 'Kitchen plug' }),
+      identifyNode: fake.resolves({ identified_endpoints: 2 }),
+      shareNode: fake.resolves({ manual_pairing_code: '34970112332', qr_pairing_code: 'MT:Y.K90AFN00KA0648G00' }),
     };
     controller = MatterController(matterHandler);
     sinon.reset();
@@ -92,7 +95,7 @@ describe('MatterController', () => {
     };
 
     await controller['get /api/v1/service/matter/node'].controller(req, res);
-    assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: false });
+    assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: false, withClusters: false });
     assert.calledWith(res.json, [{ name: 'toto' }]);
   });
   it('should get nodes with their Gladys devices', async () => {
@@ -106,7 +109,7 @@ describe('MatterController', () => {
     };
 
     await controller['get /api/v1/service/matter/node'].controller(req, res);
-    assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: true });
+    assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: true, withClusters: false });
   });
   it('should get nodes with their Gladys devices through Gladys Plus', async () => {
     // Gladys Plus forwards the query object as is: the boolean is not turned into a string
@@ -120,7 +123,107 @@ describe('MatterController', () => {
     };
 
     await controller['get /api/v1/service/matter/node'].controller(req, res);
-    assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: true });
+    assert.calledOnceWithExactly(matterHandler.getNodes, { withGladysDevices: true, withClusters: false });
+  });
+  it('should get nodes with their clusters (expert mode)', async () => {
+    const res = {
+      json: fake.returns([]),
+    };
+    await controller['get /api/v1/service/matter/node'].controller({ query: { with_clusters: 'true' } }, res);
+    // through Gladys Plus, the boolean is not turned into a string
+    await controller['get /api/v1/service/matter/node'].controller({ query: { with_clusters: true } }, res);
+    assert.calledTwice(matterHandler.getNodes);
+    assert.alwaysCalledWithExactly(matterHandler.getNodes, { withGladysDevices: false, withClusters: true });
+  });
+  it('should get the sheet of a node', async () => {
+    const res = {
+      json: fake.returns(null),
+    };
+    await controller['get /api/v1/service/matter/node/:node_id'].controller({ params: { node_id: '1234' } }, res);
+    assert.calledOnceWithExactly(matterHandler.getNodeDetails, 1234n);
+    assert.calledOnceWithExactly(res.json, { node_id: '1234', name: 'Kitchen plug' });
+  });
+  it('should make a node identify itself', async () => {
+    const res = {
+      json: fake.returns(null),
+    };
+    await controller['post /api/v1/service/matter/node/:node_id/identify'].controller(
+      { params: { node_id: '1234' } },
+      res,
+    );
+    assert.calledOnceWithExactly(matterHandler.identifyNode, 1234n);
+    assert.calledOnceWithExactly(res.json, { success: true, identified_endpoints: 2 });
+  });
+  it('should share a node', async () => {
+    const res = {
+      json: fake.returns(null),
+    };
+    await controller['post /api/v1/service/matter/node/:node_id/share'].controller(
+      { params: { node_id: '1234' } },
+      res,
+    );
+    assert.calledOnceWithExactly(matterHandler.shareNode, 1234n);
+    assert.calledOnceWithExactly(res.json, {
+      success: true,
+      manual_pairing_code: '34970112332',
+      qr_pairing_code: 'MT:Y.K90AFN00KA0648G00',
+    });
+  });
+  it('should reject a node id which is not a number on the node routes', async () => {
+    const next = fake.returns(null);
+    const res = { json: fake.returns(null) };
+    await controller['get /api/v1/service/matter/node/:node_id'].controller({ params: { node_id: '12a' } }, res, next);
+    await controller['post /api/v1/service/matter/node/:node_id/identify'].controller(
+      { params: { node_id: '-1' } },
+      res,
+      next,
+    );
+    await controller['post /api/v1/service/matter/node/:node_id/share'].controller(
+      { params: { node_id: '' } },
+      res,
+      next,
+    );
+    assert.calledThrice(next);
+    next.getCalls().forEach((call) => expect(call.args[0]).to.be.instanceOf(BadParameters));
+    assert.notCalled(matterHandler.getNodeDetails);
+    assert.notCalled(matterHandler.identifyNode);
+    assert.notCalled(matterHandler.shareNode);
+  });
+  it('should let the error middleware answer when a node is not found', async () => {
+    matterHandler.getNodeDetails = fake.rejects(new NotFoundError('Matter node 1234 not found'));
+    const next = fake.returns(null);
+    await controller['get /api/v1/service/matter/node/:node_id'].controller(
+      { params: { node_id: '1234' } },
+      { json: fake.returns(null) },
+      next,
+    );
+    assert.calledOnce(next);
+    expect(next.firstCall.args[0]).to.be.instanceOf(NotFoundError);
+  });
+  it('should return the cause when a node can not identify itself or be shared', async () => {
+    matterHandler.identifyNode = fake.rejects(new Error('Matter: Node 1234 is unreachable'));
+    matterHandler.shareNode = fake.rejects(new Error('Busy'));
+    const next = fake.returns(null);
+    const res = { json: fake.returns(null) };
+    await controller['post /api/v1/service/matter/node/:node_id/identify'].controller(
+      { params: { node_id: '1234' } },
+      res,
+      next,
+    );
+    await controller['post /api/v1/service/matter/node/:node_id/share'].controller(
+      { params: { node_id: '1234' } },
+      res,
+      next,
+    );
+    assert.calledTwice(next);
+    expect(next.firstCall.args[0]).to.be.instanceOf(Error500);
+    expect(next.firstCall.args[0].error).to.equal('Matter: Node 1234 is unreachable');
+    expect(next.secondCall.args[0].error).to.equal('Busy');
+    assert.notCalled(res.json);
+  });
+  it('should only let an admin share a node', async () => {
+    expect(controller['post /api/v1/service/matter/node/:node_id/share'].admin).to.equal(true);
+    expect(controller['post /api/v1/service/matter/node/:node_id/identify'].admin).to.equal(undefined);
   });
   it('should get ipv6 status', async () => {
     const req = {};

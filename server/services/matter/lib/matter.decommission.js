@@ -39,6 +39,8 @@ async function decommission(nodeId, { gladysDeviceSelectors = [] } = {}) {
   }
 
   this.nodesMap.delete(nodeId);
+  this.unwatchNode(nodeId);
+  this.clearNodeStatuses(nodeId);
   const externalIdPrefix = getNodeExternalIdPrefix(nodeId);
   this.devices = this.devices.filter((device) => !device.external_id.startsWith(externalIdPrefix));
 

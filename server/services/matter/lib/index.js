@@ -17,6 +17,18 @@ const { refreshDevices } = require('./matter.refreshDevices');
 const { backupController } = require('./matter.backupController');
 const { restoreBackup } = require('./matter.restoreBackup');
 const { reset } = require('./matter.reset');
+const { watchNode, unwatchNode } = require('./matter.watchNode');
+const {
+  getNodeStatus,
+  notifyNodeStatus,
+  setNodeStatus,
+  touchNode,
+  setDeviceReachability,
+  clearNodeStatuses,
+} = require('./matter.nodeStatus');
+const { getNodeDetails } = require('./matter.getNodeDetails');
+const { identifyNode } = require('./matter.identifyNode');
+const { shareNode } = require('./matter.shareNode');
 
 /**
  * @description Matter handler.
@@ -41,6 +53,13 @@ const MatterHandler = function MatterHandler(gladys, MatterMain, ProjectChipMatt
   // Key: external_id (e.g., "matter:nodeId:devicePath:clusterId")
   // Value: { supportedModes: [{mode: number, label: string, modeTags: [...]}], modeTagToValue: Map }
   this.supportedModesMap = new Map();
+  // Connection of the nodes (matter.watchNode.js, matter.nodeStatus.js), keyed by node ID as a string
+  this.watchedNodes = new Map();
+  this.nodeStatuses = new Map();
+  this.nodeStatusTimers = new Map();
+  // Paths of the bridged devices each bridge reports unreachable, and the labels of its bridged devices
+  this.unreachableDevicePaths = new Map();
+  this.bridgedDevices = new Map();
   this.backupController = gladys.job.wrapper(JOB_TYPES.SERVICE_MATTER_BACKUP, this.backupController.bind(this));
   process.on('SIGTERM', this.stop);
   process.on('SIGINT', this.stop);
@@ -62,5 +81,16 @@ MatterHandler.prototype.refreshDevices = refreshDevices;
 MatterHandler.prototype.backupController = backupController;
 MatterHandler.prototype.restoreBackup = restoreBackup;
 MatterHandler.prototype.reset = reset;
+MatterHandler.prototype.watchNode = watchNode;
+MatterHandler.prototype.unwatchNode = unwatchNode;
+MatterHandler.prototype.getNodeStatus = getNodeStatus;
+MatterHandler.prototype.notifyNodeStatus = notifyNodeStatus;
+MatterHandler.prototype.setNodeStatus = setNodeStatus;
+MatterHandler.prototype.touchNode = touchNode;
+MatterHandler.prototype.setDeviceReachability = setDeviceReachability;
+MatterHandler.prototype.clearNodeStatuses = clearNodeStatuses;
+MatterHandler.prototype.getNodeDetails = getNodeDetails;
+MatterHandler.prototype.identifyNode = identifyNode;
+MatterHandler.prototype.shareNode = shareNode;
 
 module.exports = MatterHandler;

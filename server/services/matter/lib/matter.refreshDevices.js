@@ -10,6 +10,7 @@ const { MATTER_NODE_REFRESH_CONCURRENCY } = require('../utils/constants');
 async function refreshDevices() {
   // Reset memory
   this.devices = [];
+  this.bridgedDevices.clear();
   const nodeDetails = this.commissioningController.getCommissionedNodesDetails();
 
   logger.info(`Matter: Refreshing ${nodeDetails.length} commissioned node(s)...`);
