@@ -7,6 +7,7 @@ import BoxColumns from './BoxColumns';
 import DashboardSwiper from './DashboardSwiper';
 import GetStarted from './GetStarted';
 import SetTabletMode from './SetTabletMode';
+import QuickEditor from './quick-edit/QuickEditor';
 import { JOB_STATUS } from '../../../../server/utils/constants';
 
 import style from './style.css';
@@ -136,11 +137,32 @@ const DashboardPage = ({ children, ...props }) => {
                           </button>
                         </Localizer>
                       )}
+                    {/* "+": add a device (or a widget) from the dashboard itself, without entering
+                        the editor (in-place editing, quick-edit/QuickEditor). It is the action of
+                        the mobile dock; a wall tablet keeps the plain edit button */}
+                    {props.currentDashboard && !props.hideExitFullScreenButton && !props.tabletMode && (
+                      <Localizer>
+                        <button
+                          onClick={props.openAddMenu}
+                          class={cx('btn btn-outline-primary ml-2 d-inline-flex')}
+                          data-cy="dashboard-add-button"
+                          aria-haspopup="dialog"
+                          title={<Text id="quickEdit.addMenuTitle" />}
+                        >
+                          <i class="fe fe-plus" />
+                        </button>
+                      </Localizer>
+                    )}
+                    {/* the editor stays one tap away on a desktop; on the mobile dock it is in the
+                        menu of the "+" and in the long-press menu of every widget */}
                     {props.currentDashboard && !props.hideExitFullScreenButton && (
                       <Localizer>
                         <button
                           onClick={props.editDashboard}
-                          class={cx('btn btn-outline-primary ml-2 d-inline-flex')}
+                          class={cx('btn btn-outline-primary ml-2', {
+                            'd-none d-lg-inline-flex': !props.tabletMode,
+                            'd-inline-flex': props.tabletMode
+                          })}
                           data-cy="edit-dashboard-button"
                           title={<Text id="dashboard.editDashboardButton" />}
                         >
@@ -223,6 +245,16 @@ const DashboardPage = ({ children, ...props }) => {
                   )}
                   {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
                 </DashboardSwiper>
+                {!props.dashboardNotConfigured && (
+                  <QuickEditor
+                    currentDashboard={props.currentDashboard}
+                    tabletMode={props.tabletMode}
+                    addMenuOpen={props.quickAddMenuOpen}
+                    closeAddMenu={props.closeAddMenu}
+                    openEditor={props.openEditor}
+                    onDashboardSaved={props.onDashboardSaved}
+                  />
+                )}
               </div>
             </div>
           </div>

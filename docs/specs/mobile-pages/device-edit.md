@@ -26,6 +26,14 @@ room**, and **choose which features keep their history**.
   too: the "Back" buttons of the desktop card lead to the same place.
 - **The device**: its name (a text field), its room (the native select of the system, the rooms
   grouped by house, "No room" first), and its refresh frequency when the device is polled.
+- **"Add to a dashboard"**: a row under the room, for a device already saved (it carries a
+  `created_at`; a device being created has no feature on the server yet). It opens "Where to add
+  it?" (`AddToDashboardSheet`, see `dashboard-flexible-layout-and-widgets.md` A.3.2) with the
+  dashboards to choose from, and adds the device's main features (all but battery, signal and
+  internal temperature — a light lands as one row) to a "devices" widget of the chosen dashboard
+  or to a new one at its top or bottom, saved at once. A toast confirms, with a "See" link to that
+  dashboard. The desktop card carries the same action as a button under Save. It is not part of
+  the device's own save: nothing in the bottom bar changes.
 - **"N features"**: one row per feature, in one group — the icon of its type, its name (the
   label of its type when it has none), its type and its unit, and whether its history is kept
   ("History kept · 1 204 states (≈ 56 kB)" — the size is the one the desktop card shows, from the

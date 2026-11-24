@@ -76,7 +76,9 @@ describe('Dashboard Devices Box editor', () => {
     cy.viewport(390, 664);
     cy.intercept('PATCH', `${serverUrl}/api/v1/dashboard/test`).as('saveDashboard');
     cy.visit('/dashboard/test/edit');
-    cy.get('[data-cy="edit-box-0-0"]').click();
+    // on a phone the first tap selects the widget, the second opens its settings
+    cy.get('[data-cy="widget-tap-0-0"]').click();
+    cy.get('[data-cy="widget-tap-0-0"]').click();
 
     // compact list: one row per feature, no text input in the list; the
     // sheet replaces the editor's action bar while it is open
@@ -168,7 +170,9 @@ describe('Dashboard Devices Box editor', () => {
   it('Should keep the preview empty once the last device is removed', () => {
     cy.viewport(390, 664);
     cy.visit('/dashboard/test/edit');
-    cy.get('[data-cy="edit-box-0-0"]').click();
+    // on a phone the first tap selects the widget, the second opens its settings
+    cy.get('[data-cy="widget-tap-0-0"]').click();
+    cy.get('[data-cy="widget-tap-0-0"]').click();
     cy.get('[data-widget-wrapper][data-editing] tbody tr').should('have.length', 1);
 
     cy.get('[data-cy="devices-add-button"]').click();
@@ -207,6 +211,7 @@ describe('Dashboard Devices Box editor', () => {
     cy.contains('Empty');
     // the page is responsive: the editor opens and the widget can be removed
     cy.visit('/dashboard/test/edit');
+    cy.get('[data-cy="widget-tap-0-0"]').click();
     cy.get('[data-cy="remove-box-0-0"]').click();
     cy.get('[data-widget-wrapper][data-x="0"]').should('have.length', 0);
   });

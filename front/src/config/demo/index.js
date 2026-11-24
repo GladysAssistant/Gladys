@@ -601,6 +601,32 @@ const data = translate({
   ...system
 });
 
+// The device page of an integration checks that the device belongs to it (the id of its
+// service): the integration fixtures answer an empty service for the integrations of the house,
+// which made every device page of the demo say "device not found". Those get the real service.
+services.forEach(oneService => {
+  const key = `get /api/v1/service/${oneService.name}`;
+  const current = data[key];
+  if (!current || (typeof current === 'object' && Object.keys(current).length === 0)) {
+    data[key] = oneService;
+  }
+});
+
+// A dashboard saved in the demo is kept until the page is reloaded: the
+// editor and the in-place editing of the dashboard (long press on a widget,
+// "+" of the dock) read back what they just saved, like on a real server.
+// Done after the translation pass, which does not go into functions: the
+// dashboards it starts from are the translated ones.
+dashboards.forEach(({ selector }) => {
+  let saved = data[`get /api/v1/dashboard/${selector}`];
+  const copy = () => JSON.parse(JSON.stringify(saved));
+  data[`get /api/v1/dashboard/${selector}`] = copy;
+  data[`patch /api/v1/dashboard/${selector}`] = body => {
+    saved = { ...saved, ...JSON.parse(JSON.stringify(body || {})) };
+    return copy();
+  };
+});
+
 // `GET /device/:selector/states_size`: the device pages show how much history
 // each feature holds, so every device the fixtures return gets one. The power
 // of a plug is reported every few seconds: it holds most of the history.

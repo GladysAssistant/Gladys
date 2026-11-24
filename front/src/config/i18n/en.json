@@ -437,7 +437,7 @@
     "disableFullScreen": "Exit full screen",
     "editDashboardTitle": "Edit dashboard",
     "editDashboardDeleteButton": "Delete",
-    "editDashboardCancelButton": "Cancel",
+    "editDashboardCancelButton": "Discard",
     "editDashboardDeleteText": "Are you sure you want to delete this dashboard?",
     "toggleDefineTabletMode": "Tablet Mode",
     "closeDefineTabletMode": "Close",
@@ -474,7 +474,7 @@
     "editDashboardAddSectionButton": "Add a section",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
-    "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it, use the + buttons to add widgets, columns or sections. Drag widgets to move them — on a phone, use the arrows, “Move to…” or the Reorganize mode.",
+    "editDashboardExplanation": "This is your real dashboard: tap a widget to edit it — on a phone, the first tap selects it and shows its buttons (arrows, “Move to…”, settings, + to add a widget next to it). The + buttons also add columns and sections; on a computer, drag widgets to move them.",
     "editorDashboardSettingsButton": "Dashboard settings",
     "editorDashboardSettings": "Dashboard settings",
     "editorMoveSectionUp": "Move the section up",
@@ -8701,7 +8701,10 @@
     },
     "validate": "Done",
     "title": "Choose devices",
-    "sameKindHint": "Only the devices of the same type are listed: they share one condition."
+    "sameKindHint": "Only the devices of the same type are listed: they share one condition.",
+    "suggestions": "Suggestions",
+    "lightRow": "Light",
+    "lightDetails": "Pick the controls of {{name}} one by one"
   },
   "devicePickerField": {
     "title": "Choose devices",
@@ -8713,5 +8716,60 @@
     "empty": "No device selected.",
     "remove": "Remove {{name}}",
     "notFound": "Device not found"
+  },
+  "quickEdit": {
+    "addMenuTitle": "Add to the dashboard",
+    "addDevice": "Add a device",
+    "addDeviceHint": "To an existing widget or a new one",
+    "addWidget": "Add a widget",
+    "addWidgetHint": "Weather, scenes, camera, chart…",
+    "editLayout": "Edit the layout",
+    "editLayoutHint": "Sections, columns, order of the widgets",
+    "addDevices": "Add devices",
+    "addDevicesTo": "Add to “{{name}}”",
+    "editDevices": "Rename, reorder",
+    "editDevicesHint": "The devices of this widget",
+    "widgetSettings": "Edit the widget",
+    "moveWidget": "Move",
+    "removeWidget": "Remove from the dashboard",
+    "add": "Add",
+    "next": "Next",
+    "undo": "Undo",
+    "addedOne": "{{name}} added to “{{widget}}”",
+    "addedMany": {
+      "one": "1 device added to “{{widget}}”",
+      "other": "{{count}} devices added to “{{widget}}”"
+    },
+    "addedNewWidget": {
+      "one": "{{name}} added to the dashboard",
+      "other": "{{count}} devices added to the dashboard"
+    },
+    "widgetUpdated": "“{{name}}” updated",
+    "widgetRemoved": "“{{name}}” removed from the dashboard",
+    "changedError": "This dashboard was changed elsewhere meanwhile: reload the page, then try again.",
+    "saveError": "Saving failed. Check the connection to Gladys, then try again.",
+    "loadError": "The devices could not be loaded. Check the connection to Gladys."
+  },
+  "addToDashboard": {
+    "title": "Where to add it?",
+    "button": "Add to a dashboard",
+    "existingWidgets": "To an existing widget",
+    "newWidget": "In a new widget",
+    "top": "At the top of the dashboard",
+    "topHint": "Before “{{name}}”",
+    "bottom": "At the bottom of the dashboard",
+    "bottomHint": "After “{{name}}”",
+    "emptyDashboard": "The dashboard is empty",
+    "devicesCount": {
+      "one": "1 device",
+      "other": "{{count}} devices"
+    },
+    "alreadyThere": "Already in this widget",
+    "noDashboard": "No dashboard yet: create one from the home page.",
+    "loadError": "The dashboards could not be loaded. Check the connection to Gladys.",
+    "saveError": "Saving failed. Check the connection to Gladys, then try again.",
+    "changedError": "This dashboard was changed elsewhere meanwhile: reload the page, then try again.",
+    "addedTo": "Added to “{{name}}”",
+    "see": "See"
   }
 }

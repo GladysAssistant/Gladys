@@ -147,3 +147,100 @@ export const findSectionIndex = (sectionSizes, columnIndex) => {
   }
   return sectionSizes.length - 1;
 };
+
+// ---------------------------------------------------------------- in-place editing
+// The dashboard itself (long press on a widget, "+" of the dock, "Add to a dashboard" of a device)
+// edits the sections shape directly, a widget being named by its global column index x — the same
+// x as the editor's flat columns and the data-x of the dashboard's widget slots — and its index y
+// in that column. Every function returns new arrays: the sections it is given are never mutated.
+
+const locateColumn = (sections, x) => {
+  let offset = 0;
+  for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
+    const { columns } = sections[sectionIndex];
+    if (x < offset + columns.length) {
+      return { sectionIndex, columnIndex: x - offset };
+    }
+    offset += columns.length;
+  }
+  return null;
+};
+
+const withColumn = (sections, x, change) => {
+  const location = locateColumn(sections, x);
+  if (!location) {
+    return sections;
+  }
+  return sections.map((section, sectionIndex) =>
+    sectionIndex !== location.sectionIndex
+      ? section
+      : {
+          ...section,
+          columns: section.columns.map((column, columnIndex) =>
+            columnIndex === location.columnIndex ? change([...column]) : column
+          )
+        }
+  );
+};
+
+export const getBoxInSections = (sections, x, y) => {
+  const location = locateColumn(sections || [], x);
+  if (!location) {
+    return null;
+  }
+  return sections[location.sectionIndex].columns[location.columnIndex][y] || null;
+};
+
+export const replaceBoxInSections = (sections, x, y, box) =>
+  withColumn(sections, x, column => {
+    column[y] = box;
+    return column;
+  });
+
+export const removeBoxInSections = (sections, x, y) =>
+  withColumn(sections, x, column => {
+    column.splice(y, 1);
+    return column;
+  });
+
+export const insertBoxInSections = (sections, x, y, box) => {
+  if (!sections || sections.length === 0) {
+    return [{ columns: [[box]] }];
+  }
+  return withColumn(sections, x, column => {
+    column.splice(Math.min(y, column.length), 0, box);
+    return column;
+  });
+};
+
+// Where a new widget goes "at the top" (first column, first place) or "at the bottom" (last column
+// of the last section, after its widgets) of a dashboard
+export const getEdgePosition = (sections, edge) => {
+  const columnCount = (sections || []).reduce((count, section) => count + section.columns.length, 0);
+  if (columnCount === 0) {
+    return { x: 0, y: 0 };
+  }
+  if (edge === 'top') {
+    return { x: 0, y: 0 };
+  }
+  const x = columnCount - 1;
+  const location = locateColumn(sections, x);
+  return { x, y: sections[location.sectionIndex].columns[location.columnIndex].length };
+};
+
+// Every widget of a type, in reading order: { x, y, box }
+export const findBoxesInSections = (sections, type) => {
+  const found = [];
+  let x = 0;
+  (sections || []).forEach(section =>
+    section.columns.forEach(column => {
+      column.forEach((box, y) => {
+        if (box && box.type === type) {
+          found.push({ x, y, box });
+        }
+      });
+      x += 1;
+    })
+  );
+  return found;
+};

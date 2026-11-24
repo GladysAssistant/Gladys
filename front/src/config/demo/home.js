@@ -27,7 +27,8 @@ import {
   energyPower,
   energyIndex,
   productionPower,
-  feature
+  feature,
+  daysAgo
 } from './helpers';
 import { translate } from './i18n';
 import {
@@ -716,7 +717,12 @@ rooms.forEach(room => {
       service_id: device.service.id,
       service: device.service,
       features: device.features,
-      params: []
+      params: [],
+      // like the API: every device carries its creation date. The house was set up months ago,
+      // except the garden lights, paired two days ago — what the device picker suggests first as
+      // "recently added"
+      created_at: daysAgo(device.selector === 'garden-lights' ? 2 : 120),
+      updated_at: daysAgo(device.selector === 'garden-lights' ? 2 : 120)
     };
     devices.push(fullDevice);
     return fullDevice;

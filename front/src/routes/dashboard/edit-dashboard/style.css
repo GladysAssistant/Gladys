@@ -1457,3 +1457,67 @@
 .dialogSecondary:focus:not(:focus-visible) {
   outline: none;
 }
+
+/* ============================================================
+   Phone: select, then act (A.3 "Phone editing"). Below the dock
+   breakpoint the canvas looks like the dashboard — no toolbar on
+   every widget, no "+" between every two of them — until a tap
+   selects a widget: its toolbar and the "+" before and after it
+   show. The reorganize list keeps every toolbar (.compactCanvas).
+   ============================================================ */
+.previewWrapperSelected {
+  outline: 2px solid #467fcf;
+  outline-offset: 4px;
+}
+
+:global(.glass-theme) .previewWrapperSelected {
+  outline-color: var(--gl-accent);
+}
+
+@media (max-width: 991.98px) {
+  .selectionCanvas:not(.compactCanvas) .previewWrapper {
+    margin-bottom: 1rem;
+  }
+
+  .selectionCanvas:not(.compactCanvas) .previewWrapper:not(.previewWrapperSelected) .previewToolbar {
+    display: none;
+  }
+
+  /* the selected widget's toolbar: a frosted capsule, not a bare row of buttons */
+  .selectionCanvas:not(.compactCanvas) .previewWrapperSelected .previewToolbar {
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0.25rem 0.25rem 0.875rem;
+    border-radius: 999px;
+    background: var(--gl-popover-bg, rgba(255, 255, 255, 0.96));
+    border: 1px solid var(--gl-border, rgba(0, 40, 100, 0.12));
+    box-shadow: 0 8px 24px rgba(28, 35, 52, 0.16);
+  }
+
+  .selectionCanvas:not(.compactCanvas) .addBetweenSlot:not(.addSlotNearSelection) {
+    display: none !important;
+  }
+}
+
+/* The section header holds on one line on a phone (402px: the ↓ arrow used to wrap alone on a
+   second line): tighter text buttons, and the "SECTION n" label gives way first (ellipsis) */
+@media (max-width: 699.98px) {
+  .sectionHeader {
+    padding-left: 4px;
+  }
+
+  .sectionHeader > :first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sectionActions {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+  }
+
+  .sectionTextButton {
+    padding: 0 0.5rem;
+  }
+}

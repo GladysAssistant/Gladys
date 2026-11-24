@@ -25,6 +25,7 @@ import {
   kitStyle
 } from '../mobile';
 import FeatureHistorySize from './FeatureHistorySize';
+import AddDeviceToDashboard from '../dashboard/AddDeviceToDashboard';
 import MobileFeatureSheet from './MobileFeatureSheet';
 import style from './mobileUpdateDevice.css';
 
@@ -310,6 +311,11 @@ class MobileUpdateDevice extends Component {
                     </select>
                   </MobileField>
                 )}
+
+                {/* the device goes to a dashboard from here: no picker to search it in */}
+                <div class="mt-3">
+                  <AddDeviceToDashboard device={device} />
+                </div>
 
                 <MobileSectionHeader
                   title={

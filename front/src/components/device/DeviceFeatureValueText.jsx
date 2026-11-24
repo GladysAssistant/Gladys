@@ -6,7 +6,9 @@ import {
   DEVICE_FEATURE_TYPES,
   OPENING_SENSOR_STATE
 } from '../../../../server/utils/constants';
+import { intToHex } from '../../../../server/utils/colors';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import style from './deviceFeatureValueText.css';
 
 const roundValue = value => Math.round(value * 10) / 10;
 
@@ -28,6 +30,11 @@ const DeviceFeatureValueText = ({ feature, intl }) => {
   const enumLabelPath = `deviceFeatureValue.category.${feature.category}.${feature.type}.${feature.last_value}`;
   if (get(intl.dictionary, enumLabelPath)) {
     return <Text id={enumLabelPath} />;
+  }
+  // a light color is an RGB integer: shown as the color it is, never as "16769225"
+  if (feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT && feature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR) {
+    const hex = `#${intToHex(Math.max(0, Math.round(Number(feature.last_value)) || 0))}`;
+    return <span class={style.colorSwatch} style={{ backgroundColor: hex }} role="img" aria-label={hex} title={hex} />;
   }
   if (feature.type === DEVICE_FEATURE_TYPES.SENSOR.BINARY || feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
     return feature.last_value ? <Text id="deviceFeatureValueText.on" /> : <Text id="deviceFeatureValueText.off" />;

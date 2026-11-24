@@ -1,0 +1,73 @@
+/* In-place editing of the dashboard (QuickEditor) */
+
+.menuBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 0.25rem;
+}
+
+/* The forms and the picker were laid out for the editor's panel, whose body has its own padding:
+   in a sheet (no side padding on its body) they bleed to nothing, like in the scene editor's
+   device picker (devicePickerField.css) */
+.pickerHost {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  --picker-bleed-x: 0px;
+  --picker-bleed-bottom: 0.5rem;
+  --gl-surface-strong: #f7f8fb;
+}
+
+/* the picker fills the sheet: its pinned footer stays at the bottom when a search leaves few rows */
+.pickerHost > * {
+  flex: 1 1 auto;
+}
+
+/* the devices form arrives in its BaseEditBox card: the sheet has its own header */
+.pickerHost > :global(.card) {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.pickerHost > :global(.card) > :global(.card-header) {
+  display: none;
+}
+
+.pickerHost > :global(.card) > :global(.card-body) {
+  padding: 0;
+}
+
+.loader {
+  width: 2rem;
+  height: 2rem;
+  margin: 4rem auto;
+  border-radius: 50%;
+  border: 3px solid rgba(44, 62, 118, 0.15);
+  border-top-color: var(--gl-accent, #3d6df0);
+  animation: quickEditSpin 0.8s linear infinite;
+}
+
+@keyframes quickEditSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* the widget that just changed */
+:global(.gladys-widget-added) {
+  outline: 2px solid var(--gl-accent, #3d6df0);
+  outline-offset: 3px;
+  border-radius: 20px;
+  transition: outline-color 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    animation: none;
+  }
+}

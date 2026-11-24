@@ -14,6 +14,21 @@ import {
   findSectionIndex
 } from '../../../utils/dashboardSections';
 import { DASHBOARD_SECTION_MOBILE_ORDER } from '../../../../../server/utils/constants';
+import {
+  setDashboardAnchor,
+  takeDashboardAnchor,
+  findVisibleWidget,
+  holdElementAt
+} from '../../../utils/dashboardAnchor';
+
+// Phone editing (docs/specs/dashboard-flexible-layout-and-widgets.md, A.3 "Phone editing"): below
+// the dock breakpoint a tap selects a widget, and saving leaves the editor
+const isPhoneLayout = () => window.matchMedia && window.matchMedia('(max-width: 991.98px)').matches;
+
+const findWidgetCard = (x, y) => {
+  const wrapper = document.querySelector(`[data-widget-wrapper][data-x="${x}"][data-y="${y}"]`);
+  return wrapper ? wrapper.querySelector('[data-preview-content]') || wrapper : null;
+};
 
 const UNDO_REMOVAL_MS = 6000;
 // pseudo destination of a leave confirmation asked by the browser's back
@@ -68,20 +83,74 @@ class EditDashboard extends Component {
       // stay global, the section sizes and column widths are kept aside and
       // reassembled on save
       const { columns, sectionSizes, columnWidths, sectionMobileOrders } = flattenSections(currentDashboard.boxes);
-      this.setState({
-        currentDashboard: { ...currentDashboard, boxes: columns },
-        sectionSizes,
-        columnWidths,
-        sectionMobileOrders,
-        undoRemoval: null,
-        loading: false,
-        hasUnsavedChanges: false
-      });
+      this.setState(
+        {
+          currentDashboard: { ...currentDashboard, boxes: columns },
+          sectionSizes,
+          columnWidths,
+          sectionMobileOrders,
+          undoRemoval: null,
+          loading: false,
+          hasUnsavedChanges: false,
+          selectedBoxPosition: null
+        },
+        this.applyAnchor
+      );
     } catch (e) {
       this.setState({
         loading: false
       });
       console.error(e);
+    }
+  };
+
+  // Coming from the dashboard (dashboardAnchor): the editor opens on the widget the user was looking
+  // at, and does what was asked from the widget's long-press menu — select it, open its settings or
+  // "Move to…" — or adds a new widget at the top ("+" of the dock, "Add a widget")
+  applyAnchor = () => {
+    const { currentDashboard } = this.state;
+    const anchor = takeDashboardAnchor(currentDashboard.selector, 'editor');
+    if (!anchor) {
+      return;
+    }
+    const { x, y, intent } = anchor;
+    if (intent === 'add-top') {
+      if (currentDashboard.boxes.length > 0) {
+        this.addBoxAtPositionAndEdit(0, -1);
+      }
+      return;
+    }
+    if (!currentDashboard.boxes[x] || !currentDashboard.boxes[x][y]) {
+      return;
+    }
+    if (intent === 'settings') {
+      this.openBoxSettings(x, y);
+      return;
+    }
+    if (intent === 'move') {
+      this.openMoveBox(x, y);
+      return;
+    }
+    if (intent === 'select') {
+      this.selectBox(x, y);
+    }
+    requestAnimationFrame(() => holdElementAt(() => findWidgetCard(x, y), anchor.offset));
+  };
+
+  // Back to the dashboard: it opens on the widget the editor was showing
+  anchorForViewer = url => {
+    const { currentDashboard } = this.state;
+    if (!currentDashboard || url !== `/dashboard/${currentDashboard.selector}`) {
+      return;
+    }
+    const entries = Array.from(document.querySelectorAll('[data-widget-wrapper]')).map(wrapper => ({
+      element: wrapper.querySelector('[data-preview-content]') || wrapper,
+      x: Number(wrapper.getAttribute('data-x')),
+      y: Number(wrapper.getAttribute('data-y'))
+    }));
+    const visible = findVisibleWidget(entries);
+    if (visible) {
+      setDashboardAnchor({ ...visible, selector: currentDashboard.selector, target: 'viewer' });
     }
   };
 
@@ -137,6 +206,7 @@ class EditDashboard extends Component {
   // guard's copy of the editor URL: leaving replaces it, so the history
   // keeps a single editor entry
   navigateAway = url => {
+    this.anchorForViewer(url);
     if (this.historyGuardArmed) {
       this.historyGuardArmed = false;
       route(url, true);
@@ -272,12 +342,17 @@ class EditDashboard extends Component {
         }
       }
     });
-    // any structural change closes the edit panel so it never points at a stale position
+    // any structural change closes the edit panel so it never points at a stale position; the
+    // selection (phone) follows the widget that moved
+    const { selectedBoxPosition } = this.state;
+    const movedSelected =
+      selectedBoxPosition && selectedBoxPosition.x === originalX && selectedBoxPosition.y === originalY;
     await this.setState({
       ...newState,
       boxNotEmptyError: false,
       editingBoxPosition: null,
       movingBoxPosition: null,
+      selectedBoxPosition: movedSelected ? { x: destX, y: destY } : null,
       hasUnsavedChanges: true
     });
   };
@@ -327,7 +402,44 @@ class EditDashboard extends Component {
   };
 
   openBoxSettings = (x, y) => {
-    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false, newDashboardOpen: false });
+    this.setState({
+      editingBoxPosition: { x, y },
+      selectedBoxPosition: { x, y },
+      dashboardSettingsOpen: false,
+      newDashboardOpen: false
+    });
+  };
+
+  // Phone: a tap selects a widget — its toolbar and the "+" around it show, the other widgets look
+  // like on the dashboard —, a tap on the selected one opens its settings. Elsewhere (desktop, the
+  // reorganize list where every toolbar shows) a tap opens the settings directly.
+  // Selecting shows a toolbar and the "+" around the widget (and hides the previous one's): the
+  // page is scrolled by what that moved, so the widget stays under the finger
+  selectBox = (x, y) => {
+    const card = findWidgetCard(x, y);
+    const before = card ? card.getBoundingClientRect().top : null;
+    this.setState({ selectedBoxPosition: { x, y } }, () => {
+      const after = findWidgetCard(x, y);
+      if (after && before !== null) {
+        window.scrollBy(0, after.getBoundingClientRect().top - before);
+      }
+    });
+  };
+
+  clearSelection = () => {
+    if (this.state.selectedBoxPosition) {
+      this.setState({ selectedBoxPosition: null });
+    }
+  };
+
+  onWidgetTap = (x, y) => {
+    const { selectedBoxPosition, reorganizing } = this.state;
+    const selected = selectedBoxPosition && selectedBoxPosition.x === x && selectedBoxPosition.y === y;
+    if (isPhoneLayout() && !reorganizing && !selected) {
+      this.selectBox(x, y);
+      return;
+    }
+    this.openBoxSettings(x, y);
   };
 
   openDashboardSettings = () => {
@@ -384,13 +496,24 @@ class EditDashboard extends Component {
     // the new box lands at the end of column x: open its settings right away
     const y = this.state.currentDashboard.boxes[x].length;
     this.addBox(x);
-    this.setState({ editingBoxPosition: { x, y }, dashboardSettingsOpen: false, newDashboardOpen: false });
+    this.setState({
+      editingBoxPosition: { x, y },
+      selectedBoxPosition: { x, y },
+      dashboardSettingsOpen: false,
+      newDashboardOpen: false
+    });
   };
 
+  // addBoxAtPosition inserts after the box at y: y = -1 is the first place of the column (the
+  // "+" above its first widget)
   addBoxAtPositionAndEdit = (x, y) => {
-    // addBoxAtPosition inserts after the box at y
     this.addBoxAtPosition(x, y);
-    this.setState({ editingBoxPosition: { x, y: y + 1 }, dashboardSettingsOpen: false, newDashboardOpen: false });
+    this.setState({
+      editingBoxPosition: { x, y: y + 1 },
+      selectedBoxPosition: { x, y: y + 1 },
+      dashboardSettingsOpen: false,
+      newDashboardOpen: false
+    });
   };
 
   addBox = x => {
@@ -444,6 +567,7 @@ class EditDashboard extends Component {
       boxNotEmptyError: false,
       editingBoxPosition: null,
       movingBoxPosition: null,
+      selectedBoxPosition: null,
       hasUnsavedChanges: true,
       undoRemoval:
         removedBox && removedBox.type
@@ -663,6 +787,12 @@ class EditDashboard extends Component {
         justSaved: true,
         hasUnsavedChanges: false
       });
+      // On a phone, Save is the end of the edit (one tap, not Save then Done): back to the
+      // dashboard, on the widget the editor was showing
+      if (isPhoneLayout()) {
+        this.navigateAway(`/dashboard/${selector}`);
+        return;
+      }
       // stay in the editor so the user can chain edits: the save button
       // briefly turns into a confirmation instead of routing away
       clearTimeout(this.justSavedTimeout);
@@ -719,6 +849,7 @@ class EditDashboard extends Component {
       boxNotEmptyError: false,
       editingBoxPosition: null,
       movingBoxPosition: null,
+      selectedBoxPosition: null,
       hasUnsavedChanges: true
     });
   };
@@ -761,6 +892,7 @@ class EditDashboard extends Component {
       // global column coordinates shifted: never point the panel at a stale box
       editingBoxPosition: null,
       movingBoxPosition: null,
+      selectedBoxPosition: null,
       hasUnsavedChanges: true
     });
   };
@@ -787,6 +919,7 @@ class EditDashboard extends Component {
       boxNotEmptyError: false,
       editingBoxPosition: null,
       movingBoxPosition: null,
+      selectedBoxPosition: null,
       hasUnsavedChanges: true
     });
   };
@@ -821,6 +954,7 @@ class EditDashboard extends Component {
         boxNotEmptyError: false,
         editingBoxPosition: null,
         movingBoxPosition: null,
+        selectedBoxPosition: null,
         hasUnsavedChanges: true
       });
     } else {
@@ -900,6 +1034,7 @@ class EditDashboard extends Component {
       columnBoxNotEmptyError: null,
       editingBoxPosition: null,
       movingBoxPosition: null,
+      selectedBoxPosition: null,
       dashboardSettingsOpen: false,
       newDashboardOpen: false,
       justSaved: false,
@@ -956,7 +1091,8 @@ class EditDashboard extends Component {
       sectionMobileOrders,
       roomNames,
       reorganizing,
-      leaveConfirm
+      leaveConfirm,
+      selectedBoxPosition
     }
   ) {
     return (
@@ -976,6 +1112,9 @@ class EditDashboard extends Component {
         moveBoxUp={this.moveBoxUp}
         moveCard={this.moveCard}
         openBoxSettings={this.openBoxSettings}
+        selectedBoxPosition={selectedBoxPosition}
+        onWidgetTap={this.onWidgetTap}
+        clearSelection={this.clearSelection}
         openDashboardSettings={this.openDashboardSettings}
         openNewDashboard={this.openNewDashboard}
         closeEditPanel={this.closeEditPanel}

@@ -1,0 +1,16 @@
+/* A light color is shown as the color itself, not as the integer the integration stores it as
+   ("16769225"): a small round swatch, with its hex code for screen readers */
+.colorSwatch {
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  border-radius: 50%;
+  vertical-align: -0.12em;
+  box-shadow: inset 0 0 0 1px rgba(28, 35, 52, 0.18);
+}
+
+/* Dark mode inverts the whole app: the swatch carries a real color, it is inverted back (same rule
+   as the light panel, device-features/light/style.css) */
+:global(.dark-mode) .colorSwatch {
+  filter: invert(100%) hue-rotate(180deg);
+}

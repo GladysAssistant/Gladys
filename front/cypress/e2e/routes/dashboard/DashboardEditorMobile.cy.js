@@ -1,7 +1,8 @@
 // Phone editing of a dashboard (docs/specs/dashboard-flexible-layout-and-
-// widgets.md, A.3 "phone editing"): moving a widget to another section
-// without dragging, undoing a removal, the reorganize mode, the leave
-// guard, the phone order of a section — and the viewer applying it.
+// widgets.md, A.3 "phone editing"): a tap selects a widget (only the
+// selected one shows its toolbar and the "+" around it), moving a widget to
+// another section without dragging, undoing a removal, the reorganize mode,
+// the leave guard, the phone order of a section — and the viewer applying it.
 describe('Dashboard editor on a phone', () => {
   const serverUrl = Cypress.env('serverUrl');
 
@@ -43,6 +44,14 @@ describe('Dashboard editor on a phone', () => {
     cy.intercept('PATCH', `${serverUrl}/api/v1/dashboard/phone`).as('saveDashboard');
     cy.visit('/dashboard/phone/edit');
 
+    // the canvas looks like the dashboard: no toolbar until a widget is selected
+    cy.get('[data-cy="move-to-box-0-0"]').should('not.be.visible');
+    cy.get('[data-cy="widget-tap-0-0"]').click();
+    cy.get('[data-widget-wrapper][data-x="0"][data-y="0"]').should('have.attr', 'data-selected', 'true');
+    cy.get('[data-cy="edit-panel"]').should('not.exist');
+    // the "+" above and below the selected widget only
+    cy.get('[data-cy="add-box-first-0"]').should('be.visible');
+
     // "Move to…": the second section's only column, the widget lands there
     cy.get('[data-cy="move-to-box-0-0"]').click();
     cy.get('[data-cy="move-box-form"]').should('be.visible');
@@ -52,6 +61,7 @@ describe('Dashboard editor on a phone', () => {
     cy.get('[data-widget-wrapper][data-x="2"][data-y="0"]').should('exist');
 
     // removing asks nothing and can be undone from the toast
+    cy.get('[data-cy="widget-tap-1-0"]').click();
     cy.get('[data-cy="remove-box-1-0"]').click();
     cy.get('[data-widget-wrapper][data-x="1"]').should('have.length', 0);
     cy.get('[data-cy="widget-undo"] button').click();
@@ -68,10 +78,13 @@ describe('Dashboard editor on a phone', () => {
       expect(second.columns[0].map(box => box.type)).to.deep.equal(['clock']);
       expect(second).to.not.have.property('mobile_order');
     });
+    // on a phone, saving ends the edit: back to the dashboard
+    cy.url().should('match', /\/dashboard\/phone$/);
   });
 
   it('Should withdraw the undo of a removal once the layout changes', () => {
     cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="widget-tap-1-0"]').click();
     cy.get('[data-cy="remove-box-1-0"]').click();
     cy.get('[data-cy="widget-undo"]').should('be.visible');
     // the phone order is restored by Undo too: changing it withdraws the
@@ -83,6 +96,7 @@ describe('Dashboard editor on a phone', () => {
   it('Should ask before creating a dashboard with unsaved changes', () => {
     cy.intercept('POST', `${serverUrl}/api/v1/dashboard`).as('createDashboard');
     cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="widget-tap-0-0"]').click();
     cy.get('[data-cy="move-box-down-0-0"]').click();
 
     cy.get('[data-cy="new-dashboard-button"]').click();
@@ -108,6 +122,7 @@ describe('Dashboard editor on a phone', () => {
 
   it('Should ask above the mobile menu when one of its links is tapped', () => {
     cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="widget-tap-0-0"]').click();
     cy.get('[data-cy="move-box-down-0-0"]').click();
     cy.get('[data-cy="sidebar-toggler"]').click();
     cy.get('[data-cy="sidebar-nav"] a[href="/dashboard/scene"]').click();
@@ -171,6 +186,7 @@ describe('Dashboard editor on a phone', () => {
 
   it('Should ask before leaving with unsaved changes', () => {
     cy.visit('/dashboard/phone/edit');
+    cy.get('[data-cy="widget-tap-0-0"]').click();
     cy.get('[data-cy="move-box-down-0-0"]').click();
 
     // Cancel asks first; staying keeps the editor and the change

@@ -9,6 +9,21 @@ import mainActions from '../../actions/main';
 import { JOB_TYPES, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
 import { declareReloadablePage } from '../../utils/reloadablePage';
+import { setDashboardAnchor, takeDashboardAnchor, findVisibleWidget, holdElementAt } from '../../utils/dashboardAnchor';
+
+// The widgets of the dashboard, in page order (their slots are display: contents: what is seen is
+// their first child)
+const getVisibleSlots = () =>
+  Array.from(document.querySelectorAll('[data-box-slot]')).map(slot => ({
+    element: slot.firstElementChild,
+    x: Number(slot.getAttribute('data-x')),
+    y: Number(slot.getAttribute('data-y'))
+  }));
+
+const getSlotCard = (x, y) => {
+  const slot = document.querySelector(`[data-box-slot][data-x="${x}"][data-y="${y}"]`);
+  return slot ? slot.firstElementChild : null;
+};
 
 // dashboard actions plus the shared setTabletMode (main.js), used by the
 // ?tablet_mode_house=<house_selector> URL param below to activate tablet mode
@@ -273,8 +288,44 @@ class Dashboard extends Component {
     });
   };
 
-  editDashboard = () => {
-    route(`/dashboard/${this.state.currentDashboard.selector}/edit`);
+  // The editor opens on the widget the user was looking at (dashboardAnchor): the editor is taller
+  // than the dashboard, the same scroll position would land on another widget. A target names a
+  // widget and what to do with it there (the long-press menu: its settings, "Move to…", select it).
+  openEditor = target => {
+    const { selector } = this.state.currentDashboard;
+    let anchor = findVisibleWidget(getVisibleSlots());
+    if (target && target.x !== undefined) {
+      const card = getSlotCard(target.x, target.y);
+      anchor = { x: target.x, y: target.y, offset: card ? Math.round(card.getBoundingClientRect().top) : 0 };
+    }
+    setDashboardAnchor(anchor || target ? { ...(anchor || {}), ...(target || {}), selector, target: 'editor' } : null);
+    route(`/dashboard/${selector}/edit`);
+  };
+
+  editDashboard = () => this.openEditor(null);
+
+  openAddMenu = () => this.setState({ quickAddMenuOpen: true });
+
+  closeAddMenu = () => this.setState({ quickAddMenuOpen: false });
+
+  // A change made from the dashboard itself (QuickEditor) is already saved: the page shows it
+  onDashboardSaved = dashboard => {
+    this.storeDashboardConfig(dashboard);
+    if (dashboard && dashboard.selector === this.state.currentDashboardSelector) {
+      this.setState({ currentDashboard: dashboard });
+    }
+  };
+
+  // Back from the editor: the dashboard opens on the widget the editor was showing
+  applyAnchorFromEditor = () => {
+    const { currentDashboard, loading } = this.state;
+    if (!currentDashboard || loading) {
+      return;
+    }
+    const anchor = takeDashboardAnchor(currentDashboard.selector, 'viewer');
+    if (anchor) {
+      requestAnimationFrame(() => holdElementAt(() => getSlotCard(anchor.x, anchor.y), anchor.offset));
+    }
   };
 
   isBrowserFullScreenCompatible = () => {
@@ -443,6 +494,7 @@ class Dashboard extends Component {
     if (prevProps.currentUrl !== this.props.currentUrl) {
       this.switchToDashboardFromUrl();
     }
+    this.applyAnchorFromEditor();
   }
 
   componentWillUnmount() {
@@ -479,7 +531,8 @@ class Dashboard extends Component {
       browserFullScreenCompatible,
       duckDbMigrationJob,
       tabletModeParamError,
-      tabletModeActivationFailed
+      tabletModeActivationFailed,
+      quickAddMenuOpen
     }
   ) {
     const dashboardConfigured =
@@ -525,6 +578,11 @@ class Dashboard extends Component {
         toggleDashboardDropdown={this.toggleDashboardDropdown}
         redirectToDashboard={this.redirectToDashboard}
         editDashboard={this.editDashboard}
+        openEditor={this.openEditor}
+        quickAddMenuOpen={quickAddMenuOpen}
+        openAddMenu={this.openAddMenu}
+        closeAddMenu={this.closeAddMenu}
+        onDashboardSaved={this.onDashboardSaved}
         toggleFullScreen={this.toggleFullScreen}
         toggleDefineTabletMode={this.toggleDefineTabletMode}
         fullScreen={props.fullScreen}

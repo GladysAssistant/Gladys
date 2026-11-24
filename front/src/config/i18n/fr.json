@@ -433,7 +433,7 @@
     "title": "Tableau de bord",
     "editDashboardButton": "Éditer",
     "allDashboardsButton": "Tous les tableaux de bord",
-    "editDashboardCancelButton": "Annuler",
+    "editDashboardCancelButton": "Abandonner",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
     "editDashboardSavedButton": "Enregistré",
@@ -474,7 +474,7 @@
     "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
-    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer, utilisez les boutons + pour ajouter widgets, colonnes ou sections. Glissez les widgets pour les déplacer — sur téléphone, utilisez les flèches, « Déplacer vers… » ou le mode Réorganiser.",
+    "editDashboardExplanation": "Ceci est votre vrai tableau de bord : touchez un widget pour l'éditer — sur téléphone, le premier toucher le sélectionne et affiche ses boutons (flèches, « Déplacer vers… », réglages, + pour ajouter un widget à côté). Les boutons + ajoutent aussi colonnes et sections ; sur ordinateur, glissez les widgets pour les déplacer.",
     "editorDashboardSettingsButton": "Réglages du tableau de bord",
     "editorDashboardSettings": "Réglages du tableau de bord",
     "editorMoveSectionUp": "Monter la section",
@@ -8701,7 +8701,10 @@
     },
     "validate": "Valider",
     "title": "Choisir",
-    "sameKindHint": "Seuls les appareils du même type sont listés : ils partagent une seule condition."
+    "sameKindHint": "Seuls les appareils du même type sont listés : ils partagent une seule condition.",
+    "suggestions": "Suggestions",
+    "lightRow": "Lumière",
+    "lightDetails": "Choisir les réglages de {{name}} un par un"
   },
   "devicePickerField": {
     "title": "Choisir des appareils",
@@ -8713,5 +8716,60 @@
     "empty": "Aucun appareil sélectionné.",
     "remove": "Retirer {{name}}",
     "notFound": "Appareil introuvable"
+  },
+  "quickEdit": {
+    "addMenuTitle": "Ajouter au tableau de bord",
+    "addDevice": "Ajouter un appareil",
+    "addDeviceHint": "Dans un widget existant ou un nouveau",
+    "addWidget": "Ajouter un widget",
+    "addWidgetHint": "Météo, scènes, caméra, graphique…",
+    "editLayout": "Modifier la mise en page",
+    "editLayoutHint": "Sections, colonnes, ordre des widgets",
+    "addDevices": "Ajouter des appareils",
+    "addDevicesTo": "Ajouter à « {{name}} »",
+    "editDevices": "Renommer, réordonner",
+    "editDevicesHint": "Les appareils de ce widget",
+    "widgetSettings": "Modifier le widget",
+    "moveWidget": "Déplacer",
+    "removeWidget": "Retirer du tableau de bord",
+    "add": "Ajouter",
+    "next": "Suivant",
+    "undo": "Annuler",
+    "addedOne": "{{name}} ajouté à « {{widget}} »",
+    "addedMany": {
+      "one": "1 appareil ajouté à « {{widget}} »",
+      "other": "{{count}} appareils ajoutés à « {{widget}} »"
+    },
+    "addedNewWidget": {
+      "one": "{{name}} ajouté au tableau de bord",
+      "other": "{{count}} appareils ajoutés au tableau de bord"
+    },
+    "widgetUpdated": "« {{name}} » mis à jour",
+    "widgetRemoved": "« {{name}} » retiré du tableau de bord",
+    "changedError": "Ce tableau de bord a été modifié ailleurs entre-temps : rechargez la page, puis recommencez.",
+    "saveError": "L'enregistrement a échoué. Vérifiez la connexion à Gladys, puis recommencez.",
+    "loadError": "Impossible de charger les appareils. Vérifiez la connexion à Gladys."
+  },
+  "addToDashboard": {
+    "title": "Où l'ajouter ?",
+    "button": "Ajouter au tableau de bord",
+    "existingWidgets": "Dans un widget existant",
+    "newWidget": "Dans un nouveau widget",
+    "top": "En haut du tableau de bord",
+    "topHint": "Avant « {{name}} »",
+    "bottom": "En bas du tableau de bord",
+    "bottomHint": "Après « {{name}} »",
+    "emptyDashboard": "Le tableau de bord est vide",
+    "devicesCount": {
+      "one": "1 appareil",
+      "other": "{{count}} appareils"
+    },
+    "alreadyThere": "Déjà dans ce widget",
+    "noDashboard": "Aucun tableau de bord pour l'instant : créez-en un depuis l'accueil.",
+    "loadError": "Impossible de charger les tableaux de bord. Vérifiez la connexion à Gladys.",
+    "saveError": "L'enregistrement a échoué. Vérifiez la connexion à Gladys, puis recommencez.",
+    "changedError": "Ce tableau de bord a été modifié ailleurs entre-temps : rechargez la page, puis recommencez.",
+    "addedTo": "Ajouté à « {{name}} »",
+    "see": "Voir"
   }
 }

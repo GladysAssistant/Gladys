@@ -437,7 +437,7 @@
     "disableFullScreen": "Vollbild beenden",
     "editDashboardTitle": "Dashboard bearbeiten",
     "editDashboardDeleteButton": "Löschen",
-    "editDashboardCancelButton": "Abbrechen",
+    "editDashboardCancelButton": "Verwerfen",
     "editDashboardDeleteText": "Bist du sicher, dass du dieses Dashboard löschen möchtest?",
     "toggleDefineTabletMode": "Tablet-Modus",
     "closeDefineTabletMode": "Schließen",
@@ -474,7 +474,7 @@
     "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
-    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten, und nutze die +-Schaltflächen, um Widgets, Spalten oder Abschnitte hinzuzufügen. Ziehe Widgets, um sie zu verschieben – auf dem Telefon nutze die Pfeile, „Verschieben nach…“ oder den Modus „Neu anordnen“.",
+    "editDashboardExplanation": "Das ist dein echtes Dashboard: Tippe auf ein Widget, um es zu bearbeiten – auf dem Telefon wählt das erste Tippen es aus und zeigt seine Schaltflächen (Pfeile, „Verschieben nach…“, Einstellungen, + für ein Widget daneben). Die +-Schaltflächen fügen auch Spalten und Abschnitte hinzu; am Computer ziehst du Widgets, um sie zu verschieben.",
     "editorDashboardSettingsButton": "Dashboard-Einstellungen",
     "editorDashboardSettings": "Dashboard-Einstellungen",
     "editorMoveSectionUp": "Abschnitt nach oben verschieben",
@@ -8701,7 +8701,10 @@
     },
     "validate": "Fertig",
     "title": "Geräte wählen",
-    "sameKindHint": "Es werden nur Geräte desselben Typs angezeigt: Sie teilen sich eine Bedingung."
+    "sameKindHint": "Es werden nur Geräte desselben Typs angezeigt: Sie teilen sich eine Bedingung.",
+    "suggestions": "Vorschläge",
+    "lightRow": "Licht",
+    "lightDetails": "Die Steuerungen von {{name}} einzeln auswählen"
   },
   "devicePickerField": {
     "title": "Geräte auswählen",
@@ -8713,5 +8716,60 @@
     "empty": "Kein Gerät ausgewählt.",
     "remove": "{{name}} entfernen",
     "notFound": "Gerät nicht gefunden"
+  },
+  "quickEdit": {
+    "addMenuTitle": "Zum Dashboard hinzufügen",
+    "addDevice": "Gerät hinzufügen",
+    "addDeviceHint": "In ein vorhandenes oder ein neues Widget",
+    "addWidget": "Widget hinzufügen",
+    "addWidgetHint": "Wetter, Szenen, Kamera, Diagramm…",
+    "editLayout": "Layout bearbeiten",
+    "editLayoutHint": "Abschnitte, Spalten, Reihenfolge der Widgets",
+    "addDevices": "Geräte hinzufügen",
+    "addDevicesTo": "Zu „{{name}}“ hinzufügen",
+    "editDevices": "Umbenennen, neu anordnen",
+    "editDevicesHint": "Die Geräte dieses Widgets",
+    "widgetSettings": "Widget bearbeiten",
+    "moveWidget": "Verschieben",
+    "removeWidget": "Vom Dashboard entfernen",
+    "add": "Hinzufügen",
+    "next": "Weiter",
+    "undo": "Rückgängig",
+    "addedOne": "{{name}} zu „{{widget}}“ hinzugefügt",
+    "addedMany": {
+      "one": "1 Gerät zu „{{widget}}“ hinzugefügt",
+      "other": "{{count}} Geräte zu „{{widget}}“ hinzugefügt"
+    },
+    "addedNewWidget": {
+      "one": "{{name}} zum Dashboard hinzugefügt",
+      "other": "{{count}} Geräte zum Dashboard hinzugefügt"
+    },
+    "widgetUpdated": "„{{name}}“ aktualisiert",
+    "widgetRemoved": "„{{name}}“ vom Dashboard entfernt",
+    "changedError": "Dieses Dashboard wurde inzwischen anderswo geändert: Lade die Seite neu und versuche es erneut.",
+    "saveError": "Speichern fehlgeschlagen. Prüfe die Verbindung zu Gladys und versuche es erneut.",
+    "loadError": "Die Geräte konnten nicht geladen werden. Prüfe die Verbindung zu Gladys."
+  },
+  "addToDashboard": {
+    "title": "Wo hinzufügen?",
+    "button": "Zu einem Dashboard hinzufügen",
+    "existingWidgets": "In ein vorhandenes Widget",
+    "newWidget": "In ein neues Widget",
+    "top": "Oben im Dashboard",
+    "topHint": "Vor „{{name}}“",
+    "bottom": "Unten im Dashboard",
+    "bottomHint": "Nach „{{name}}“",
+    "emptyDashboard": "Das Dashboard ist leer",
+    "devicesCount": {
+      "one": "1 Gerät",
+      "other": "{{count}} Geräte"
+    },
+    "alreadyThere": "Bereits in diesem Widget",
+    "noDashboard": "Noch kein Dashboard: Erstelle eines auf der Startseite.",
+    "loadError": "Die Dashboards konnten nicht geladen werden. Prüfe die Verbindung zu Gladys.",
+    "saveError": "Speichern fehlgeschlagen. Prüfe die Verbindung zu Gladys und versuche es erneut.",
+    "changedError": "Dieses Dashboard wurde inzwischen anderswo geändert: Lade die Seite neu und versuche es erneut.",
+    "addedTo": "Zu „{{name}}“ hinzugefügt",
+    "see": "Anzeigen"
   }
 }
