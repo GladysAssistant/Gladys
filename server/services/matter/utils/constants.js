@@ -1,6 +1,8 @@
 const VARIABLES = {
   MATTER_ENABLED: 'MATTER_ENABLED',
   MATTER_BACKUP: 'MATTER_BACKUP',
+  // JSON { nodeId: ISO date }: the last contact of each node, kept across restarts
+  MATTER_LAST_CONTACTS: 'MATTER_LAST_CONTACTS',
 };
 
 const MATTER_NODE_CONNECTION_TIMEOUT_MS = 15000;

@@ -23,6 +23,7 @@ function createObservable() {
 
 const createNode = (connectionState) => ({
   connectionState,
+  isConnected: connectionState === 0,
   events: {
     stateChanged: createObservable(),
     connectionAlive: createObservable(),
@@ -64,6 +65,16 @@ describe('Matter.watchNode', () => {
     node.events.connectionAlive.emit();
     node.events.eventTriggered.emit({});
     expect(matterHandler.getNodeStatus(1234n).last_contact).to.deep.equal(new Date('2026-11-24T10:00:04.000Z'));
+  });
+
+  it('should not count the values replayed from the cache of an offline node as a contact', async () => {
+    const node = createNode(0);
+    matterHandler.watchNode(1234n, node);
+    node.isConnected = false;
+    node.events.stateChanged.emit(2);
+    await clock.tickAsync(5000);
+    node.events.attributeChanged.emit({});
+    expect(matterHandler.getNodeStatus(1234n).last_contact).to.deep.equal(new Date('2026-11-24T10:00:00.000Z'));
   });
 
   it('should watch a node only once', () => {

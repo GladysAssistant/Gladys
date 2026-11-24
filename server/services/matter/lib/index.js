@@ -23,6 +23,8 @@ const {
   notifyNodeStatus,
   setNodeStatus,
   touchNode,
+  saveLastContacts,
+  loadLastContacts,
   setDeviceReachability,
   clearNodeStatuses,
 } = require('./matter.nodeStatus');
@@ -57,6 +59,8 @@ const MatterHandler = function MatterHandler(gladys, MatterMain, ProjectChipMatt
   this.watchedNodes = new Map();
   this.nodeStatuses = new Map();
   this.nodeStatusTimers = new Map();
+  // last contact of each node, kept when the controller restarts (nightly backup) and saved
+  this.lastContacts = new Map();
   // Paths of the bridged devices each bridge reports unreachable, and the labels of its bridged devices
   this.unreachableDevicePaths = new Map();
   this.bridgedDevices = new Map();
@@ -87,6 +91,8 @@ MatterHandler.prototype.getNodeStatus = getNodeStatus;
 MatterHandler.prototype.notifyNodeStatus = notifyNodeStatus;
 MatterHandler.prototype.setNodeStatus = setNodeStatus;
 MatterHandler.prototype.touchNode = touchNode;
+MatterHandler.prototype.saveLastContacts = saveLastContacts;
+MatterHandler.prototype.loadLastContacts = loadLastContacts;
 MatterHandler.prototype.setDeviceReachability = setDeviceReachability;
 MatterHandler.prototype.clearNodeStatuses = clearNodeStatuses;
 MatterHandler.prototype.getNodeDetails = getNodeDetails;

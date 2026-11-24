@@ -67,3 +67,7 @@
   font-family: monospace;
   overflow-wrap: anywhere;
 }
+
+.sheetSubsection {
+  margin-top: 1rem;
+}

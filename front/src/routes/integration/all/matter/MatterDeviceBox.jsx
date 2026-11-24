@@ -13,7 +13,7 @@ import { MobileNotice } from '../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../components/integration/mobile';
 import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 import { UnavailableTag, UnavailablePill, UnavailableReason } from './MatterAvailability';
-import { getDeviceAvailability } from './matterUtils';
+import { getDeviceAvailability, UNAVAILABLE_REASONS } from './matterUtils';
 
 class MatterDeviceBox extends Component {
   constructor(props) {
@@ -151,7 +151,10 @@ class MatterDeviceBox extends Component {
         pills={<UnavailablePill availability={availability} />}
         notices={[
           availability && availability.available === false && (
-            <MobileNotice tone="danger" icon="wifi-off">
+            <MobileNotice
+              tone="danger"
+              icon={availability.reason === UNAVAILABLE_REASONS.BRIDGED_UNREACHABLE ? 'link-2' : 'wifi-off'}
+            >
               <UnavailableReason reason={availability.reason} />
             </MobileNotice>
           ),

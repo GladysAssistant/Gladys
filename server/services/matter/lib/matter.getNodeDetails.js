@@ -174,6 +174,7 @@ async function getNodeDetails(nodeId) {
     return {
       name: device.name,
       selector: device.selector,
+      device_path: devicePath,
       available: availability.available,
       unavailable_reason: availability.reason,
     };

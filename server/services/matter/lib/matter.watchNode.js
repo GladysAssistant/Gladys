@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { getConnectionState, getStoredLastContact } = require('./matter.nodeStatus');
+const { getConnectionState } = require('./matter.nodeStatus');
 
 // The events of a node which mean it was just heard of
 const CONTACT_EVENTS = ['connectionAlive', 'attributeChanged', 'eventTriggered'];
@@ -42,11 +42,18 @@ function watchNode(nodeId, node) {
   }
   const unsubscribers = [
     observeNodeEvent(node, 'stateChanged', (state) => this.setNodeStatus(key, state)),
-    ...CONTACT_EVENTS.map((eventName) => observeNodeEvent(node, eventName, () => this.touchNode(key))),
+    // the values matter.js replays from its cache while the node is offline are no contact
+    ...CONTACT_EVENTS.map((eventName) =>
+      observeNodeEvent(node, eventName, () => {
+        if (node.isConnected) {
+          this.touchNode(key);
+        }
+      }),
+    ),
   ].filter(Boolean);
   this.watchedNodes.set(key, { node, unsubscribers });
   logger.debug(`Matter: Watching the connection of node ${key}`);
-  this.setNodeStatus(key, getConnectionState(node), getStoredLastContact(node));
+  this.setNodeStatus(key, getConnectionState(node));
 }
 
 /**

@@ -70,8 +70,20 @@ describe('Matter settings', () => {
       { fabric_index: 2, label: null, vendor_id: 4937, vendor_name: 'Apple', is_gladys: false }
     ],
     gladys_devices: [
-      { name: 'Living room plug – Outlet 1', selector: 'outlet-1', available: true, unavailable_reason: null },
-      { name: 'Living room plug – Outlet 2', selector: 'outlet-2', available: true, unavailable_reason: null }
+      {
+        name: 'Living room plug – Outlet 1',
+        selector: 'outlet-1',
+        device_path: '1',
+        available: true,
+        unavailable_reason: null
+      },
+      {
+        name: 'Living room plug – Outlet 2',
+        selector: 'outlet-2',
+        device_path: '2',
+        available: true,
+        unavailable_reason: null
+      }
     ],
     bridged_devices: [],
     capabilities: { identify: true, share: true }
@@ -186,6 +198,10 @@ describe('Matter settings', () => {
       payload: { node_id: '1', status: 'disconnected', available: false, unreachable_device_paths: [] }
     });
     cy.get('[data-cy=matter-node-unavailable]').should('be.visible');
+    // its devices follow
+    cy.get('[data-cy=matter-node-gladys-device]').each(row =>
+      cy.wrap(row).should('contain', i18n.integration.matter.device.unavailable)
+    );
     cy.get('[data-cy=matter-node-sheet] [data-cy=matter-node-status]').should(
       'contain',
       i18n.integration.matter.node.status.offline

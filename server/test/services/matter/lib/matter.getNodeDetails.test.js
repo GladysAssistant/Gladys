@@ -118,9 +118,9 @@ describe('Matter.getNodeDetails', () => {
     matterHandler.nodeStatuses.set('1234', {
       status: 'connected',
       since: new Date('2026-11-24T10:00:00.000Z'),
-      last_contact: new Date('2026-11-24T10:05:00.000Z'),
       available: true,
     });
+    matterHandler.lastContacts.set('1234', new Date('2026-11-24T10:05:00.000Z'));
     matterHandler.unreachableDevicePaths.set('1234', new Set(['1:child_endpoint:4']));
     matterHandler.bridgedDevices.set(
       '1234',
@@ -172,8 +172,20 @@ describe('Matter.getNodeDetails', () => {
         { fabric_index: 3, label: null, vendor_id: 1234, vendor_name: null, is_gladys: false },
       ],
       gladys_devices: [
-        { name: 'Lamp', selector: 'lamp', available: true, unavailable_reason: null },
-        { name: 'Door', selector: 'door', available: false, unavailable_reason: 'bridged-unreachable' },
+        {
+          name: 'Lamp',
+          selector: 'lamp',
+          device_path: '1:child_endpoint:3',
+          available: true,
+          unavailable_reason: null,
+        },
+        {
+          name: 'Door',
+          selector: 'door',
+          device_path: '1:child_endpoint:4',
+          available: false,
+          unavailable_reason: 'bridged-unreachable',
+        },
       ],
       bridged_devices: [
         { path: '1:child_endpoint:3', name: 'Lamp', reachable: true },
@@ -227,8 +239,11 @@ describe('Matter.getNodeDetails', () => {
     node.getRootEndpoint = undefined;
     node.deviceInformation = {};
     node.getDevices = () => [];
+    // never heard of since Gladys started
+    matterHandler.nodeStatuses.clear();
+    matterHandler.lastContacts.clear();
     const details = await matterHandler.getNodeDetails(1234n);
-    expect(details).to.deep.include({ live: false, controllers: null });
+    expect(details).to.deep.include({ live: false, controllers: null, last_contact: null, status: 'disconnected' });
     expect(details.network).to.deep.equal({
       type: null,
       power_source: null,

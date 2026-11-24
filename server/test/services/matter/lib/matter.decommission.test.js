@@ -57,6 +57,7 @@ describe('Matter.decommission', () => {
     matterHandler.watchedNodes.set('1234', { node: {}, unsubscribers: [unsubscribe] });
     matterHandler.nodeStatuses.set('1234', { status: 'connected', since: new Date(), available: true });
     matterHandler.unreachableDevicePaths.set('1234', new Set(['1:child_endpoint:3']));
+    matterHandler.lastContacts.set('1234', new Date());
     const result = await matterHandler.decommission(1234n);
     expect(result).to.deep.equal({ forced: false, deleted_devices: [], failed_devices: [] });
     expect(matterHandler.devices).to.have.lengthOf(0);
@@ -66,6 +67,7 @@ describe('Matter.decommission', () => {
     expect(matterHandler.watchedNodes.size).to.equal(0);
     expect(matterHandler.nodeStatuses.size).to.equal(0);
     expect(matterHandler.unreachableDevicePaths.size).to.equal(0);
+    expect(matterHandler.lastContacts.size).to.equal(0);
     assert.notCalled(matterHandler.commissioningController.removeNode);
     assert.notCalled(gladys.device.destroy);
   });

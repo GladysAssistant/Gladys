@@ -48,10 +48,11 @@ export const buildNodesStatus = nodes =>
  */
 export const applyNodeStatus = (nodesStatus, payload) => {
   const updated = new Map(nodesStatus);
+  const previous = nodesStatus.get(payload.node_id);
   updated.set(payload.node_id, {
     status: payload.status,
     available: payload.available,
-    last_contact: payload.last_contact,
+    last_contact: payload.last_contact || (previous && previous.last_contact),
     unreachable_device_paths: payload.unreachable_device_paths || []
   });
   return updated;

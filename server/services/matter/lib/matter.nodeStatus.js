@@ -1,30 +1,13 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const {
+  VARIABLES,
   MATTER_NODE_STATUS,
   MATTER_NODE_STATUS_BY_STATE,
   MATTER_NODE_UNAVAILABLE_GRACE_MS,
   MATTER_NODE_STATE_CONNECTED,
 } = require('../utils/constants');
 const { isNodeAvailable } = require('../utils/getMatterAvailability');
-
-/**
- * @description The last contact matter.js remembers for a node (when it was last seen online or went
- * offline), so that a node offline since Gladys started still shows when it was last heard of.
- * @param {object} node - The Matter node.
- * @returns {Date|null} The last contact, or null when unknown.
- * @example
- * getStoredLastContact(node);
- */
-function getStoredLastContact(node) {
-  try {
-    const commissioning = (node.state && node.state.commissioning) || {};
-    const timestamps = [commissioning.onlineAt, commissioning.offlineAt].filter((value) => typeof value === 'number');
-    return timestamps.length > 0 ? new Date(Math.max(...timestamps)) : null;
-  } catch (e) {
-    return null;
-  }
-}
 
 /**
  * @description The connection state of a node as matter.js gives it (NodeStates).
@@ -51,13 +34,14 @@ function getConnectionState(node) {
 function getNodeStatus(nodeId, node) {
   const key = nodeId.toString();
   const unreachableDevicePaths = Array.from(this.unreachableDevicePaths.get(key) || []);
+  const lastContact = this.lastContacts.get(key) || null;
   const nodeStatus = this.nodeStatuses.get(key);
   if (nodeStatus) {
     return {
       status: nodeStatus.status,
       available: nodeStatus.available,
       since: nodeStatus.since,
-      last_contact: nodeStatus.last_contact,
+      last_contact: lastContact,
       unreachable_device_paths: unreachableDevicePaths,
     };
   }
@@ -67,7 +51,7 @@ function getNodeStatus(nodeId, node) {
     status,
     available: status === MATTER_NODE_STATUS.CONNECTED,
     since: null,
-    last_contact: node ? getStoredLastContact(node) : null,
+    last_contact: lastContact,
     unreachable_device_paths: unreachableDevicePaths,
   };
 }
@@ -98,12 +82,10 @@ function notifyNodeStatus(nodeId) {
  * grace delay, then becomes unavailable if it did not come back.
  * @param {bigint|string} nodeId - The node ID.
  * @param {number} state - The NodeStates value given by matter.js.
- * @param {Date|null} [storedLastContact] - The last contact remembered by matter.js, for a node seen
- * for the first time.
  * @example
  * matterHandler.setNodeStatus(1234n, 2);
  */
-function setNodeStatus(nodeId, state, storedLastContact = null) {
+function setNodeStatus(nodeId, state) {
   const key = nodeId.toString();
   const status = MATTER_NODE_STATUS_BY_STATE[state] || MATTER_NODE_STATUS.DISCONNECTED;
   const previous = this.nodeStatuses.get(key);
@@ -111,11 +93,13 @@ function setNodeStatus(nodeId, state, storedLastContact = null) {
     return;
   }
   const now = new Date();
-  let lastContact = previous ? previous.last_contact : storedLastContact;
   if (status === MATTER_NODE_STATUS.CONNECTED) {
-    lastContact = now;
+    this.lastContacts.set(key, now);
+  } else if (previous && previous.status === MATTER_NODE_STATUS.CONNECTED) {
+    // the node is lost: its last contact must survive a restart of Gladys
+    this.saveLastContacts();
   }
-  const nodeStatus = { status, since: now, last_contact: lastContact };
+  const nodeStatus = { status, since: now };
   nodeStatus.available = isNodeAvailable(nodeStatus, now.getTime());
   this.nodeStatuses.set(key, nodeStatus);
 
@@ -146,9 +130,50 @@ function setNodeStatus(nodeId, state, storedLastContact = null) {
  * matterHandler.touchNode(1234n);
  */
 function touchNode(nodeId) {
-  const nodeStatus = this.nodeStatuses.get(nodeId.toString());
-  if (nodeStatus) {
-    nodeStatus.last_contact = new Date();
+  const key = nodeId.toString();
+  if (this.nodeStatuses.has(key)) {
+    this.lastContacts.set(key, new Date());
+  }
+}
+
+/**
+ * @description Saves the last contact of each node, so that a node lost before Gladys restarts still
+ * shows when it was last heard of. Written when a node is lost and when the controller stops, never
+ * on each contact.
+ * @returns {Promise} Resolves once saved; a failure is only logged.
+ * @example
+ * await matterHandler.saveLastContacts();
+ */
+async function saveLastContacts() {
+  const lastContacts = {};
+  this.lastContacts.forEach((date, key) => {
+    lastContacts[key] = date.toISOString();
+  });
+  try {
+    await this.gladys.variable.setValue(VARIABLES.MATTER_LAST_CONTACTS, JSON.stringify(lastContacts), this.serviceId);
+  } catch (e) {
+    logger.warn(`Matter: Unable to save the last contact of the nodes: ${e}`);
+  }
+}
+
+/**
+ * @description Reads the last contact of each node saved before Gladys restarted.
+ * @example
+ * await matterHandler.loadLastContacts();
+ */
+async function loadLastContacts() {
+  try {
+    const saved = JSON.parse(
+      (await this.gladys.variable.getValue(VARIABLES.MATTER_LAST_CONTACTS, this.serviceId)) || '{}',
+    );
+    Object.keys(saved).forEach((key) => {
+      const date = new Date(saved[key]);
+      if (!this.lastContacts.has(key) && !Number.isNaN(date.getTime())) {
+        this.lastContacts.set(key, date);
+      }
+    });
+  } catch (e) {
+    logger.warn(`Matter: Unable to read the last contact of the nodes: ${e}`);
   }
 }
 
@@ -179,7 +204,8 @@ function setDeviceReachability(nodeId, devicePath, reachable) {
 }
 
 /**
- * @description Forgets the status of a node (decommissioned) or of all nodes (stopped, reset).
+ * @description Forgets the status of a node (decommissioned, its last contact too) or of all nodes
+ * (stopped: their last contact is kept for when the controller starts again).
  * @param {bigint|string} [nodeId] - The node ID, all nodes when missing.
  * @example
  * matterHandler.clearNodeStatuses();
@@ -197,17 +223,19 @@ function clearNodeStatuses(nodeId) {
   clearTimeout(this.nodeStatusTimers.get(key));
   this.nodeStatusTimers.delete(key);
   this.nodeStatuses.delete(key);
+  this.lastContacts.delete(key);
   this.unreachableDevicePaths.delete(key);
   this.bridgedDevices.delete(key);
 }
 
 module.exports = {
-  getStoredLastContact,
   getConnectionState,
   getNodeStatus,
   notifyNodeStatus,
   setNodeStatus,
   touchNode,
+  saveLastContacts,
+  loadLastContacts,
   setDeviceReachability,
   clearNodeStatuses,
 };

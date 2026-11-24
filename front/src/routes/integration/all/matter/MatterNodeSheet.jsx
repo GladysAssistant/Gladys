@@ -16,7 +16,7 @@ import {
 import MatterShareSheet from './MatterShareSheet';
 import { NodeStatusPill } from './MatterNodeList';
 import { UnavailableReason } from './MatterAvailability';
-import { getNetworkIcon, getNodeDisplayName } from './matterUtils';
+import { getNetworkIcon, getNodeDisplayName, getDeviceAvailability } from './matterUtils';
 import style from './style.css';
 
 const SIGNAL_TONES = {
@@ -234,30 +234,45 @@ class MatterNodeSheet extends Component {
     );
   }
 
-  renderDevices(details) {
+  renderDevices(details, status) {
+    // the availability follows the status of the node, kept live by the WebSocket
+    const nodesStatus = new Map([
+      [
+        details.node_id,
+        { available: status.available, unreachable_device_paths: status.unreachable_device_paths || [] }
+      ]
+    ]);
+    const getAvailability = device =>
+      device.device_path === undefined
+        ? { available: device.available, reason: device.unavailable_reason }
+        : getDeviceAvailability({ external_id: `matter:${details.node_id}:${device.device_path}` }, nodesStatus);
     return (
       <div>
         {details.gladys_devices.length > 0 && (
           <MobileGroup data-cy="matter-node-gladys-devices">
-            {details.gladys_devices.map(device => (
-              <MobileRow
-                key={device.selector}
-                icon="box"
-                title={device.name}
-                subtitle={!device.available && <UnavailableReason reason={device.unavailable_reason} />}
-                trailing={
-                  <MobilePill tone={device.available ? 'success' : 'danger'}>
-                    <Text
-                      id={
-                        device.available
-                          ? 'integration.matter.device.available'
-                          : 'integration.matter.device.unavailable'
-                      }
-                    />
-                  </MobilePill>
-                }
-              />
-            ))}
+            {details.gladys_devices.map(device => {
+              const availability = getAvailability(device);
+              return (
+                <MobileRow
+                  key={device.selector}
+                  icon="box"
+                  title={device.name}
+                  subtitle={!availability.available && <UnavailableReason reason={availability.reason} />}
+                  trailing={
+                    <MobilePill tone={availability.available ? 'success' : 'danger'}>
+                      <Text
+                        id={
+                          availability.available
+                            ? 'integration.matter.device.available'
+                            : 'integration.matter.device.unavailable'
+                        }
+                      />
+                    </MobilePill>
+                  }
+                  dataCy="matter-node-gladys-device"
+                />
+              );
+            })}
           </MobileGroup>
         )}
         {details.gladys_devices.length === 0 && (
@@ -266,25 +281,29 @@ class MatterNodeSheet extends Component {
           </MobileNotice>
         )}
         {details.bridged_devices.length > 0 && (
-          <div>
+          <div class={style.sheetSubsection}>
             <MobileSectionHeader title={<Text id="integration.matter.node.bridgedDevices" />} />
             <MobileGroup data-cy="matter-node-bridged-devices">
-              {details.bridged_devices.map(device => (
-                <MobileRow
-                  key={device.path}
-                  icon="link-2"
-                  title={device.name}
-                  trailing={
-                    <MobilePill tone={device.reachable ? 'success' : 'danger'}>
-                      <Text
-                        id={
-                          device.reachable ? 'integration.matter.node.reachable' : 'integration.matter.node.unreachable'
-                        }
-                      />
-                    </MobilePill>
-                  }
-                />
-              ))}
+              {details.bridged_devices.map(device => {
+                const reachable = status.unreachable_device_paths
+                  ? !status.unreachable_device_paths.includes(device.path)
+                  : device.reachable;
+                return (
+                  <MobileRow
+                    key={device.path}
+                    icon="link-2"
+                    title={device.name}
+                    trailing={
+                      <MobilePill tone={reachable ? 'success' : 'danger'}>
+                        <Text
+                          id={reachable ? 'integration.matter.node.reachable' : 'integration.matter.node.unreachable'}
+                        />
+                      </MobilePill>
+                    }
+                    dataCy="matter-node-bridged-device"
+                  />
+                );
+              })}
             </MobileGroup>
           </div>
         )}
@@ -412,7 +431,7 @@ class MatterNodeSheet extends Component {
             <div class={style.sheetBlock}>{this.renderControllers(details.controllers)}</div>
 
             <MobileSectionHeader title={<Text id="integration.matter.node.sections.devices" />} />
-            <div class={style.sheetBlock}>{this.renderDevices(details)}</div>
+            <div class={style.sheetBlock}>{this.renderDevices(details, status)}</div>
 
             <MobileSectionHeader title={<Text id="integration.matter.node.sections.actions" />} />
             {identifyResult && identifyResult.success && (
@@ -488,9 +507,9 @@ class MatterNodeSheet extends Component {
           dataCy="matter-node-remove-confirm"
           depth={1}
         >
-          <p>
+          <div class="mb-3">
             <MarkupText id="integration.matter.settings.decommission.confirmMessage" />
-          </p>
+          </div>
           {linkedDevices.length > 0 && (
             <div class="mb-3">
               <Text id="integration.matter.settings.decommission.linkedDevices" />

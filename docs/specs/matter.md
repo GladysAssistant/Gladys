@@ -71,7 +71,13 @@ A node is watched once. When matter.js gives a new object for the same node (con
 
 The grace delay keeps a renewed subscription, or a short glitch, from making the devices blink "unavailable". A timer makes the node unavailable if the same reconnection is still running when it ends.
 
-`last_contact` is the last time the node was heard of. For a node offline since Gladys started, it is the last time matter.js saw it online or going offline (`state.commissioning.onlineAt` / `offlineAt`).
+`last_contact` is the last time the node was heard of while connected: it became connected, or sent data. The values matter.js replays from its cache while the node is offline are no contact.
+
+The last contacts survive two restarts:
+- **Controller restart** (nightly backup): they are kept in memory when the controller stops.
+- **Gladys restart**: they are saved in the service variable `MATTER_LAST_CONTACTS` (`{ nodeId: ISO date }`). It is written when a node is lost (connected → any other status) and when the controller stops, never on each contact, and read when the controller starts.
+
+A decommission forgets the last contact of the node; a reset deletes the variable. (matter.js 0.17.9 declares `state.commissioning.onlineAt` / `offlineAt` but never fills them.)
 
 ### B.2 Bridged devices
 
@@ -166,7 +172,7 @@ An error that is not a `400`/`404` is sent as an `Error500` with its message, so
   - `vendor_name` names Apple, Google, Amazon and Samsung SmartThings by their vendor id.
   - `is_gladys` comes from `currentFabricIndex`.
   - The field is `null` while the node is offline: the fabrics are always read from the node.
-- `gladys_devices`: `{ name, selector, available, unavailable_reason }`. `bridged_devices`: `{ path, name, reachable }`.
+- `gladys_devices`: `{ name, selector, device_path, available, unavailable_reason }` (the front recomputes the availability live from the WebSocket). `bridged_devices`: `{ path, name, reachable }`.
 - `capabilities`: `identify` (an endpoint has `Identify`) and `share` (the root endpoint has `AdministratorCommissioning`).
 
 ## D. Front

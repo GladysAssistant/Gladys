@@ -17,7 +17,12 @@ describe('Matter.getNodes', () => {
         getAllKeys: fake.returns(['id-1', 'id-2']),
         get: (entity, id) =>
           ({
-            'id-1': { name: 'Kitchen plug', selector: 'kitchen-plug', external_id: 'matter:1234:1' },
+            'id-1': {
+              name: 'Kitchen plug',
+              selector: 'kitchen-plug',
+              external_id: 'matter:1234:1',
+              features: [{ last_value_changed: '2026-11-24T09:00:00.000Z' }],
+            },
             'id-2': { name: 'Other node', selector: 'other-node', external_id: 'matter:12345:1' },
           }[id]),
       },
@@ -139,12 +144,8 @@ describe('Matter.getNodes', () => {
     setupController();
     const since = new Date('2026-11-24T10:00:00.000Z');
     const lastContact = new Date('2026-11-24T10:05:00.000Z');
-    matterHandler.nodeStatuses.set('1234', {
-      status: 'disconnected',
-      since,
-      last_contact: lastContact,
-      available: false,
-    });
+    matterHandler.nodeStatuses.set('1234', { status: 'disconnected', since, available: false });
+    matterHandler.lastContacts.set('1234', lastContact);
     matterHandler.unreachableDevicePaths.set('1234', new Set(['1:child_endpoint:2']));
     matterHandler.commissioningController.getNode = fake.returns({
       isConnected: false,

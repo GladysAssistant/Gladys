@@ -153,7 +153,7 @@ class MatterSettingsPage extends Component {
               ...node,
               status: payload.status,
               available: payload.available,
-              last_contact: payload.last_contact,
+              last_contact: payload.last_contact || node.last_contact,
               unreachable_device_paths: payload.unreachable_device_paths
             }
           : node

@@ -61,7 +61,10 @@ describe('Matter.reset', () => {
     await matterHandler.reset();
 
     assert.calledOnce(matterHandler.stop);
-    assert.calledOnceWithExactly(gladys.variable.destroy, 'MATTER_BACKUP', 'service-1');
+    assert.calledTwice(gladys.variable.destroy);
+    assert.calledWithExactly(gladys.variable.destroy, 'MATTER_BACKUP', 'service-1');
+    assert.calledWithExactly(gladys.variable.destroy, 'MATTER_LAST_CONTACTS', 'service-1');
+    expect(matterHandler.lastContacts.size).to.equal(0);
     assert.calledOnceWithExactly(gladys.variable.setValue, 'MATTER_ENABLED', 'false', 'service-1');
 
     // Verify directory was deleted

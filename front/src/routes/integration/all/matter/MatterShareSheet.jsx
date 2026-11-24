@@ -76,9 +76,9 @@ class MatterShareSheet extends Component {
         )}
         {share && !expired && (
           <div class={style.shareContent}>
-            <p class="text-muted">
+            <div class="text-muted mb-3">
               <MarkupText id="integration.matter.node.share.description" />
-            </p>
+            </div>
             {qrCodeDataUrl && (
               <img
                 class={style.shareQrCode}

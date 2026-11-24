@@ -13,6 +13,9 @@ describe('Matter.stop', () => {
       job: {
         wrapper: fake.returns(null),
       },
+      variable: {
+        setValue: fake.resolves(null),
+      },
     };
     const MatterMain = {};
     const ProjectChipMatter = {};
@@ -38,7 +41,16 @@ describe('Matter.stop', () => {
     matterHandler.nodeStatusTimers.set('1234', timer);
     matterHandler.unreachableDevicePaths.set('1234', new Set(['1:child_endpoint:3']));
     matterHandler.bridgedDevices.set('1234', new Map([['1:child_endpoint:3', 'Lamp']]));
+    matterHandler.lastContacts.set('1234', new Date('2026-11-24T10:00:00.000Z'));
     await matterHandler.stop();
+    // the last contacts are saved, and kept for when the controller starts again
+    assert.calledOnceWithExactly(
+      matterHandler.gladys.variable.setValue,
+      'MATTER_LAST_CONTACTS',
+      JSON.stringify({ 1234: '2026-11-24T10:00:00.000Z' }),
+      'service-1',
+    );
+    expect(matterHandler.lastContacts.size).to.equal(1);
     assert.calledOnce(unsubscribe);
     expect(matterHandler.watchedNodes.size).to.equal(0);
     expect(matterHandler.nodeStatuses.size).to.equal(0);
