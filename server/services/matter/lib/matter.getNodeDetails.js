@@ -48,15 +48,18 @@ async function readAttribute(clusterClient, attributeName, { remote = true, fabr
   const timeout = new Promise((resolve) => {
     timeoutId = setTimeout(() => resolve(undefined), MATTER_NODE_READ_TIMEOUT_MS);
   });
-  try {
-    const value = await Promise.race([clusterClient.attributes[attributeName].get(remote, fabricFiltered), timeout]);
-    clearTimeout(timeoutId);
-    return value;
-  } catch (e) {
-    clearTimeout(timeoutId);
-    logger.debug(`Matter: Unable to read ${clusterClient.name}.${attributeName}: ${e}`);
-    return undefined;
-  }
+  // the read handles its own failure: one coming after the timeout won the race is caught too
+  const read = (async () => {
+    try {
+      return await clusterClient.attributes[attributeName].get(remote, fabricFiltered);
+    } catch (e) {
+      logger.debug(`Matter: Unable to read ${clusterClient.name}.${attributeName}: ${e}`);
+      return undefined;
+    }
+  })();
+  const value = await Promise.race([read, timeout]);
+  clearTimeout(timeoutId);
+  return value;
 }
 
 /**

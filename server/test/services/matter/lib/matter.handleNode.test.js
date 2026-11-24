@@ -1,5 +1,5 @@
 const sinon = require('sinon').createSandbox();
-const { expect } = require('chai');
+const { expect, assert: chaiAssert } = require('chai');
 
 const { fake, assert } = sinon;
 
@@ -135,6 +135,26 @@ describe('Matter.handleNode', () => {
     expect(Array.from(matterHandler.bridgedDevices.get('1234').values())).to.deep.equal(['3', '4']);
     // no reachable attribute: no listener
     assert.notCalled(information.addReachableAttributeListener);
+  });
+
+  it('should keep the devices already discovered when a later endpoint fails', async () => {
+    const failingInformation = bridgedInformation({ nodeLabel: { get: fake.rejects(new Error('read failed')) } });
+    const plug = endpoint(1, [0x010a]);
+    const failing = endpoint(2, [0x0100], [failingInformation, onOffClusterClient()]);
+    const node = { isConnected: true, connectionState: 0, getDevices: () => [plug, failing] };
+    matterHandler.commissioningController = { getNode: fake.resolves(node) };
+    await chaiAssert.isRejected(
+      matterHandler.handleNode({ nodeId: 1234n, deviceData: { basicInformation: { nodeLabel: 'Plug' } } }),
+      'read failed',
+    );
+    expect(matterHandler.devices.map((device) => device.external_id)).to.deep.equal(['matter:1234:1']);
+    expect(matterHandler.devices[0].matter_naming).to.deep.equal({
+      product: 'Plug',
+      role: 'outlet',
+      index: 1,
+      count: 1,
+      alone: true,
+    });
   });
 
   it('should keep handling a bridged device whose reachability can not be read', async () => {

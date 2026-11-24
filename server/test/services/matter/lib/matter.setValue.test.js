@@ -70,6 +70,28 @@ describe('Matter.setValue', () => {
     assert.notCalled(onOff.on);
   });
 
+  it('should refuse a command to a bridged device reported unreachable while the node was connecting', async () => {
+    const onOff = { on: fake.resolves(null) };
+    const bridgedDevice = {
+      number: 3,
+      getClusterClientById: () => onOff,
+      getChildEndpoints: () => [],
+    };
+    const node = {
+      ...createDisconnectedNode(),
+      getDevices: fake.returns([{ number: 1, getChildEndpoints: () => [bridgedDevice] }]),
+    };
+    node.connect = () => {
+      // the bridge reports the device unreachable as the node connects
+      matterHandler.unreachableDevicePaths.set('12345', new Set(['1:child_endpoint:3']));
+      node.isConnected = true;
+    };
+    matterHandler.nodesMap.set(12345n, node);
+    const promise = matterHandler.setValue({ external_id: 'matter:12345:1:child_endpoint:3' }, { type: 'binary' }, 1);
+    await chaiAssert.isRejected(promise, 'Matter: Device 1:child_endpoint:3 of node 12345 is unreachable');
+    assert.notCalled(onOff.on);
+  });
+
   it('should turn on a binary device', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1',

@@ -8,7 +8,8 @@ import {
   MobileEmptyState,
   BigButton
 } from '../../../../components/mobile';
-import { UnavailablePill } from './MatterAvailability';
+import { UnavailablePill, UnavailableReason } from './MatterAvailability';
+import { UNAVAILABLE_REASONS } from './matterUtils';
 import {
   MobileIntegrationTab,
   MobileListToolbar,
@@ -61,7 +62,16 @@ const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
           </MobilePill>
         )
       }
-      notices={
+      notices={[
+        availability && availability.available === false && (
+          <MobileNotice
+            tone="danger"
+            icon={availability.reason === UNAVAILABLE_REASONS.BRIDGED_UNREACHABLE ? 'link-2' : 'wifi-off'}
+            data-cy="matter-paired-device-unavailable-reason"
+          >
+            <UnavailableReason reason={availability.reason} />
+          </MobileNotice>
+        ),
         (isNodeIdChanged || isUpdate) && (
           <MobileNotice icon="info">
             <Text
@@ -73,7 +83,7 @@ const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
             />
           </MobileNotice>
         )
-      }
+      ]}
       showFeatures={hasFeatures}
       saveError={
         pairedError && (

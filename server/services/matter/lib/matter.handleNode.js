@@ -194,12 +194,17 @@ async function handleNode(nodeDetail) {
   // the devices of this node only: several nodes are handled at the same time (refreshDevices)
   const nodeDevices = [];
   const context = { matterHandler: this, nodeId: nodeDetail.nodeId, devices: nodeDevices };
-  await Promise.each(node.getDevices(), async (device) => {
-    logger.debug(`Matter: Handling device ${device.number}`);
-    await handleDevice(context, device, nodeInformations, '');
-  });
-  completeNamingHints(nodeDevices);
-  this.devices.push(...nodeDevices);
+  try {
+    await Promise.each(node.getDevices(), async (device) => {
+      logger.debug(`Matter: Handling device ${device.number}`);
+      await handleDevice(context, device, nodeInformations, '');
+    });
+  } finally {
+    // an endpoint which fails (a bridged device that can not be read) does not hide the devices
+    // already discovered on this node; the error still goes up to the caller
+    completeNamingHints(nodeDevices);
+    this.devices.push(...nodeDevices);
+  }
   logger.info(
     `Matter: Node ${nodeDetail.nodeId} handled, ${nodeDevices.length} device(s) with features (${
       isConnected ? 'connected' : 'offline'

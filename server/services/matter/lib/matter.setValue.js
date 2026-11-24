@@ -97,11 +97,14 @@ async function setValue(gladysDevice, gladysFeature, value) {
   }
 
   // A bridge which says it can not reach the bridged device would only answer with an error
-  const unreachableDevicePaths = this.unreachableDevicePaths.get(nodeId.toString()) || new Set();
   const targetPath = devicePath.join(':');
-  if (Array.from(unreachableDevicePaths).some((unreachablePath) => isDevicePathUnder(targetPath, unreachablePath))) {
-    throw new Error(`Matter: Device ${targetPath} of node ${nodeId} is unreachable, the command could not be sent`);
-  }
+  const assertTargetReachable = () => {
+    const unreachableDevicePaths = this.unreachableDevicePaths.get(nodeId.toString()) || new Set();
+    if (Array.from(unreachableDevicePaths).some((unreachablePath) => isDevicePathUnder(targetPath, unreachablePath))) {
+      throw new Error(`Matter: Device ${targetPath} of node ${nodeId} is unreachable, the command could not be sent`);
+    }
+  };
+  assertTargetReachable();
 
   // Connect if not already connected
   // (bounded wait, so that an offline node never blocks the action or the scene forever)
@@ -109,6 +112,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
   if (!isConnected) {
     throw new Error(`Matter: Node ${nodeId} is unreachable, the command could not be sent`);
   }
+  // the bridge may have reported the device unreachable while the node was connecting
+  assertTargetReachable();
 
   // Handle binary device (a switch, or the on/off of a light: both are the "binary" type)
   // Locks share the same "binary" type, but they are controlled through the DoorLock cluster below

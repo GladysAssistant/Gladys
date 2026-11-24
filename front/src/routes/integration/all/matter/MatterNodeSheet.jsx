@@ -75,49 +75,71 @@ class MatterNodeSheet extends Component {
     }
   }
 
+  // Every opening of the sheet (another node, or the same one again) is a new selection: an answer
+  // to a request sent for an earlier selection is ignored
+  selection = 0;
+
+  isCurrent = selection => selection === this.selection;
+
   loadDetails = async () => {
+    this.selection += 1;
+    const selection = this.selection;
     const { nodeId } = this.props;
     this.setState({
       details: null,
       loading: true,
       error: null,
+      identifying: false,
       identifyResult: null,
       share: null,
+      shareLoading: false,
       shareError: null,
       shareOpen: false,
       confirmRemove: false
     });
     try {
       const details = await this.props.httpClient.get(`/api/v1/service/matter/node/${nodeId}`);
-      // the user may have opened another node meanwhile
-      if (this.props.nodeId === nodeId) {
+      if (this.isCurrent(selection)) {
         this.setState({ details, loading: false });
       }
     } catch (e) {
       console.error(e);
-      this.setState({ loading: false, error: getErrorMessage(e) || true });
+      if (this.isCurrent(selection)) {
+        this.setState({ loading: false, error: getErrorMessage(e) || true });
+      }
     }
   };
 
   identify = async () => {
+    const { selection } = this;
     this.setState({ identifying: true, identifyResult: null });
     try {
       await this.props.httpClient.post(`/api/v1/service/matter/node/${this.props.nodeId}/identify`);
-      this.setState({ identifying: false, identifyResult: { success: true } });
+      if (this.isCurrent(selection)) {
+        this.setState({ identifying: false, identifyResult: { success: true } });
+      }
     } catch (e) {
       console.error(e);
-      this.setState({ identifying: false, identifyResult: { success: false, message: getErrorMessage(e) } });
+      if (this.isCurrent(selection)) {
+        this.setState({ identifying: false, identifyResult: { success: false, message: getErrorMessage(e) } });
+      }
     }
   };
 
   share = async () => {
+    const { selection } = this;
     this.setState({ shareOpen: true, shareLoading: true, share: null, shareError: null });
     try {
       const share = await this.props.httpClient.post(`/api/v1/service/matter/node/${this.props.nodeId}/share`);
-      this.setState({ share, shareLoading: false });
+      if (this.isCurrent(selection)) {
+        this.setState({ share, shareLoading: false });
+      }
     } catch (e) {
       console.error(e);
-      this.setState({ shareLoading: false, shareError: getErrorMessage(e) || '' });
+      if (this.isCurrent(selection)) {
+        // the generic notice shows even when Gladys gives no message
+        this.setState({ shareLoading: false, shareError: getErrorMessage(e) || true });
+      }
     }
   };
 

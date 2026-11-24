@@ -303,6 +303,30 @@ describe('Matter.getNodeDetails', () => {
       expect(await promise).to.equal(undefined);
     });
 
+    it('should catch a read which fails after the timeout won', async () => {
+      let rejectRead;
+      const get = fake(
+        () =>
+          new Promise((resolve, reject) => {
+            rejectRead = reject;
+          }),
+      );
+      const promise = readAttribute({ name: 'Slow', attributes: { value: { get } } }, 'value');
+      await clock.tickAsync(5000);
+      expect(await promise).to.equal(undefined);
+      // the late failure is handled by the read itself (mocha fails a test on an unhandled rejection)
+      rejectRead(new Error('timeout of the node'));
+      await clock.tickAsync(0);
+      sinon.assert.calledOnce(get);
+    });
+
+    it('should give undefined for an attribute whose read throws at once', async () => {
+      const get = () => {
+        throw new Error('not readable');
+      };
+      expect(await readAttribute({ name: 'Broken', attributes: { value: { get } } }, 'value')).to.equal(undefined);
+    });
+
     it('should give undefined for a missing cluster or attribute', async () => {
       expect(await readAttribute(undefined, 'value')).to.equal(undefined);
       expect(await readAttribute({ attributes: {} }, 'value')).to.equal(undefined);

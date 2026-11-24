@@ -69,9 +69,11 @@ class MatterShareSheet extends Component {
         {error && (
           <MobileNotice tone="danger" icon="alert-circle" data-cy="matter-share-error">
             <Text id="integration.matter.node.share.error" />
-            <div>
-              <small>{error}</small>
-            </div>
+            {typeof error === 'string' && (
+              <div>
+                <small>{error}</small>
+              </div>
+            )}
           </MobileNotice>
         )}
         {share && !expired && (

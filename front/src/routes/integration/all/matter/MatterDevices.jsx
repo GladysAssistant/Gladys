@@ -22,6 +22,7 @@ import { UnavailableTag } from './MatterAvailability';
 import {
   applyNodeStatus,
   buildNodesStatus,
+  createStatusEventsTracker,
   getDeviceAvailability,
   keepFeatureNames,
   nameNewDevice,
@@ -144,6 +145,8 @@ const replaceGladysDeviceWithPairedDevice = (gladysDevice, pairedDevice, diction
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
+    // the status messages received while the nodes are requested win over the answer
+    this.statusEvents = createStatusEventsTracker();
     this.state = {
       search: '',
       orderDir: 'asc',
@@ -210,6 +213,7 @@ class MatterDevices extends Component {
   }
 
   handleNodeStatusChanged = payload => {
+    this.statusEvents.record(payload);
     this.setState(prevState => ({ nodesStatus: applyNodeStatus(prevState.nodesStatus, payload) }));
   };
 
@@ -313,9 +317,11 @@ class MatterDevices extends Component {
 
   getNodes = async () => {
     try {
-      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node');
+      const { result: nodes, events } = await this.statusEvents.during(() =>
+        this.props.httpClient.get('/api/v1/service/matter/node')
+      );
       this.setState({
-        nodesStatus: buildNodesStatus(nodes)
+        nodesStatus: events.reduce(applyNodeStatus, buildNodesStatus(nodes))
       });
     } catch (e) {
       console.error(e);

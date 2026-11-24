@@ -11,7 +11,7 @@ import MatterExpertTree from './MatterExpertTree';
 import { MobileSwitch } from '../../../../components/mobile';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
-import { getNodeDisplayName } from './matterUtils';
+import { applyNodeStatusToNodes, createStatusEventsTracker, getNodeDisplayName } from './matterUtils';
 
 // The expert mode (the endpoint and cluster tree) is a convenience of this browser only
 const EXPERT_MODE_STORAGE_KEY = 'matter-settings-expert-mode';
@@ -108,6 +108,8 @@ class MatterSettingsPage extends Component {
   constructor(props) {
     super(props);
     this.decommissionsInProgress = new Set();
+    // the status messages received while the nodes are requested win over the answer
+    this.statusEvents = createStatusEventsTracker();
     this.state = {
       matterEnabled: null,
       loading: true,
@@ -146,19 +148,8 @@ class MatterSettingsPage extends Component {
 
   // the status of a node, live: the list and the open sheet follow it
   handleNodeStatusChanged = payload => {
-    this.setState(prevState => ({
-      nodes: prevState.nodes.map(node =>
-        node.node_id === payload.node_id
-          ? {
-              ...node,
-              status: payload.status,
-              available: payload.available,
-              last_contact: payload.last_contact || node.last_contact,
-              unreachable_device_paths: payload.unreachable_device_paths
-            }
-          : node
-      )
-    }));
+    this.statusEvents.record(payload);
+    this.setState(prevState => ({ nodes: applyNodeStatusToNodes(prevState.nodes, payload) }));
   };
 
   getNodeName = node => getNodeDisplayName(node, get(this.props, 'intl.dictionary'));
@@ -229,7 +220,10 @@ class MatterSettingsPage extends Component {
       if (this.state.expertMode) {
         query.with_clusters = true;
       }
-      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node', query);
+      const { result, events } = await this.statusEvents.during(() =>
+        this.props.httpClient.get('/api/v1/service/matter/node', query)
+      );
+      const nodes = events.reduce(applyNodeStatusToNodes, result);
 
       // Initialize all devices as collapsed
       const collapsedDevices = {};

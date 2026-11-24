@@ -59,6 +59,54 @@ export const applyNodeStatus = (nodesStatus, payload) => {
 };
 
 /**
+ * @description The nodes of the settings page, with the status a WebSocket message brings for one of
+ * them; every other field of the node is kept.
+ * @param {Array} nodes - The nodes (GET /node).
+ * @param {object} payload - The payload of `matter.node-status-changed`.
+ * @returns {Array} A new array.
+ * @example
+ * applyNodeStatusToNodes(nodes, { node_id: '1', status: 'disconnected', available: false });
+ */
+export const applyNodeStatusToNodes = (nodes, payload) =>
+  nodes.map(node =>
+    node.node_id === payload.node_id
+      ? {
+          ...node,
+          status: payload.status,
+          available: payload.available,
+          last_contact: payload.last_contact || node.last_contact,
+          unreachable_device_paths: payload.unreachable_device_paths || []
+        }
+      : node
+  );
+
+/**
+ * @description Follows the status messages received while a list of nodes is requested: they are
+ * newer than its answer, which must not overwrite them.
+ * @returns {object} { record(payload), during(request) }: `during` resolves to the answer of the
+ * request and the latest message of each node received meanwhile.
+ * @example
+ * const statusEvents = createStatusEventsTracker();
+ * const { result, events } = await statusEvents.during(() => httpClient.get('/api/v1/service/matter/node'));
+ */
+export const createStatusEventsTracker = () => {
+  const pending = new Set();
+  return {
+    record: payload => pending.forEach(events => events.set(payload.node_id, payload)),
+    during: async request => {
+      const events = new Map();
+      pending.add(events);
+      try {
+        const result = await request();
+        return { result, events: Array.from(events.values()) };
+      } finally {
+        pending.delete(events);
+      }
+    }
+  };
+};
+
+/**
  * @description Whether a Matter device is available: its node answers, and its bridge (if any) can
  * reach it. Null when the status of its node is not known yet (nothing is shown then).
  * @param {object} device - The Gladys (or paired) device.

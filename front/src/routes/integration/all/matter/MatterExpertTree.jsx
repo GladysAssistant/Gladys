@@ -18,7 +18,13 @@ const DeviceDisplay = ({
 
   return (
     <div class={cx('mb-4', { 'ml-4': level > 0 })}>
-      <div class="d-flex align-items-center cursor-pointer mb-3" onClick={() => toggleDevice(devicePath)}>
+      <button
+        type="button"
+        class="btn btn-link text-reset text-decoration-none p-0 d-flex align-items-center mb-3"
+        aria-expanded={!isCollapsed}
+        onClick={() => toggleDevice(devicePath)}
+        data-cy="matter-expert-endpoint-toggle"
+      >
         <i
           class={cx('fe mr-2', {
             'fe-chevron-right': isCollapsed,
@@ -33,7 +39,7 @@ const DeviceDisplay = ({
           )}
           <Text id="integration.matter.settings.node.device" fields={{ name: device.name, number: device.number }} />
         </h6>
-      </div>
+      </button>
 
       {!isCollapsed && (
         <>
