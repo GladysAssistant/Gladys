@@ -2776,6 +2776,7 @@
         "added": "Zu Gladys hinzugefügt",
         "alreadyInGladys": "Bereits in Gladys",
         "openDevice": "Gerät öffnen",
+        "more": "Das Anlernen ist noch erlaubt: Versetze ein weiteres Gerät in den Anlernmodus, um es ebenfalls hinzuzufügen.",
         "toAdd": {
           "one": "1 bereites Gerät ist noch nicht hinzugefügt: Es bleibt hier, bis du es hinzufügst.",
           "other": "{{count}} bereite Geräte sind noch nicht hinzugefügt: Sie bleiben hier, bis du sie hinzufügst."

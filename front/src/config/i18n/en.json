@@ -2532,6 +2532,7 @@
         "added": "Added to Gladys",
         "alreadyInGladys": "Already in Gladys",
         "openDevice": "Open the device",
+        "more": "Joining is still permitted: put another device in pairing mode to add it too.",
         "toAdd": {
           "one": "1 ready device is not added yet: it stays here until you add it.",
           "other": "{{count}} ready devices are not added yet: they stay here until you add them."

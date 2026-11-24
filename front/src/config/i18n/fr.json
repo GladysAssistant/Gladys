@@ -2909,6 +2909,7 @@
         "added": "Ajouté à Gladys",
         "alreadyInGladys": "Déjà dans Gladys",
         "openDevice": "Ouvrir l'appareil",
+        "more": "L'appairage est toujours autorisé : mettez un autre appareil en mode appairage pour l'ajouter aussi.",
         "toAdd": {
           "one": "1 appareil prêt n'est pas encore ajouté : il reste ici jusqu'à ce que vous l'ajoutiez.",
           "other": "{{count}} appareils prêts ne sont pas encore ajoutés : ils restent ici jusqu'à ce que vous les ajoutiez."

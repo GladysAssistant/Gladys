@@ -236,6 +236,8 @@ describe('Zigbee2mqtt pairing window', () => {
 
       sendPairing([atStep(readyBulb, 'joined')]);
       cy.get('[data-cy=z2m-pairing-tips]').should('not.exist');
+      // The tips gone, the window still tells more devices can join
+      cy.get('[data-cy=z2m-pairing-more]').i18n(`${T}.more`);
       cy.get('[data-cy=z2m-pairing-row]').should('have.attr', 'data-status', 'joined');
       cy.get('[data-cy=z2m-pairing-row]').should('contain', readyBulb.ieee_address);
 

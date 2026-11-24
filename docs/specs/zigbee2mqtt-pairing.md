@@ -174,7 +174,8 @@ device".
   confirmed while joining is already closed failed in nothing. Each click is an attempt: the answer of
   an earlier one, still running after its 10 s, touches neither the wait nor the outcome of the last.
   In the demo, the answer of the request is enough. Without a known end, no countdown.
-- **Tips** (approach, pairing mode, add it here) while the registry is empty.
+- **Tips** (approach, pairing mode, add it here) while the registry is empty; once a device is listed, while
+  joining is permitted, a line under the rows says another device can be put in pairing mode.
 - **One row per entry**, a timeline "Joined → Identification → Ready" (the last step reads "Not supported"
   for an `unsupported` entry; each step also tells its state —
   done, in progress, failed, not supported, to come — in a text for screen readers, told as it changes:

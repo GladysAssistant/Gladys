@@ -2532,6 +2532,7 @@
         "added": "Añadido a Gladys",
         "alreadyInGladys": "Ya está en Gladys",
         "openDevice": "Abrir el dispositivo",
+        "more": "El emparejamiento sigue permitido: pon otro dispositivo en modo emparejamiento para añadirlo también.",
         "toAdd": {
           "one": "1 dispositivo listo aún no se ha añadido: se queda aquí hasta que lo añadas.",
           "other": "{{count}} dispositivos listos aún no se han añadido: se quedan aquí hasta que los añadas."

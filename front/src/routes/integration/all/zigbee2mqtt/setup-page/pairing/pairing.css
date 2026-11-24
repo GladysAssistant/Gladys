@@ -156,6 +156,11 @@
 
 /* ---------- under the rows ---------- */
 
+.more {
+  margin: 12px 0 0;
+  color: #495057;
+}
+
 .toAdd {
   margin-top: 12px;
 }

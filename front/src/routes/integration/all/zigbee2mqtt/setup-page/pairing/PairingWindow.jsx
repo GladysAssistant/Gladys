@@ -790,7 +790,7 @@ class PairingWindow extends Component {
       );
     }).length;
 
-  render({ isMobile, online }, { entries, loadError }) {
+  render({ isMobile, online }, { entries, loadError, allowed }) {
     const empty = entries.length === 0;
     const toAdd = this.countToAdd();
     return (
@@ -808,6 +808,12 @@ class PairingWindow extends Component {
           ) : (
             <ul class={style.rows}>{entries.map(this.renderDesktopRow)}</ul>
           ))}
+        {/* The tips are gone once a device joined: more can still be paired */}
+        {!empty && online && allowed && (
+          <p class={style.more} data-cy="z2m-pairing-more">
+            <Text id={`${T}.more`} />
+          </p>
+        )}
         {toAdd > 0 &&
           (isMobile ? (
             <MobileNotice icon="info" role="status" class={style.toAdd} data-cy="z2m-pairing-to-add">
