@@ -91,6 +91,16 @@ describe('zigbee2mqtt updatePermitJoin', () => {
     });
   });
 
+  it('should keep the ready devices not in Gladys when joining opens again', () => {
+    zigbee2MqttManager.getDiscoveredDevices = fake.returns([{ name: 'to add', ieee_address: '0x01' }]);
+    zigbee2MqttManager.pairingDevices = {
+      '0x01': { ieee_address: '0x01', status: 'ready' },
+      '0x02': { ieee_address: '0x02', status: 'left' },
+    };
+    zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
+    expect(Object.keys(zigbee2MqttManager.pairingDevices)).to.deep.equal(['0x01']);
+  });
+
   it('should keep the devices seen joining when the window Gladys forgot is told again (reconnection, init)', () => {
     zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
     zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
@@ -100,7 +110,8 @@ describe('zigbee2mqtt updatePermitJoin', () => {
     zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
     expect(zigbee2MqttManager.z2mPermitJoin).to.equal(true);
     expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');
-    // Closed by Zigbee2mqtt, then another window
+    // Closed by Zigbee2mqtt, then another window: the device added to Gladys meanwhile is forgotten
+    zigbee2MqttManager.getDiscoveredDevices = fake.returns([{ id: 'device-id', ieee_address: '0x01' }]);
     zigbee2MqttManager.updatePermitJoin(false);
     zigbee2MqttManager.updatePermitJoin(true, NOW + 254000);
     expect(zigbee2MqttManager.pairingDevices).to.deep.equal({});
@@ -155,7 +166,7 @@ describe('zigbee2mqtt updatePermitJoin', () => {
 
   it('should keep the devices seen joining when a window without any end is told again after an init (Zigbee2mqtt 1)', () => {
     zigbee2MqttManager.updatePermitJoin(true, undefined);
-    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'ready' } };
+    zigbee2MqttManager.pairingDevices = { '0x01': { ieee_address: '0x01', status: 'unsupported' } };
     zigbee2MqttManager.updatePermitJoin(false, null, { forgotten: true });
     zigbee2MqttManager.updatePermitJoin(true, undefined);
     expect(zigbee2MqttManager.pairingDevices).to.have.property('0x01');

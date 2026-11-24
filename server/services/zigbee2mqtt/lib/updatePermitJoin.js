@@ -78,8 +78,9 @@ function updatePermitJoin(allowed, end, options = {}) {
   if (allowed) {
     this.lastPermitJoinEnd = permitJoinEnd;
   }
+  // A new window: the devices of the previous one forgotten, but those ready and not added yet
   if (opened) {
-    this.clearPairingDevices();
+    this.clearPairingDevices(true);
   }
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,

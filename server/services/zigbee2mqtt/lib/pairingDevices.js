@@ -80,15 +80,29 @@ function emitPairingDevices(entries = this.getPairingDevices()) {
 }
 
 /**
- * @description Forget the devices seen joining (joining opens again, Gladys disconnects), and tell it.
+ * @description Forget the devices seen joining (joining opens again, Gladys disconnects), and tell it. A new window
+ * keeps the ready devices not in Gladys yet: the user may not have added them before it opened (C.2).
+ * @param {boolean} [keepDevicesToAdd] - Whether the ready devices not in Gladys are kept.
  * @example
- * clearPairingDevices();
+ * clearPairingDevices(true);
  */
-function clearPairingDevices() {
-  if (Object.keys(this.pairingDevices).length === 0) {
+function clearPairingDevices(keepDevicesToAdd = false) {
+  const kept = new Set(
+    keepDevicesToAdd
+      ? this.getPairingDevices()
+          .filter((entry) => entry.status === PAIRING_STATUS.READY && !(entry.device && entry.device.id !== undefined))
+          .map((entry) => entry.ieee_address)
+      : [],
+  );
+  const ieeeAddresses = Object.keys(this.pairingDevices);
+  if (ieeeAddresses.length === kept.size) {
     return;
   }
-  this.pairingDevices = {};
+  ieeeAddresses.forEach((ieeeAddress) => {
+    if (!kept.has(ieeeAddress)) {
+      delete this.pairingDevices[ieeeAddress];
+    }
+  });
   this.emitPairingDevices();
 }
 

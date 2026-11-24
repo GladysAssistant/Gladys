@@ -219,6 +219,38 @@ describe('zigbee2mqtt pairingDevices', () => {
       zigbee2MqttManager.clearPairingDevices();
       assert.notCalled(gladys.event.emit);
     });
+
+    it('should keep the ready devices not in Gladys when asked, in their order', () => {
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([
+        { name: 'in gladys', id: 'device-id', ieee_address: '0x01' },
+        { name: 'to add', ieee_address: '0x03' },
+      ]);
+      const ready = { status: 'successful', supported: true, definition };
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_interview', data: { ieee_address: '0x04', ...ready } });
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_interview', data: { ieee_address: '0x01', ...ready } });
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { ieee_address: '0x02' } });
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_interview', data: { ieee_address: '0x03', ...ready } });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: '0x05', status: 'failed' },
+      });
+      zigbee2MqttManager.clearPairingDevices(true);
+      // Not discovered yet (0x04) is not in Gladys either
+      expect(Object.keys(zigbee2MqttManager.pairingDevices)).to.deep.equal(['0x04', '0x03']);
+      expect(lastSent().map((entry) => entry.ieee_address)).to.deep.equal(['0x04', '0x03']);
+      expect(lastSent()[1].device).to.deep.equal({ name: 'to add', ieee_address: '0x03' });
+    });
+
+    it('should tell nothing when every device is kept', () => {
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: '0x42', status: 'successful', supported: true, definition },
+      });
+      gladys.event.emit = fake();
+      zigbee2MqttManager.clearPairingDevices(true);
+      expect(zigbee2MqttManager.pairingDevices).to.have.property('0x42');
+      assert.notCalled(gladys.event.emit);
+    });
   });
 
   describe('updatePairingFromList', () => {

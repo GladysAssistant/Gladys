@@ -89,7 +89,7 @@ renews the current window for 254 s ("Extend", D): the same window (B.1), the re
 ### C.1 Entry
 
 The server keeps `pairingDevices`, by IEEE address, the devices seen joining since joining last
-opened:
+opened, and the ready ones of earlier windows not added to Gladys yet:
 
 | Field          | Content                                                                                                                                       |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -112,7 +112,7 @@ opened:
 | `device_leave`                                | —                       | `left`                    | removed (`left`: unchanged)        |
 | `bridge/devices`                              | —                       | name updated; the device listed with its interview finished (`interview_completed`, not `interviewing`): `ready` or `unsupported` as `device_interview` `successful` | name updated; `device` computed again (`ready`) |
 | `bridge/devices` without the device (removed from Zigbee2mqtt) | —      | removed                   | removed, but `left` (no longer listed since it left) |
-| a new window opens (`allowed` false → true, not the same window, B.1) | registry emptied | emptied | emptied |
+| a new window opens (`allowed` false → true, not the same window, B.1) | — | removed | removed, but `ready` with a `device` not in Gladys (no `id`) or not known yet |
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
 - `device_announce` is ignored: every known device announces itself when it powers up.
@@ -126,7 +126,9 @@ opened:
   `device_leave`: its entry is removed when a `bridge/devices` no longer lists it.
 - Closing joining keeps the registry: an interview often ends after the window, and the user may add
   the ready devices later. A new run of Zigbee2mqtt keeps it too, and so does the same window told again
-  after a reconnection or an init (B.1).
+  after a reconnection or an init (B.1). A new window keeps the ready devices while they are not in
+  Gladys: the window reopened shows them with their photo and suggested name, not only the Discover tab
+  under their IEEE address.
 - A device leaving before its interview ended stays `left`: its row says why it is gone, until it joins
   again or a new window opens.
 - An event arriving while joining is closed (a device joining through the Zigbee2mqtt interface) is
