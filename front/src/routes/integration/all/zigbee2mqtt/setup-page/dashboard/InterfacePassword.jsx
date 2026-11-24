@@ -22,7 +22,7 @@ class InterfacePassword extends Component {
     try {
       await navigator.clipboard.writeText(this.props.password);
     } catch (e) {
-      // Refused by the browser: the password stays revealed for the user to copy it
+      // Refused by the browser: the password can be revealed for the user to copy it
       console.error('Failed to copy the password of the interface', e);
       return;
     }

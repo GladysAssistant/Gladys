@@ -735,11 +735,11 @@ A screen of its own, back to the dashboard by "Configuration":
   restarted once.
 - **Interface password** (local mode, always on): an init that installs Zigbee2mqtt generates it when
   Gladys has none (20 characters, as the MQTT accounts), and `configureContainer` writes it as
-  `frontend.auth_token`; `Z2M_FRONTEND_AUTH_TOKEN` saves it with the configuration at the end of the init,
-  not before: the file may hold another one. A password written by hand in the file wins, and Gladys keeps
-  it at its next start; a reference to another file (`'!secret.yaml auth_token'`) is left as is, and
-  Gladys knows no password then. An installation without one gets it at the next start of Gladys,
-  Zigbee2mqtt restarted once (`auth_token` needs a restart). `GET /setup` gives it
+  `frontend.auth_token`; `Z2M_FRONTEND_AUTH_TOKEN` saves it once the file is read, before Zigbee2mqtt
+  restarts with it (not before: the file may hold another one). A password written by hand in the file
+  wins, and Gladys keeps it at its next start; a reference to another file (`'!secret.yaml auth_token'`)
+  is left as is, and Gladys knows no password then. An installation without one gets it at the next start
+  of Gladys, Zigbee2mqtt restarted once (`auth_token` needs a restart). `GET /setup` gives it
   (`Z2M_FRONTEND_AUTH_TOKEN`, never saved by `POST /setup`); the links to the interface (dashboard,
   advanced settings, device and Discover pages, where the page of a device follows the query:
   `?token=…#/device/…`) carry it as `?token=`, which the interface of Zigbee2mqtt 2 (Windfront) reads to

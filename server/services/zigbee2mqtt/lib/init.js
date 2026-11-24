@@ -264,8 +264,8 @@ async function initialize(setupMode, { dongleLost = false } = {}) {
       logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
       // We force set the mqttMode to local for existing instances
       configuration.mqttMode = MQTT_MODE.LOCAL;
-      // Password of the interface of Zigbee2mqtt: replaced by the one its configuration file holds (configureContainer),
-      // saved with the configuration once installed. Not saved before: the file read later may hold another one.
+      // Password of the interface of Zigbee2mqtt: replaced by the one its configuration file holds
+      // (configureContainer), saved once the file is read (installZ2mContainer), not before: it may hold another one.
       if (!configuration.z2mFrontendAuthToken) {
         configuration.z2mFrontendAuthToken = generate(20, {
           number: true,

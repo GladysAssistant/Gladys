@@ -301,6 +301,36 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
   });
 
+  it('should save the password of the interface before Zigbee2mqtt restarts with it', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mFrontendAuthToken: 'interface-password' };
+    gladys.variable = { setValue: fake.resolves(null), destroy: fake.resolves(null) };
+    gladys.system.getContainers = fake.resolves([container]);
+    gladys.system.pull = fake.rejects(new Error('docker fail pull'));
+    zigbee2mqttManager.configureContainer = fake.resolves({ configChanged: true, adapterChanged: true });
+    sinon.stub(logger, 'error');
+    // EXECUTE
+    const promise = zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    await expect(promise).to.be.rejectedWith('docker fail pull');
+    logger.error.restore();
+    // Restarted with the password, which Gladys knows although the installation failed
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    assert.calledOnceWithExactly(gladys.variable.setValue, 'Z2M_FRONTEND_AUTH_TOKEN', 'interface-password', serviceId);
+    assert.callOrder(gladys.variable.setValue, gladys.system.restartContainer);
+  });
+
+  it('should forget the password of the interface the file reads from another file', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mFrontendAuthToken: null };
+    gladys.variable = { setValue: fake.resolves(null), destroy: fake.resolves(null) };
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_AUTH_TOKEN', serviceId);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
   it('should create the z2m container without USB device in network mode', async () => {
     // PREPARE
     const config = { z2mAdapterMode: 'network', z2mNetworkAdapterUrl: 'tcp://192.168.1.20:6638' };
