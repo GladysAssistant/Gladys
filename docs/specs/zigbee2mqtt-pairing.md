@@ -253,9 +253,12 @@ Zigbee2mqtt.
 - Cypress (`setup/Zigbee2MqttPairing.cy.js`, `…PairingMobile.cy.js`, step ④ in `…Wizard*.cy.js`,
   Pair in `…Dashboard.cy.js`): countdown, Extend, Stop, the three failures of a request, a slow
   answer after a message, Zigbee2mqtt not answering; a device going joined → interviewing → ready →
-  added (suggested name suffixed, room, request body), a typed name kept, an Add that fails, already
-  in Gladys, unsupported, failed, left, the icon when the photo does not load, a message more recent
-  than the list read at opening, the list not readable; the sheet of a ready device on a phone.
+  added (suggested name suffixed, room, request body, the count of devices to add), a typed name kept,
+  an Add that fails, already in Gladys, unsupported (its last step), failed, left before the end of its
+  interview, removed, the icon of what the device is when the photo does not load, a message more recent
+  than the list read at opening, the list not readable, the failure cleared and joining asked again after
+  an outage, "back" closing the screen; on a phone, the sheet of a ready device, the model of an
+  unsupported one, Extend and Stop side by side, "back" closing the sheet then the screen.
 
 ## F. Out of scope
 
