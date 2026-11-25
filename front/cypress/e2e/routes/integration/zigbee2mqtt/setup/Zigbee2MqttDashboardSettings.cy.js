@@ -182,6 +182,8 @@ describe('Zigbee2mqtt dashboard settings', () => {
       cy.get('[data-cy=z2m-dashboard-interface]')
         .should('have.attr', 'href')
         .and('match', /:12000\/\?token=interface-password$/);
+      // The first time in a browser, the interface still asks for it: said next to the link
+      cy.get('[data-cy=z2m-dashboard-interface-hint]').should('contain', i18nText(`${T}.actions.interfaceHint`));
 
       cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
       cy.get('[data-cy=z2m-dashboard-open-interface]')
@@ -207,8 +209,43 @@ describe('Zigbee2mqtt dashboard settings', () => {
         .and('not.contain', i18nText(`${T}.advanced.interface.passwordHelp`));
     });
 
+    it('should copy the password of the interface without the clipboard API, as on the plain-HTTP local address', () => {
+      visitDashboard({ setup: { ...localSetup, Z2M_FRONTEND_AUTH_TOKEN: 'interface-password' } });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.window().then(win => {
+        // navigator.clipboard only exists in a secure context: the legacy copy of the plain-HTTP local address
+        cy.stub(win.navigator.clipboard, 'writeText').rejects(new Error('not allowed'));
+        cy.stub(win.document, 'execCommand')
+          .returns(true)
+          .as('execCommand');
+      });
+      cy.get('[data-cy=z2m-dashboard-interface-password-copy]')
+        .should('have.attr', 'aria-label', i18nText(`${T}.mobile.copy`))
+        .click();
+      cy.get('@execCommand').should('have.been.calledWith', 'copy');
+      cy.get('[data-cy=z2m-dashboard-interface-password-copied]')
+        .should('have.attr', 'aria-live', 'polite')
+        .and('contain', i18nText('integration.zigbee2mqtt.setup.modes.local.externalMqtt.copied'));
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('not.contain', 'interface-password');
+    });
+
+    it('should reveal the password of the interface when the browser refuses to copy it', () => {
+      visitDashboard({ setup: { ...localSetup, Z2M_FRONTEND_AUTH_TOKEN: 'interface-password' } });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.window().then(win => {
+        cy.stub(win.navigator.clipboard, 'writeText').rejects(new Error('not allowed'));
+        cy.stub(win.document, 'execCommand').returns(false);
+      });
+      cy.get('[data-cy=z2m-dashboard-interface-password-copy]').click();
+      // Shown for the user to select it
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('have.text', 'interface-password');
+      cy.get('[data-cy=z2m-dashboard-interface-password-copied]').should('be.empty');
+    });
+
     it('should show no password of the interface when Gladys does not know it', () => {
       visitDashboard();
+      cy.get('[data-cy=z2m-dashboard-interface]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-interface-hint]').should('not.exist');
       cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
       cy.get('[data-cy=z2m-dashboard-port]').should('exist');
       cy.get('[data-cy=z2m-dashboard-interface-password]').should('not.exist');

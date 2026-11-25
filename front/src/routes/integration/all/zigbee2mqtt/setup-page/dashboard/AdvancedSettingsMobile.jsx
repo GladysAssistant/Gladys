@@ -26,6 +26,7 @@ import {
 import BottomSheet from '../../../../../../components/sheet/BottomSheet';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../../../../utils/consts';
+import copyText from '../../utils/copyText';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
@@ -158,14 +159,14 @@ class MqttAccess extends Component {
 }
 
 // The password of the interface of Zigbee2mqtt, for an interface opened outside Gladys: revealed for 5 s, copied in one
-// tap
+// tap (also on the plain-HTTP local address); revealed until tapped again when the browser refuses to copy it
 class InterfacePasswordMobile extends Component {
   copy = async () => {
-    try {
-      await navigator.clipboard.writeText(this.props.password);
-    } catch (e) {
-      // Refused by the browser: the password can be revealed for the user to copy it
-      console.error('Failed to copy the password of the interface', e);
+    const copied = await copyText(this.props.password);
+    if (!copied) {
+      // Shown for the user to select it, without hiding it while they do
+      clearTimeout(this.revealTimer);
+      this.setState({ revealed: true });
       return;
     }
     this.setState(prevState => ({ copiedKey: (prevState.copiedKey || 0) + 1 }));
@@ -187,9 +188,8 @@ class InterfacePasswordMobile extends Component {
   }
 
   render({ password, linked, dictionary }, { revealed, copiedKey }) {
-    const canCopy = typeof window !== 'undefined' && window.isSecureContext && Boolean(navigator.clipboard);
     return (
-      <div data-cy="z2m-dashboard-interface-password">
+      <div class={style.mobileInterfacePassword} data-cy="z2m-dashboard-interface-password">
         <MobileGroup>
           <MobileRow
             title={<Text id={`${T}.advanced.interface.password`} />}
@@ -207,14 +207,12 @@ class InterfacePasswordMobile extends Component {
                   onClick={this.toggleReveal}
                   data-cy="z2m-dashboard-interface-password-reveal"
                 />
-                {canCopy && (
-                  <MobileRowButton
-                    icon="copy"
-                    label={get(dictionary, `${T}.mobile.copy`)}
-                    onClick={this.copy}
-                    data-cy="z2m-dashboard-interface-password-copy"
-                  />
-                )}
+                <MobileRowButton
+                  icon="copy"
+                  label={get(dictionary, `${T}.mobile.copy`)}
+                  onClick={this.copy}
+                  data-cy="z2m-dashboard-interface-password-copy"
+                />
               </span>
             }
           />

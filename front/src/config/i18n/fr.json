@@ -2767,6 +2767,7 @@
             "restart": "Redémarrer",
             "stop": "Arrêter",
             "interface": "Interface Zigbee2MQTT",
+            "interfaceHint": "L'interface demande un mot de passe ? Rechargez la page, ou copiez-le depuis les réglages avancés.",
             "changeKey": "Changer",
             "disconnect": "Déconnecter",
             "connect": "Se connecter",
@@ -2802,9 +2803,9 @@
               "port": "Port",
               "help": "Changer le port redémarre Zigbee2MQTT ; ses données sont gardées.",
               "open": "Ouvrir l'interface",
-              "password": "Mot de passe",
-              "passwordHelp": "Le lien de Gladys le donne à l'interface. À sa première ouverture dans un navigateur, elle peut quand même le demander : rechargez la page. Ouverte hors de Gladys (favori, autre appareil), collez-le.",
-              "passwordHelpNoLink": "Demandé par l'interface de Zigbee2MQTT ouverte depuis le réseau local : collez-le."
+              "password": "Mot de passe de l'interface",
+              "passwordHelp": "Gladys ouvre l'interface sans vous le demander. Si l'interface le demande quand même (première ouverture dans ce navigateur), rechargez la page. Depuis un favori ou un autre appareil, collez ce mot de passe.",
+              "passwordHelpNoLink": "L'interface de Zigbee2MQTT demande ce mot de passe quand elle est ouverte depuis le réseau local : collez-le."
             },
             "broker": {
               "title": "Connexion au broker MQTT"

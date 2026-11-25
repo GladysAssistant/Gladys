@@ -2634,6 +2634,7 @@
             "restart": "Neu starten",
             "stop": "Stoppen",
             "interface": "Zigbee2MQTT-Oberfläche",
+            "interfaceHint": "Die Oberfläche verlangt ein Passwort? Laden Sie die Seite neu oder kopieren Sie es aus den erweiterten Einstellungen.",
             "changeKey": "Ändern",
             "disconnect": "Trennen",
             "connect": "Verbinden",
@@ -2669,9 +2670,9 @@
               "port": "Port",
               "help": "Eine Änderung des Ports startet Zigbee2MQTT neu; seine Daten bleiben erhalten.",
               "open": "Oberfläche öffnen",
-              "password": "Passwort",
-              "passwordHelp": "Der Link von Gladys übergibt es der Oberfläche. Beim ersten Öffnen in einem Browser kann sie es trotzdem verlangen: Seite neu laden. Außerhalb von Gladys geöffnet (Lesezeichen, anderes Gerät): einfügen.",
-              "passwordHelpNoLink": "Wird von der Zigbee2MQTT-Oberfläche verlangt, wenn sie im lokalen Netzwerk geöffnet wird: einfügen."
+              "password": "Passwort der Oberfläche",
+              "passwordHelp": "Gladys öffnet die Oberfläche, ohne Sie nach diesem Passwort zu fragen. Verlangt die Oberfläche es trotzdem (erstes Öffnen in diesem Browser), laden Sie die Seite neu. Von einem Lesezeichen oder einem anderen Gerät aus fügen Sie dieses Passwort ein.",
+              "passwordHelpNoLink": "Die Zigbee2MQTT-Oberfläche verlangt dieses Passwort, wenn sie im lokalen Netzwerk geöffnet wird: Fügen Sie es dort ein."
             },
             "broker": {
               "title": "Verbindung zum MQTT-Broker"

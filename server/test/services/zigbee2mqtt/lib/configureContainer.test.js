@@ -675,6 +675,26 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(config.z2mFrontendAuthToken).to.equal(null);
   });
 
+  it('it should keep a password of the interface written by hand that starts with "!", as Zigbee2mqtt reads it', async () => {
+    // PREPARE
+    // No space after the "!": not a reference to another file for Zigbee2mqtt, the password itself
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(
+      configFilePath,
+      content.replace('  port: 12000\n', "  port: 12000\n  auth_token: '!MyPassw0rd'\n"),
+    );
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'gladys-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    expect(changed.configChanged).to.equal(false);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include("  auth_token: '!MyPassw0rd'\n");
+    expect(config.z2mFrontendAuthToken).to.equal('!MyPassw0rd');
+  });
+
   it('it should only add mqtt credentials', async () => {
     // PREPARE
     const config = {

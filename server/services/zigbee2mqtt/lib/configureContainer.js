@@ -21,6 +21,9 @@ const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.
 const YAML_CONFIG = { singleQuote: true };
 const CONFIGURATION_FILE = path.basename(DEFAULT.CONFIGURATION_PATH);
 const COORDINATOR_BACKUP_FILE = 'coordinator_backup.json';
+// A value Zigbee2mqtt reads from another file (`!secret.yaml auth_token`): its own rule (`parseValueRef` of its
+// settings), a "!" followed further by a space, so that a password such as `!MyPassw0rd` stays a password
+const VALUE_REFERENCE = /!(.*) (.*)/;
 
 /**
  * @description Read the Z2M configuration file. A file Gladys cannot read is not one to replace: its error is thrown.
@@ -382,7 +385,7 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   // The password of the interface: one written by hand in the file wins, and Gladys keeps it; else the one of Gladys is
   // written. A reference to another file (`!secret.yaml auth_token`) is left as is: Gladys does not know the password.
   const { auth_token: authToken } = loadedConfig.frontend;
-  if (typeof authToken === 'string' && authToken.startsWith('!')) {
+  if (typeof authToken === 'string' && VALUE_REFERENCE.test(authToken)) {
     config.z2mFrontendAuthToken = null;
   } else if (typeof authToken === 'string' && authToken !== '') {
     config.z2mFrontendAuthToken = authToken;

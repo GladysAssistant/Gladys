@@ -303,8 +303,10 @@
   gap: 0.5rem;
 }
 
+/* selected at once, for a copy by hand */
 .passwordValue {
   min-width: 0;
+  user-select: all;
 }
 
 .componentState {
@@ -360,6 +362,11 @@
   font-size: 14px;
   word-break: break-all;
   user-select: all;
+}
+
+/* apart from the row below it, as a field */
+.mobileInterfacePassword {
+  margin-bottom: 16px;
 }
 
 .mobileRowButtons {

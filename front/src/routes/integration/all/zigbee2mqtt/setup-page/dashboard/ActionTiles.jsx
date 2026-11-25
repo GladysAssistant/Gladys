@@ -11,7 +11,7 @@ const ICONS = { restart: 'refresh-cw', stop: 'square', interface: 'external-link
 
 // Restart, stop (once confirmed: Zigbee2mqtt stays stopped until it is started again), the interface of Zigbee2mqtt
 const ActionTiles = ({ view, actions }) => {
-  const { tiles, z2mUrl, actionStatus, confirmStop } = view;
+  const { tiles, z2mUrl, actionStatus, confirmStop, interfaceAsksPassword } = view;
   const busy = actionStatus === RequestStatus.Getting;
   const stopKeys = getStopKeys(view.configuration);
   if (tiles.length === 0) {
@@ -48,6 +48,11 @@ const ActionTiles = ({ view, actions }) => {
           )
         )}
       </div>
+      {interfaceAsksPassword && tiles.includes('interface') && (
+        <small class="text-muted" data-cy="z2m-dashboard-interface-hint">
+          <Text id={`${T}.actions.interfaceHint`} />
+        </small>
+      )}
       {confirmStop && (
         <div class={style.confirm} role="alertdialog" data-cy="z2m-dashboard-confirm-stop">
           <span>

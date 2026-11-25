@@ -2,12 +2,13 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
+import copyText from '../../utils/copyText';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard.advanced.interface';
 
 // The password of the interface of Zigbee2mqtt, for an interface opened outside Gladys: revealed for 5 s, copied in one
-// click
+// click (also on the plain-HTTP local address); revealed until clicked again when the browser refuses to copy it
 class InterfacePassword extends Component {
   toggleReveal = () => {
     clearTimeout(this.revealTimer);
@@ -19,14 +20,14 @@ class InterfacePassword extends Component {
   };
 
   copy = async () => {
-    try {
-      await navigator.clipboard.writeText(this.props.password);
-    } catch (e) {
-      // Refused by the browser: the password can be revealed for the user to copy it
-      console.error('Failed to copy the password of the interface', e);
+    const copied = await copyText(this.props.password);
+    clearTimeout(this.copyTimer);
+    if (!copied) {
+      // Shown for the user to select it, without hiding it while they do
+      clearTimeout(this.revealTimer);
+      this.setState({ revealed: true, copied: false });
       return;
     }
-    clearTimeout(this.copyTimer);
     this.setState({ copied: true });
     this.copyTimer = setTimeout(() => this.setState({ copied: false }), 2000);
   };
@@ -37,14 +38,13 @@ class InterfacePassword extends Component {
   }
 
   render({ password, linked }, { revealed, copied }) {
-    const canCopy = typeof window !== 'undefined' && window.isSecureContext && Boolean(navigator.clipboard);
     return (
       <div class="mt-3" data-cy="z2m-dashboard-interface-password">
         <div class="form-label">
           <Text id={`${T}.password`} />
         </div>
         <div class={style.passwordRow}>
-          <code class={cx('text-break mr-auto', style.passwordValue)} data-cy="z2m-dashboard-interface-password-value">
+          <code class={cx('text-break', style.passwordValue)} data-cy="z2m-dashboard-interface-password-value">
             {revealed ? password : '••••••••••••••••••••'}
           </code>
           <Localizer>
@@ -59,24 +59,25 @@ class InterfacePassword extends Component {
               <i class={cx('fe', { 'fe-eye': !revealed, 'fe-eye-off': revealed })} aria-hidden="true" />
             </button>
           </Localizer>
-          {canCopy && (
-            <Localizer>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-secondary py-0 px-2 flex-shrink-0"
-                aria-label={<Text id="integration.zigbee2mqtt.setup.dashboard.mobile.copy" />}
-                onClick={this.copy}
-                data-cy="z2m-dashboard-interface-password-copy"
-              >
-                <i class="fe fe-copy" aria-hidden="true" />
-              </button>
-            </Localizer>
-          )}
-          {copied && (
-            <small class="text-success flex-shrink-0">
-              <Text id="integration.zigbee2mqtt.setup.modes.local.externalMqtt.copied" />
-            </small>
-          )}
+          <Localizer>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary py-0 px-2 flex-shrink-0"
+              aria-label={<Text id="integration.zigbee2mqtt.setup.dashboard.mobile.copy" />}
+              onClick={this.copy}
+              data-cy="z2m-dashboard-interface-password-copy"
+            >
+              <i class="fe fe-copy" aria-hidden="true" />
+            </button>
+          </Localizer>
+          {/* Always there, for the screen readers to announce the copy */}
+          <small
+            class="text-success flex-shrink-0"
+            aria-live="polite"
+            data-cy="z2m-dashboard-interface-password-copied"
+          >
+            {copied && <Text id="integration.zigbee2mqtt.setup.modes.local.externalMqtt.copied" />}
+          </small>
         </div>
         <small class="form-text text-muted">
           <Text id={linked ? `${T}.passwordHelp` : `${T}.passwordHelpNoLink`} />

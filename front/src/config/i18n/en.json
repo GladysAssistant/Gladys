@@ -2390,6 +2390,7 @@
             "restart": "Restart",
             "stop": "Stop",
             "interface": "Zigbee2MQTT interface",
+            "interfaceHint": "The interface asks for a password? Reload the page, or copy it from the advanced settings.",
             "changeKey": "Change",
             "disconnect": "Disconnect",
             "connect": "Connect",
@@ -2425,9 +2426,9 @@
               "port": "Port",
               "help": "Changing the port restarts Zigbee2MQTT; its data is kept.",
               "open": "Open the interface",
-              "password": "Password",
-              "passwordHelp": "The link of Gladys gives it to the interface. The first time it opens in a browser, it may still ask for it: reload the page. Opened outside Gladys (a bookmark, another device), paste it.",
-              "passwordHelpNoLink": "Asked by the interface of Zigbee2MQTT opened from the local network: paste it."
+              "password": "Interface password",
+              "passwordHelp": "Gladys opens the interface without asking you for this password. If the interface asks for it anyway (the first time in this browser), reload the page. From a bookmark or another device, paste this password.",
+              "passwordHelpNoLink": "The Zigbee2MQTT interface asks for this password when it is opened from the local network: paste it there."
             },
             "broker": {
               "title": "Connection to the MQTT broker"

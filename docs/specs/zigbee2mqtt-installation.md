@@ -738,17 +738,28 @@ A screen of its own, back to the dashboard by "Configuration":
   `frontend.auth_token`; `Z2M_FRONTEND_AUTH_TOKEN` saves it once the file is read, before Zigbee2mqtt
   restarts with it (not before: the file may hold another one). A password written by hand in the file
   wins, and Gladys keeps it at its next start; a reference to another file (`'!secret.yaml auth_token'`)
-  is left as is, and Gladys knows no password then. An installation without one gets it at the next start
+  is left as is, and Gladys knows no password then. A reference is told as Zigbee2mqtt tells it
+  (`parseValueRef` of its settings, `/!(.*) (.*)/`): a "!" followed further by a space, so that a
+  password written by hand such as `!MyPassw0rd` stays a password. An installation without one gets it at the next start
   of Gladys, Zigbee2mqtt restarted once (`auth_token` needs a restart). `GET /setup` gives it
   (`Z2M_FRONTEND_AUTH_TOKEN`, never saved by `POST /setup`); the links to the interface (dashboard,
   advanced settings, device and Discover pages, where the page of a device follows the query:
   `?token=…#/device/…`) carry it as `?token=`, which the interface of Zigbee2mqtt 2 (Windfront) reads to
   open without asking for it, except the first time it opens in a browser: Windfront reads `?token=` only
   once a first refusal told it that the interface asks for a password, so it shows its login screen, and
-  opens at once when the page is reloaded. The screen shows it, revealed for 5 s and copied in one click
-  when the browser allows it (HTTPS), with these words, for that first time and for an interface opened
-  outside Gladys (a bookmark, another device); without a link to the interface (Gladys Plus, no port yet),
-  it only says to paste it. An external Zigbee2mqtt is not touched: its interface URL may carry `?token=`
+  opens at once when the page is reloaded. Said next to the link of the dashboard (under the tiles, on the
+  row of the interface on a phone): reload the page, or copy the password from the advanced settings. The
+  password in the address of the links shows in the status bar of the browser and stays in its history:
+  accepted for an interface of the local network (the only one Gladys links with its password). The
+  advanced settings show it under the label "Interface password" (apart from the one of the MQTT access),
+  revealed for 5 s and copied in one click, by the Clipboard API on HTTPS and by the selection of the
+  browser (`document.execCommand('copy')`) on the plain-HTTP local address, the value selected at once for a
+  copy by hand; a copy the browser refuses reveals it, until hidden again; "Copied" is announced
+  (`aria-live`). With these words, for that first time and for an interface opened outside Gladys (a
+  bookmark, another device); without a link to the interface (Gladys Plus, no port yet), it only says to
+  paste it. With a reference to another file, the screen says nothing of the password: Gladys does not
+  tell it from no password yet (the variable is erased in both cases), and the user who wrote the reference
+  knows where the password is. An external Zigbee2mqtt is not touched: its interface URL may carry `?token=`
   itself. Erased by the reset.
 - **External broker**: its form, as the wizard words and orders it (URL, user and password, interface
   URL), "Save" as the primary button and "Cancel" (back to the saved values) once something changed;
@@ -776,13 +787,15 @@ screen layout (`Dashboard.jsx` and `AdvancedSettings.jsx` keep the state and the
   as a row to the Discover tab), the progress of an installation, the alerts as notices, the primary
   action as a full-width button (with "Change the dongle or model" on a failure); then the coordinator
   as rows (its facts as values, "Change the dongle" as a row); then Restart, Stop and the interface
-  (opened in another tab) as rows; then "Advanced settings". **Stop and Restart are confirmed in a
+  (opened in another tab, with the words about its password as the subtitle of its row, N.4) as rows; then
+  "Advanced settings". **Stop and Restart are confirmed in a
   sheet** (mobile-pages C.5: nothing restarted on a single tap; the primary Restart of a failure is not,
   nothing runs to interrupt).
 - **Advanced settings**: a focus page, back to "Configuration" from its navigation bar; the port, or
   the fields of the external broker (the password with its reveal button), saved from the bottom bar
   shown once something differs, where a refused save is told; the state of each component as pills;
-  the password of the interface as a row, revealed for 5 s and copied in one tap (HTTPS); the MQTT access as
+  the password of the interface as a row, revealed for 5 s and copied in one tap (also on plain HTTP; revealed
+  when the browser refuses the copy), its words apart from the row below; the MQTT access as
   rows, each value copied in one tap and the password revealed for 5 s; the reset
   as a red row confirmed in a sheet. Leaving with something not saved, by the navigation bar or the
   system "back", asks first (save and leave, leave without saving, keep editing).

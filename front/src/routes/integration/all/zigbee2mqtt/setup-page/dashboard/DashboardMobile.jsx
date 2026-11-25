@@ -291,6 +291,11 @@ class DashboardMobile extends Component {
                   <span class={kitStyle.rowTitle}>
                     <Text id={`${T}.actions.interface`} />
                   </span>
+                  {view.interfaceAsksPassword && (
+                    <span class={kitStyle.rowSub} data-cy="z2m-dashboard-interface-hint">
+                      <Text id={`${T}.actions.interfaceHint`} />
+                    </span>
+                  )}
                 </span>
                 <i class={cx('fe', 'fe-external-link', kitStyle.rowChevron)} aria-hidden="true" />
               </a>
