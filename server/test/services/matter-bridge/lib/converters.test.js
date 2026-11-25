@@ -51,6 +51,41 @@ describe('Matter bridge converters', () => {
     expect(converters.fromMireds(converters.toMireds(2700, kelvin), kelvin)).to.equal(2703);
     // A temperature beyond what the lamp accepts is sent as its warmest or coldest white.
     expect(converters.fromMireds(500, { min: 2700, max: 6500 })).to.equal(2700);
+    expect(converters.toMireds(2000, { min: 2700, max: 6500 })).to.equal(371);
+  });
+
+  it('should pass colour temperatures in mireds through', () => {
+    // An IKEA bulb, from zigbee2mqtt.
+    const ikea = { min: 250, max: 454 };
+    expect(converters.isMireds(ikea)).to.equal(true);
+    expect(converters.toMireds(250, ikea)).to.equal(250);
+    expect(converters.toMireds(370.4, ikea)).to.equal(370);
+    expect(converters.fromMireds(370, ikea)).to.equal(370);
+    // A temperature beyond what the lamp accepts is sent as its warmest or coldest white.
+    expect(converters.toMireds(500, ikea)).to.equal(454);
+    expect(converters.fromMireds(153, ikea)).to.equal(250);
+    expect(converters.fromMireds(500, ikea)).to.equal(454);
+  });
+
+  it('should tell the scales that are not mireds apart', () => {
+    expect(converters.isMireds({ min: 150, max: 500 })).to.equal(true);
+    expect(converters.isMireds({ min: 123, max: 500 })).to.equal(true);
+    // Tuya and Broadlink scales.
+    expect(converters.isMireds({ min: 0, max: 1000 })).to.equal(false);
+    expect(converters.isMireds({ min: 0, max: 100, unit: 'percent' })).to.equal(false);
+    expect(converters.isMireds({ min: 100, max: 1000, unit: 'percent' })).to.equal(false);
+    expect(converters.isMireds({ min: 2000, max: 6535 })).to.equal(false);
+    expect(converters.isMireds({})).to.equal(false);
+    expect(converters.isMireds({ min: 500, max: 500 })).to.equal(false);
+  });
+
+  it('should give the range of whites a light can make, in mireds', () => {
+    expect(converters.miredsRange({ min: 250, max: 454 })).to.deep.equal([250, 454]);
+    // Rounded outwards, so the whole range of the lamp is offered.
+    expect(converters.miredsRange({ min: 2000, max: 6535 })).to.deep.equal([153, 500]);
+    expect(converters.miredsRange({ min: 2700, max: 6500 })).to.deep.equal([153, 371]);
+    expect(converters.miredsRange({ min: 0, max: 1000 })).to.deep.equal([153, 500]);
+    expect(converters.miredsRange({ unit: 'kelvin' })).to.deep.equal([153, 500]);
   });
 
   it('should convert colours to and from hue and saturation', () => {

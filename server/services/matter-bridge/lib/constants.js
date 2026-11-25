@@ -87,6 +87,10 @@ const MAX_LABEL_BYTES = 32;
 // slider being dragged, a transition). Only the last one is forwarded to the Gladys device.
 const COMMAND_DEBOUNCE_MS = 300;
 
+// A movement a Matter app asked a cover for ends once no position came from Gladys for this long:
+// a cover stopped on the way (wall switch, remote) may never report anything else.
+const COVER_MOVEMENT_TIMEOUT_MS = 30 * 1000;
+
 // Matter enums, by their numeric values from the Matter specification. They are kept here rather
 // than read from matter.js so the adapters stay plain data that tests can check without it.
 const COLOR_MODE = {
@@ -186,6 +190,7 @@ module.exports = {
   MAX_DISCRIMINATOR,
   MAX_LABEL_BYTES,
   COMMAND_DEBOUNCE_MS,
+  COVER_MOVEMENT_TIMEOUT_MS,
   COLOR_MODE,
   MOVEMENT_TYPE,
   MOVEMENT_STATUS,

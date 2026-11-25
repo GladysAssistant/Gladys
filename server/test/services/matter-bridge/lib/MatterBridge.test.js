@@ -251,11 +251,29 @@ describe('MatterBridge', () => {
   describe('stop', () => {
     it('should close the node and forget the devices', async () => {
       await bridge.start();
+      bridge.windowReopenedAt = Date.now();
       await bridge.stop();
       expect(matter.server.closed).to.equal(true);
       expect(bridge.server).to.equal(null);
       expect(bridge.devices.size).to.equal(0);
+      // Their endpoints are closed with the node: they stay in the storage until erased.
+      expect(Array.from(bridge.closedDevices.entries())).to.deep.equal([
+        ['light-id', 'light'],
+        ['sensor-id', 'sensor'],
+      ]);
+      // The next node opens its window at once.
+      expect(bridge.windowReopenedAt).to.equal(null);
       sinon.assert.calledWith(gladys.event.removeListener, EVENTS.TRIGGERS.CHECK, bridge.onTriggerCheck);
+    });
+
+    it('should erase the devices that left Gladys while it was stopped, on the next start', async () => {
+      await bridge.start();
+      await bridge.stop();
+      devices = [sensor];
+      await bridge.start();
+      expect(matter.server.nodeStore.erased).to.deep.equal([{ id: 'light', owner: 'aggregator' }]);
+      expect(bridge.closedDevices.size).to.equal(0);
+      expect(Array.from(bridge.devices.keys())).to.deep.equal(['sensor-id']);
     });
 
     it('should stop when not started', async () => {
@@ -282,6 +300,8 @@ describe('MatterBridge', () => {
       sinon.assert.calledWith(gladys.variable.destroy, VARIABLES.PASSCODE, SERVICE_ID);
       sinon.assert.calledWith(gladys.variable.destroy, VARIABLES.DISCRIMINATOR, SERVICE_ID);
       expect(bridge.server).to.not.equal(null);
+      expect(bridge.closedDevices.size).to.equal(0);
+      expect(bridge.reservedNumbers.size).to.equal(0);
       expect(variables[VARIABLES.PASSCODE]).to.not.equal(undefined);
       expect(typeof passcode).to.equal('number');
       expect(matter.server.options.commissioning.passcode).to.not.equal(passcode);
@@ -349,6 +369,21 @@ describe('MatterBridge', () => {
         EVENTS.ACTION.TRIGGERED,
         sinon.match({ device_feature: 'cover-state' }),
       );
+    });
+
+    it('should wait for a cover a Matter app moves to report its position', async () => {
+      const shutter = {
+        id: 'shutter-id',
+        name: 'Shutter',
+        selector: 'shutter',
+        features: [feature('shutter-position', 'shutter', 'position')],
+      };
+      await bridge.onDeviceChange(shutter);
+      const Behavior = bridge.devices.get('shutter-id').built.children[0].type.behaviors[0];
+      new Behavior().handleMovement(0, false, 2, 0);
+      expect(bridge.bindings.settles.has('shutter-position')).to.equal(true);
+      await bridge.onDeviceDelete(shutter);
+      expect(bridge.bindings.settles.size).to.equal(0);
     });
 
     it('should add a created device', async () => {
@@ -469,6 +504,78 @@ describe('MatterBridge', () => {
       expect(lightRoot.deleted).to.equal(true);
       expect(sensorRoot.closed).to.equal(true);
       expect(sensorRoot.deleted).to.equal(false);
+    });
+
+    it('should give a device whose rebuild failed its endpoint numbers once it is built again', async () => {
+      const { root, children } = bridge.devices.get('light-id').built;
+      const withBattery = { ...light, features: [...light.features, feature('light-b', 'battery', 'integer')] };
+      const realAdd = matter.main.Endpoint.prototype.add;
+      const add = sinon.stub(matter.main.Endpoint.prototype, 'add').callsFake(async function failing(child) {
+        if (child.id === 'light') {
+          throw new Error('conformance');
+        }
+        return realAdd.call(this, child);
+      });
+      await bridge.onDeviceChange(withBattery);
+      expect(bridge.devices.has('light-id')).to.equal(false);
+      expect(root.deleted).to.equal(true);
+      expect(bridge.reservedNumbers.get('light-id')).to.deep.equal({
+        light: root.number,
+        'light-light-1': children[0].number,
+      });
+
+      add.restore();
+      await bridge.onDeviceChange(withBattery);
+      const rebuilt = bridge.devices.get('light-id').built;
+      expect(rebuilt.root.number).to.equal(root.number);
+      expect(rebuilt.children[0].number).to.equal(children[0].number);
+      expect(bridge.reservedNumbers.size).to.equal(0);
+    });
+
+    it('should forget the endpoint numbers kept for a device that left Gladys', async () => {
+      bridge.reservedNumbers.set('light-id', { light: 2 });
+      bridge.reservedNumbers.set('gone-id', { gone: 9 });
+      await bridge.onDeviceDelete(light);
+      await bridge.saveConfig({ exposureMode: 'all', exposedDevices: [] });
+      expect(bridge.reservedNumbers.size).to.equal(0);
+    });
+
+    it('should erase a device taken off the bridge once it is deleted from Gladys', async () => {
+      const { root, children } = bridge.devices.get('light-id').built;
+      await bridge.onDeviceChange({ ...light, features: [] });
+      expect(bridge.closedDevices.get('light-id')).to.equal('light');
+      await bridge.onDeviceDelete(light);
+      expect(matter.server.nodeStore.erased).to.deep.equal([{ id: 'light', owner: 'aggregator' }]);
+      expect(bridge.closedDevices.size).to.equal(0);
+      // A new device under the same selector does not inherit its endpoint numbers.
+      await bridge.onDeviceChange({ ...light, id: 'new-light-id' });
+      const recreated = bridge.devices.get('new-light-id').built;
+      expect(recreated.root.number).to.not.equal(root.number);
+      expect(recreated.children[0].number).to.not.equal(children[0].number);
+    });
+
+    it('should erase a device taken off the bridge that left Gladys while syncing', async () => {
+      variables[VARIABLES.EXPOSURE_MODE] = 'selection';
+      variables[VARIABLES.EXPOSED_DEVICES] = '["sensor"]';
+      await bridge.onDeviceChange(light);
+      devices = [sensor];
+      await bridge.saveConfig({ exposureMode: 'selection', exposedDevices: ['sensor'] });
+      expect(matter.server.nodeStore.erased).to.deep.equal([{ id: 'light', owner: 'aggregator' }]);
+    });
+
+    it('should keep a device taken off a stopped bridge listed, to erase it on the next start', async () => {
+      await bridge.onDeviceChange({ ...light, features: [] });
+      await bridge.stop();
+      await bridge.forgetDevice('light-id');
+      expect(bridge.closedDevices.get('light-id')).to.equal('light');
+      expect(matter.server.nodeStore.erased).to.deep.equal([]);
+    });
+
+    it('should survive endpoints that cannot be erased', async () => {
+      await bridge.onDeviceChange({ ...light, features: [] });
+      matter.server.nodeStore.endpointStores.eraseStoreForEndpoint = sinon.stub().rejects(new Error('storage'));
+      await bridge.onDeviceDelete(light);
+      expect(bridge.closedDevices.size).to.equal(0);
     });
 
     it('should survive an endpoint failing to be removed', async () => {
@@ -952,6 +1059,8 @@ describe('MatterBridge', () => {
     });
 
     it('should rebuild every device once the node removed from its last ecosystem is online again', async () => {
+      bridge.closedDevices.set('closed-id', 'closed');
+      bridge.reservedNumbers.set('closed-id', { closed: 9 });
       const before = bridge.devices.get('light-id').built;
       matter.server.lifecycle.decommissioned.emit({});
       matter.server.lifecycle.online.emit({});
@@ -960,6 +1069,9 @@ describe('MatterBridge', () => {
       expect(after).to.not.equal(before);
       expect(before.root.deleted).to.equal(true);
       expect(bridge.devices.size).to.equal(2);
+      // The reset erased the storage: nothing is kept for the devices off the bridge.
+      expect(bridge.closedDevices.size).to.equal(0);
+      expect(bridge.reservedNumbers.size).to.equal(0);
       // The new endpoints are bound: Gladys states reach them.
       await bridge.onTriggerCheck({ type: EVENTS.DEVICE.NEW_STATE, device_feature: 'light-binary', last_value: 0 });
       expect(after.children[0].state.onOff.onOff).to.equal(false);

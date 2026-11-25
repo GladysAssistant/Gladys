@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
-import { EXPOSURE_MODES, ERROR_CODES } from './actions';
+import { EXPOSURE_MODES, ERROR_CODES, STANDARD_MATTER_PORT } from './actions';
 import style from './style.css';
 
 // Vendor ids of the main Matter ecosystems, from the CSA vendor list: a paired ecosystem is shown
@@ -211,9 +211,11 @@ const StartError = ({ status }) => {
     );
   }
   if (status.errorCode === ERROR_CODES.PORT_IN_USE) {
+    // Only the standard port is the one Alexa needs: a port set with MATTER_BRIDGE_PORT is not.
+    const message = status.port === STANDARD_MATTER_PORT ? 'portInUse' : 'portInUseCustom';
     return (
       <div class="alert alert-danger">
-        <Text id="integration.matter-bridge.portInUse" fields={{ port: status.port }} />
+        <Text id={`integration.matter-bridge.${message}`} fields={{ port: status.port }} />
       </div>
     );
   }

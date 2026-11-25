@@ -20,11 +20,14 @@ module.exports = function MatterBridgeService(gladys, serviceId) {
   async function start() {
     logger.info('Starting Matter bridge service');
     await bridge.start();
-    // The pairings are backed up every night, to be part of the Gladys backups.
+    // The pairings are backed up every night, to be part of the Gladys backups. A bridge that is
+    // off has nothing to back up: no job is recorded for it.
     if (!backupJob) {
       backupJob = gladys.scheduler.scheduleJob(BACKUP_RULE, async () => {
         try {
-          await backup();
+          if (await bridge.isEnabled()) {
+            await backup();
+          }
         } catch (e) {
           logger.error(`Matter bridge: unable to back up: ${e.message}`);
         }

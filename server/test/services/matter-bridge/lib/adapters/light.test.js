@@ -57,8 +57,23 @@ describe('Matter bridge light adapter', () => {
     expect(state.colorControl).to.include({
       colorMode: COLOR_MODE.COLOR_TEMPERATURE,
       colorTemperatureMireds: 153,
+      colorTempPhysicalMinMireds: 153,
+      colorTempPhysicalMaxMireds: 500,
       remainingTime: 0,
     });
+  });
+
+  it('should offer the whites a colour temperature light in mireds can make', () => {
+    const ikea = feature('ikea-temperature', 'light', 'temperature', { min: 250, max: 454 });
+    const roles = { binary, temperature: ikea };
+    const { state } = light.build(matter, roles, createContext({ 'ikea-temperature': 370 }));
+    expect(state.colorControl).to.include({
+      colorTemperatureMireds: 370,
+      colorTempPhysicalMinMireds: 250,
+      colorTempPhysicalMaxMireds: 454,
+      coupleColorTempToLevelMinMireds: 250,
+    });
+    expect(light.toMatter('temperature', 250, roles).colorControl.colorTemperatureMireds).to.equal(250);
   });
 
   it('should build an extended colour light', () => {
@@ -80,6 +95,8 @@ describe('Matter bridge light adapter', () => {
   it('should build an extended colour light whose colour is unknown', () => {
     const { state } = light.build(matter, { binary, color }, createContext({}));
     expect(state.colorControl).to.not.have.property('currentHue');
+    // Its whites are made with its colour, over the usual range.
+    expect(state.colorControl).to.include({ colorTempPhysicalMinMireds: 153, colorTempPhysicalMaxMireds: 500 });
   });
 
   it('should convert Gladys states to Matter', () => {

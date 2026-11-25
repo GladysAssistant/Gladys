@@ -10,10 +10,13 @@ const { loadMatter, MATTER_LOG_LEVEL } = require('../../../../services/matter-br
 const { planDevice } = require('../../../../services/matter-bridge/lib/planDevice');
 const { buildEndpoints, endpointNumbers } = require('../../../../services/matter-bridge/lib/buildEndpoints');
 const { Bindings, isRemoteChange } = require('../../../../services/matter-bridge/lib/Bindings');
+const MatterBridge = require('../../../../services/matter-bridge/lib/MatterBridge');
+const { COVER_STATE } = require('../../../../utils/constants');
 const {
   AIR_QUALITY,
   EXPRESSED_STATE,
   COMMISSIONING_WINDOW_NOT_OPEN,
+  MOVEMENT_STATUS,
 } = require('../../../../services/matter-bridge/lib/constants');
 const { feature, createContext } = require('../fakes');
 
@@ -50,6 +53,11 @@ const DEVICES = [
   device('white-light', [
     feature('white-light-binary', 'light', 'binary'),
     feature('white-light-temperature', 'light', 'temperature', { min: 0, max: 100 }),
+  ]),
+  // A lamp whose range is in mireds, as zigbee2mqtt gives it for many IKEA bulbs.
+  device('ikea-light', [
+    feature('ikea-light-binary', 'light', 'binary'),
+    feature('ikea-light-temperature', 'light', 'temperature', { min: 250, max: 454 }),
   ]),
   device('color-light', [
     feature('color-light-binary', 'light', 'binary'),
@@ -90,6 +98,8 @@ const VALUES = {
   'dimmable-light-brightness': 40,
   'white-light-binary': 0,
   'white-light-temperature': 30,
+  'ikea-light-binary': 1,
+  'ikea-light-temperature': 370,
   'color-light-binary': 1,
   'color-light-brightness': 80,
   'color-light-color': 0xff8800,
@@ -264,6 +274,49 @@ describe('Matter bridge on the real matter.js', function realMatter() {
     expect(light.state.colorControl.remainingTime).to.equal(0);
   });
 
+  it('should offer the whites a lamp in mireds can make, and pass its temperature through', () => {
+    const [ikea] = built.get('ikea-light').children;
+    expect(ikea.state.colorControl).to.include({
+      colorTemperatureMireds: 370,
+      colorTempPhysicalMinMireds: 250,
+      colorTempPhysicalMaxMireds: 454,
+    });
+  });
+
+  it('should end the movement of a cover that stopped, or that nothing more came from', async () => {
+    const shutterDevice = DEVICES.find(({ id }) => id === 'shutter');
+    const [shutter] = built.get('shutter').children;
+    const { settle } = built.get('shutter').functions[0].adapter;
+    const bindings = new Bindings({ event: { emit: () => null } });
+    bindings.add(shutterDevice, built.get('shutter'));
+    const lift = () => shutter.state.windowCovering.operationalStatus.lift;
+    try {
+      // A Matter app asks to open the shutter, 40 % closed: matter.js reports it opening.
+      await shutter.set({ windowCovering: { targetPositionLiftPercent100ths: 0 } });
+      expect(lift()).to.equal(MOVEMENT_STATUS.OPENING);
+      // The wall switch stops it on the way, and the shutter reports it.
+      await bindings.push({ device_feature: 'shutter-state', last_value: COVER_STATE.STOP });
+      expect(lift()).to.equal(MOVEMENT_STATUS.STOPPED);
+      expect(shutter.state.windowCovering.targetPositionLiftPercent100ths).to.equal(4000);
+
+      // Asked to go where it already is: the target does not change, the movement ends all the same.
+      await shutter.set({ windowCovering: { operationalStatus: { global: 1, lift: 1, tilt: 0 } } });
+      expect(lift()).to.equal(MOVEMENT_STATUS.OPENING);
+      await bindings.push({ device_feature: 'shutter-position', last_value: 60 });
+      expect(lift()).to.equal(MOVEMENT_STATUS.STOPPED);
+
+      // Nothing comes from a shutter stopped on the way: the movement ends once the delay is over.
+      await shutter.set({ windowCovering: { targetPositionLiftPercent100ths: 0 } });
+      expect(lift()).to.equal(MOVEMENT_STATUS.OPENING);
+      await bindings.settleNow(built.get('shutter').functions[0].adapter, shutter, 'shutter-position');
+      expect(lift()).to.equal(MOVEMENT_STATUS.STOPPED);
+      expect(shutter.state.windowCovering.targetPositionLiftPercent100ths).to.equal(4000);
+      expect(settle.toMatter(shutter.state)).to.equal(null);
+    } finally {
+      bindings.clear();
+    }
+  });
+
   it('should override the movements of the real window covering behavior', () => {
     const Base = matter.behaviors.WindowCoveringServer.with('Lift', 'PositionAwareLift');
     expect(Base.prototype.handleMovement).to.be.a('function');
@@ -336,5 +389,18 @@ describe('Matter bridge on the real matter.js', function realMatter() {
       expect(number, id).to.not.equal(numbers[id]);
     });
     built.set('climate', recreated);
+  });
+
+  it('should erase the stored endpoints of a closed device, so that their numbers are not given back', async () => {
+    const lux = DEVICES.find(({ id }) => id === 'lux');
+    const numbers = endpointNumbers(built.get('lux'));
+    await built.get('lux').root.close();
+    // The way the bridge erases a device taken off the bridge, then deleted from Gladys.
+    await MatterBridge.prototype.eraseStoredDevice.call({ matter, server, aggregator }, 'lux');
+    const recreated = await expose(lux);
+    Object.entries(endpointNumbers(recreated)).forEach(([id, number]) => {
+      expect(number, id).to.not.equal(numbers[id]);
+    });
+    built.set('lux', recreated);
   });
 });

@@ -5,7 +5,11 @@ const { Bindings, isRemoteChange } = require('../../../../services/matter-bridge
 const { buildEndpoints } = require('../../../../services/matter-bridge/lib/buildEndpoints');
 const { planDevice } = require('../../../../services/matter-bridge/lib/planDevice');
 const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../../../utils/constants');
-const { EXPRESSED_STATE } = require('../../../../services/matter-bridge/lib/constants');
+const {
+  EXPRESSED_STATE,
+  MOVEMENT_STATUS,
+  COVER_MOVEMENT_TIMEOUT_MS,
+} = require('../../../../services/matter-bridge/lib/constants');
 const { createMatter, feature, createContext } = require('../fakes');
 
 const REMOTE = { fabric: 1 };
@@ -201,6 +205,88 @@ describe('Matter bridge Bindings', () => {
     await bindings.push({ device_feature: 'light-binary', last_value: 1 }).catch(() => null);
     await bindings.push({ device_feature: 'light-binary', last_value: 0 });
     expect(built.children[0].state.onOff.onOff).to.equal(false);
+  });
+
+  describe('settle', () => {
+    const shutterDevice = {
+      id: 'shutter-id',
+      name: 'Shutter',
+      selector: 'shutter',
+      features: [feature('shutter-position', 'shutter', 'position'), feature('shutter-state', 'shutter', 'state')],
+    };
+    let shutter;
+
+    beforeEach(() => {
+      shutter = buildEndpoints(
+        matter,
+        shutterDevice,
+        planDevice(shutterDevice),
+        createContext({ 'shutter-position': 50 }),
+      );
+      bindings.add(shutterDevice, shutter);
+      // Apple Home asked to open the shutter, half closed.
+      Object.assign(shutter.children[0].state.windowCovering, {
+        operationalStatus: { global: MOVEMENT_STATUS.OPENING, lift: MOVEMENT_STATUS.OPENING, tilt: 0 },
+        targetPositionLiftPercent100ths: 0,
+      });
+    });
+
+    it('should end a movement no position came for, the delay starting again with each position', async () => {
+      const { windowCovering } = shutter.children[0].state;
+      bindings.settleLater('shutter-position');
+      clock.tick(COVER_MOVEMENT_TIMEOUT_MS - 1);
+      await bindings.push({ device_feature: 'shutter-position', last_value: 55 });
+      clock.tick(COVER_MOVEMENT_TIMEOUT_MS - 1);
+      await bindings.pushes;
+      expect(shutter.children[0].state.windowCovering.operationalStatus.lift).to.equal(MOVEMENT_STATUS.OPENING);
+      expect(windowCovering.targetPositionLiftPercent100ths).to.equal(0);
+      clock.tick(1);
+      await bindings.pushes;
+      expect(shutter.children[0].state.windowCovering).to.include({
+        currentPositionLiftPercent100ths: 4500,
+        targetPositionLiftPercent100ths: 4500,
+      });
+      expect(shutter.children[0].state.windowCovering.operationalStatus.lift).to.equal(MOVEMENT_STATUS.STOPPED);
+      expect(bindings.settles.size).to.equal(0);
+    });
+
+    it('should leave a cover that stopped meanwhile as it is', async () => {
+      bindings.settleLater('shutter-position');
+      await bindings.push({ device_feature: 'shutter-position', last_value: 100 });
+      const set = sinon.spy(shutter.children[0], 'set');
+      clock.tick(COVER_MOVEMENT_TIMEOUT_MS);
+      await bindings.pushes;
+      sinon.assert.notCalled(set);
+    });
+
+    it('should only wait for the features an adapter settles', () => {
+      bindings.settleLater('shutter-state');
+      bindings.settleLater('light-binary');
+      bindings.settleLater('unknown');
+      expect(bindings.settles.size).to.equal(0);
+    });
+
+    it('should drop the wait of a device it forgets', async () => {
+      bindings.settleLater('shutter-position');
+      bindings.remove('shutter-id');
+      expect(bindings.settles.size).to.equal(0);
+      const set = sinon.spy(shutter.children[0], 'set');
+      clock.tick(COVER_MOVEMENT_TIMEOUT_MS);
+      await bindings.pushes;
+      sinon.assert.notCalled(set);
+    });
+
+    it('should keep pushing states after a settle the endpoint refused', async () => {
+      sinon
+        .stub(shutter.children[0], 'set')
+        .onFirstCall()
+        .rejects(new Error('closed'))
+        .callThrough();
+      bindings.settleLater('shutter-position');
+      clock.tick(COVER_MOVEMENT_TIMEOUT_MS);
+      await bindings.push({ device_feature: 'light-binary', last_value: 0 });
+      expect(built.children[0].state.onOff.onOff).to.equal(false);
+    });
   });
 
   it('should forget a device, its listeners and pending commands', () => {

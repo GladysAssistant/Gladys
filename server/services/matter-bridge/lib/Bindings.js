@@ -34,6 +34,8 @@ function Bindings(gladys, debounceMs = COMMAND_DEBOUNCE_MS) {
   this.cleanups = new Map();
   // Feature selector -> pending debounced command
   this.timers = new Map();
+  // Feature selector -> pending end of a movement no state came for (see the settle of adapters)
+  this.settles = new Map();
   // Gladys states are pushed one at a time: a state derived from several features (the expressed
   // state of a smoke and CO alarm, the overall air quality) is computed from the endpoint state,
   // which must hold the previous push.
@@ -84,6 +86,9 @@ Bindings.prototype.add = function add(device, built) {
         cleanups.push(() => this.byFeature.delete(feature.selector));
       }
       this.byFeature.get(feature.selector).push({ device, adapter, roles, role, endpoint });
+      if (adapter.settle && adapter.settle.role === role) {
+        cleanups.push(() => this.cancelSettle(feature.selector));
+      }
     });
 
     adapter.listeners
@@ -144,6 +149,66 @@ Bindings.prototype.schedule = function schedule(device, feature, debounce, compu
 Bindings.prototype.cancel = function cancel(feature) {
   clearTimeout(this.timers.get(feature.selector));
   this.timers.delete(feature.selector);
+};
+
+/**
+ * @description Wait for the state of a feature to settle: when no state came for it for the delay
+ * its adapter sets, the adapter computes a last change from the endpoint state, such as the end of
+ * a movement no position came for. Each state pushed meanwhile starts the delay again.
+ * @param {string} selector - Feature selector.
+ * @example
+ * bindings.settleLater('shutter-position');
+ */
+Bindings.prototype.settleLater = function settleLater(selector) {
+  const binding = (this.byFeature.get(selector) || []).find(
+    ({ adapter, role }) => adapter.settle && adapter.settle.role === role,
+  );
+  if (!binding) {
+    return;
+  }
+  const { adapter, endpoint } = binding;
+  this.cancelSettle(selector);
+  this.settles.set(
+    selector,
+    setTimeout(() => {
+      this.settles.delete(selector);
+      const run = () => this.settleNow(adapter, endpoint, selector);
+      // eslint-disable-next-line promise/prefer-await-to-then
+      this.pushes = this.pushes.then(run, run);
+    }, adapter.settle.delayMs),
+  );
+};
+
+/**
+ * @description Apply the change an adapter computes once the state of a feature settled: only to
+ * be called through settleLater.
+ * @param {object} adapter - Adapter of the endpoint.
+ * @param {object} endpoint - The matter.js endpoint.
+ * @param {string} selector - Feature selector.
+ * @returns {Promise} Resolves once the endpoint is updated.
+ * @example
+ * await bindings.settleNow(cover, endpoint, 'shutter-position');
+ */
+Bindings.prototype.settleNow = async function settleNow(adapter, endpoint, selector) {
+  try {
+    const patch = adapter.settle.toMatter(endpoint.state);
+    if (patch) {
+      await endpoint.set(patch);
+    }
+  } catch (e) {
+    logger.warn(`Matter bridge: unable to settle the state of ${selector}: ${e.message}`);
+  }
+};
+
+/**
+ * @description Drop a pending settle.
+ * @param {string} selector - Feature selector.
+ * @example
+ * bindings.cancelSettle('shutter-position');
+ */
+Bindings.prototype.cancelSettle = function cancelSettle(selector) {
+  clearTimeout(this.settles.get(selector));
+  this.settles.delete(selector);
 };
 
 /**
@@ -210,6 +275,10 @@ Bindings.prototype.pushNow = async function pushNow(event) {
     } catch (e) {
       logger.warn(`Matter bridge: unable to forward the state of ${event.device_feature}: ${e.message}`);
     }
+  }
+  // A state awaited to settle came: the delay starts again.
+  if (this.settles.has(event.device_feature)) {
+    this.settleLater(event.device_feature);
   }
 };
 

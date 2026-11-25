@@ -13,6 +13,10 @@ const ERROR_CODES = {
   MATTERBRIDGE_ENABLED: 'matterbridge_enabled'
 };
 
+// The port the bridge listens on unless MATTER_BRIDGE_PORT moves it: the only one Amazon Alexa
+// discovers (MATTER_BRIDGE_PORT in server/services/matter-bridge/lib/constants.js).
+const STANDARD_MATTER_PORT = 5540;
+
 const formOf = status => ({
   exposureMode: status.exposureMode,
   exposedDevices: status.exposedDevices
@@ -141,5 +145,5 @@ const actions = store => ({
   }
 });
 
-export { EXPOSURE_MODES, ERROR_CODES };
+export { EXPOSURE_MODES, ERROR_CODES, STANDARD_MATTER_PORT };
 export default actions;

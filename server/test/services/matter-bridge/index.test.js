@@ -7,6 +7,7 @@ const MatterBridgeMock = sinon.stub();
 MatterBridgeMock.prototype.start = sinon.stub().resolves();
 MatterBridgeMock.prototype.stop = sinon.stub().resolves();
 MatterBridgeMock.prototype.backup = sinon.stub().resolves();
+MatterBridgeMock.prototype.isEnabled = sinon.stub().resolves(true);
 
 const MatterBridgeService = proxyquire('../../../services/matter-bridge/index', {
   './lib/MatterBridge': MatterBridgeMock,
@@ -17,11 +18,12 @@ describe('MatterBridgeService', () => {
   const scheduledJob = { cancel: sinon.stub() };
   const gladys = {
     // Like the Gladys job wrapper: runs the function, reports a failure by rejecting.
-    job: { wrapper: sinon.stub().callsFake((type, func) => (...args) => func(...args, 'job-id')) },
+    job: { wrapper: sinon.stub().callsFake((type, func) => sinon.spy((...args) => func(...args, 'job-id'))) },
     scheduler: { scheduleJob: sinon.stub().returns(scheduledJob) },
   };
   const service = MatterBridgeService(gladys, 'service-id');
   const [backupJobType] = gladys.job.wrapper.firstCall.args;
+  const backupJob = gladys.job.wrapper.firstCall.returnValue;
   let scheduled;
 
   afterEach(() => {
@@ -49,6 +51,15 @@ describe('MatterBridgeService', () => {
     await scheduled();
     sinon.assert.calledTwice(service.bridge.backup);
     service.bridge.backup.resolves();
+  });
+
+  it('should not run the backup job, which records itself, while the bridge is off', async () => {
+    service.bridge.isEnabled.resolves(false);
+    await scheduled();
+    // The job wrapper is what records the job.
+    sinon.assert.notCalled(backupJob);
+    sinon.assert.notCalled(service.bridge.backup);
+    service.bridge.isEnabled.resolves(true);
   });
 
   it('should stop the bridge and cancel its backup', async () => {

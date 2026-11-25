@@ -52,7 +52,8 @@ function truncate(value) {
  * @param {object} matter - The matter.js modules.
  * @param {object} device - Gladys device.
  * @param {object} plan - Plan of the device, from planDevice.
- * @param {object} ctx - Build context: read(feature) and command(feature, value).
+ * @param {object} ctx - Build context: read(feature), command(feature, value) and moved(feature),
+ * which tells the bindings a cover started moving.
  * @param {object} [numbers] - Endpoint numbers to reuse by endpoint id, when the device is rebuilt
  * (see endpointNumbers): ecosystems know an endpoint by its number, and matter.js forgets the
  * number of a deleted endpoint.

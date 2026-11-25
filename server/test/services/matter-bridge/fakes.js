@@ -149,13 +149,29 @@ function createMatter() {
   class FabricManager {}
   const commissioner = { windowStatus: 1, isFailsafeArmed: false };
   const fabricManager = { fabrics: [] };
+  // Like the storage of matter.js: erasing the store of an endpoint erases those of its children,
+  // and the numbers they held.
+  class ServerNodeStore {}
+  const nodeStore = {
+    erased: [],
+    endpointStores: {
+      eraseStoreForEndpoint: async (endpoint) => {
+        nodeStore.erased.push({ id: endpoint.id, owner: endpoint.owner && endpoint.owner.id });
+        Array.from(closedNumbers.keys())
+          .filter((id) => id === endpoint.id || id.startsWith(`${endpoint.id}-`))
+          .forEach((id) => closedNumbers.delete(id));
+      },
+    },
+  };
   const services = new Map([
     [DeviceCommissioner, commissioner],
     [FabricManager, fabricManager],
+    [ServerNodeStore, nodeStore],
   ]);
   const server = {
     commissioner,
     fabricManager,
+    nodeStore,
     lifecycle: { isOnline: true, online: createObservable(), decommissioned: createObservable() },
     events: { commissioning: { fabricsChanged: createObservable() } },
     env: { has: (type) => services.has(type), get: (type) => services.get(type), services },
@@ -229,6 +245,7 @@ function createMatter() {
     server,
     main: {
       AddressInUseError,
+      ServerNodeStore,
       Environment: { default: { vars: { set: (key, value) => vars.set(key, value) } } },
       ServerNode: { create: async (options) => Object.assign(server, { options }) },
       Endpoint: FakeEndpoint,
@@ -260,16 +277,19 @@ function feature(selector, category, type, extra = {}) {
 /**
  * @description Build context reading values from a map and recording commands.
  * @param {object} [values] - Last values by feature selector.
- * @returns {object} Context with read, command and the recorded commands.
+ * @returns {object} Context with read, command and moved, and the recorded commands and moves.
  * @example
  * const ctx = createContext({ 'light-binary': 1 });
  */
 function createContext(values = {}) {
   const commands = [];
+  const moves = [];
   return {
     commands,
+    moves,
     read: (f) => (f.selector in values ? values[f.selector] : null),
     command: (f, value) => commands.push([f.selector, value]),
+    moved: (f) => moves.push(f.selector),
   };
 }
 

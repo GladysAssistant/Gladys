@@ -3,6 +3,7 @@ const {
   isNumber,
   toLevel,
   fromLevel,
+  miredsRange,
   toMireds,
   fromMireds,
   colorToHueSaturation,
@@ -75,10 +76,13 @@ function lightType(matter, roles) {
  * colorState({ color }, read);
  */
 function colorState(roles, read) {
+  // Matter apps only offer the whites the light can make. A colour light without colour
+  // temperature feature makes its whites with its colour, over the usual range.
+  const [lowest, highest] = roles.temperature ? miredsRange(roles.temperature) : [MIREDS_MIN, MIREDS_MAX];
   const state = {
-    colorTempPhysicalMinMireds: MIREDS_MIN,
-    colorTempPhysicalMaxMireds: MIREDS_MAX,
-    coupleColorTempToLevelMinMireds: MIREDS_MIN,
+    colorTempPhysicalMinMireds: lowest,
+    colorTempPhysicalMaxMireds: highest,
+    coupleColorTempToLevelMinMireds: lowest,
     startUpColorTemperatureMireds: null,
     remainingTime: 0,
     colorMode: roles.color ? COLOR_MODE.HUE_SATURATION : COLOR_MODE.COLOR_TEMPERATURE,

@@ -21,7 +21,7 @@ const {
 const { getStoragePath, getPort, getPairingConfig, softwareVersionOf, uniqueIdOf } = require('./config');
 const { readExposure, isExposed } = require('./exposure');
 const { planDevice, planSignature } = require('./planDevice');
-const { buildEndpoints, endpointNumbers, truncate } = require('./buildEndpoints');
+const { buildEndpoints, endpointId, endpointNumbers, truncate } = require('./buildEndpoints');
 const { Bindings } = require('./Bindings');
 const { isStorageEmpty, createBackup, restoreBackup } = require('./backup');
 const { checkIpv6 } = require('../../../utils/checkIpv6');
@@ -53,6 +53,12 @@ function MatterBridge(gladys, serviceId, loadMatter) {
   this.windowReopenedAt = null;
   // Device id -> { selector, name, signature, built }
   this.devices = new Map();
+  // Device id -> endpoint numbers of a device being rebuilt, until it is on the bridge again: a
+  // rebuild that fails must not cost the device the numbers the ecosystems know it by.
+  this.reservedNumbers = new Map();
+  // Device id -> selector of a device taken off the bridge: its endpoints were closed, and matter.js
+  // keeps them in its storage until they are erased.
+  this.closedDevices = new Map();
   this.bindings = new Bindings(gladys);
   // Device changes are applied one at a time: two of them on the same device must not interleave.
   this.queue = Promise.resolve();
@@ -61,9 +67,7 @@ function MatterBridge(gladys, serviceId, loadMatter) {
     event.type === EVENTS.DEVICE.NEW_STATE ? this.bindings.push(event) : null,
   );
   this.onDeviceChange = eventFunctionWrapper((device) => this.enqueue(() => this.syncDevice(device)));
-  this.onDeviceDelete = eventFunctionWrapper((device) =>
-    this.enqueue(() => this.removeDevice(device.id, { forget: true })),
-  );
+  this.onDeviceDelete = eventFunctionWrapper((device) => this.enqueue(() => this.forgetDevice(device.id)));
 }
 
 /**
@@ -353,7 +357,10 @@ MatterBridge.prototype.rebuildAll = async function rebuildAll(server) {
     return;
   }
   logger.info('Matter bridge: removed from its last ecosystem and reset, its devices are rebuilt');
-  // No ecosystem knows the endpoints any more: their numbers do not have to be kept.
+  // No ecosystem knows the endpoints any more: their numbers do not have to be kept, and the reset
+  // erased the closed ones.
+  this.reservedNumbers.clear();
+  this.closedDevices.clear();
   // eslint-disable-next-line no-restricted-syntax
   for (const deviceId of Array.from(this.devices.keys())) {
     // eslint-disable-next-line no-await-in-loop
@@ -431,7 +438,12 @@ MatterBridge.prototype.stopNow = async function stopNow() {
   this.gladys.event.removeListener(EVENTS.DEVICE.UPDATE, this.onDeviceChange);
   this.gladys.event.removeListener(EVENTS.DEVICE.DELETE, this.onDeviceDelete);
   this.bindings.clear();
+  // Closing the node closes the endpoints of every exposed device: they stay in the storage, so a
+  // device that is no longer there on the next start can still be erased.
+  this.devices.forEach(({ selector }, deviceId) => this.closedDevices.set(deviceId, selector));
   this.devices.clear();
+  // A new node starts with an open commissioning window, without the delay of the previous one.
+  this.windowReopenedAt = null;
   const { server } = this;
   this.online = false;
   this.server = null;
@@ -459,6 +471,8 @@ MatterBridge.prototype.reset = function reset() {
       // The backup first: an empty storage next to a backup would bring the old pairings back.
       await this.gladys.variable.destroy(VARIABLES.BACKUP, this.serviceId);
       await fse.remove(getStoragePath(this.gladys));
+      this.reservedNumbers.clear();
+      this.closedDevices.clear();
       await this.gladys.variable.destroy(VARIABLES.PASSCODE, this.serviceId);
       await this.gladys.variable.destroy(VARIABLES.DISCRIMINATOR, this.serviceId);
     } catch (e) {
@@ -569,11 +583,16 @@ MatterBridge.prototype.syncAll = async function syncAll() {
     }
   }
 
+  // Every device the bridge knows of, on it or not: those that left Gladys are forgotten.
+  const known = new Set([...this.devices.keys(), ...this.closedDevices.keys(), ...this.reservedNumbers.keys()]);
   // eslint-disable-next-line no-restricted-syntax
-  for (const deviceId of Array.from(this.devices.keys())) {
-    if (!kept.has(deviceId)) {
+  for (const deviceId of known) {
+    if (!inGladys.has(deviceId)) {
       // eslint-disable-next-line no-await-in-loop
-      await this.removeDevice(deviceId, { forget: !inGladys.has(deviceId) });
+      await this.forgetDevice(deviceId);
+    } else if (!kept.has(deviceId)) {
+      // eslint-disable-next-line no-await-in-loop
+      await this.removeDevice(deviceId);
     }
   }
 };
@@ -621,14 +640,14 @@ MatterBridge.prototype.upsertDevice = async function upsertDevice(device) {
     }
     return true;
   }
-  let numbers;
   if (existing) {
     // The endpoints are deleted, so nothing of the former ones is left in the storage of
-    // matter.js, and the new ones are given the numbers the former had.
-    numbers = endpointNumbers(existing.built);
+    // matter.js, and the new ones are given the numbers the former had. The numbers are kept until
+    // the device is on the bridge again: should it fail to be built, a later sync gives them back.
+    this.reservedNumbers.set(device.id, endpointNumbers(existing.built));
     await this.removeDevice(device.id, { forget: true });
   }
-  return this.addDevice(device, plan, signature, numbers);
+  return this.addDevice(device, plan, signature, this.reservedNumbers.get(device.id));
 };
 
 /**
@@ -652,6 +671,7 @@ MatterBridge.prototype.addDevice = async function addDevice(device, plan, signat
       {
         read: (feature) => this.readValue(feature),
         command: (feature, value) => this.bindings.command(device, feature, value),
+        moved: (feature) => this.bindings.settleLater(feature.selector),
       },
       numbers,
     );
@@ -670,6 +690,8 @@ MatterBridge.prototype.addDevice = async function addDevice(device, plan, signat
   }
   this.bindings.add(device, built);
   this.devices.set(device.id, { selector: device.selector, name: device.name, signature, built });
+  this.reservedNumbers.delete(device.id);
+  this.closedDevices.delete(device.id);
   return true;
 };
 
@@ -697,10 +719,60 @@ MatterBridge.prototype.removeDevice = async function removeDevice(deviceId, { fo
     if (forget) {
       await existing.built.root.delete();
     } else {
+      // Listed until it returns or leaves Gladys, which then erases it (see forgetDevice).
+      this.closedDevices.set(deviceId, existing.selector);
       await existing.built.root.close();
     }
   } catch (e) {
     logger.warn(`Matter bridge: unable to remove device ${existing.selector}: ${e.message}`);
+  }
+};
+
+/**
+ * @description Forget a device deleted from Gladys: its endpoints are deleted from the bridge, or
+ * erased from the storage of matter.js when it was taken off the bridge before, so that nothing of
+ * it is left in the storage and in the backups, and a new device with the same selector does not
+ * get its endpoint numbers.
+ * @param {string} deviceId - Gladys device id.
+ * @returns {Promise} Resolves once the device is forgotten.
+ * @example
+ * await bridge.forgetDevice(device.id);
+ */
+MatterBridge.prototype.forgetDevice = async function forgetDevice(deviceId) {
+  this.reservedNumbers.delete(deviceId);
+  if (this.devices.has(deviceId)) {
+    await this.removeDevice(deviceId, { forget: true });
+    return;
+  }
+  const selector = this.closedDevices.get(deviceId);
+  // Without a node, the device stays listed: the next start erases it, as syncAll forgets the
+  // devices that left Gladys.
+  if (selector !== undefined && this.server) {
+    this.closedDevices.delete(deviceId);
+    await this.eraseStoredDevice(selector);
+  }
+};
+
+/**
+ * @description Erase the endpoints of a device that is not on the bridge from the storage of
+ * matter.js, children included, and release their numbers. They are closed, so no Endpoint is left
+ * to delete them: the store of the root endpoint is erased by its id under the aggregator, matter.js
+ * being handed the fields of an endpoint it reads to find that store (checked against the real
+ * matter.js in realMatter.test.js).
+ * @param {string} selector - Gladys selector of the device.
+ * @returns {Promise} Resolves once the endpoints are erased.
+ * @example
+ * await bridge.eraseStoredDevice('kitchen-light');
+ */
+MatterBridge.prototype.eraseStoredDevice = async function eraseStoredDevice(selector) {
+  const id = endpointId(selector);
+  try {
+    const { ServerNodeStore } = this.matter.main;
+    await this.server.env
+      .get(ServerNodeStore)
+      .endpointStores.eraseStoreForEndpoint({ id, maybeId: id, maybeNumber: undefined, owner: this.aggregator });
+  } catch (e) {
+    logger.warn(`Matter bridge: unable to erase the stored endpoints of ${selector}: ${e.message}`);
   }
 };
 
