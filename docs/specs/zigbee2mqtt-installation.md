@@ -737,7 +737,9 @@ A screen of its own, back to the dashboard by "Configuration":
   Gladys has none (20 characters, as the MQTT accounts), and `configureContainer` writes it as
   `frontend.auth_token`; `Z2M_FRONTEND_AUTH_TOKEN` saves it once the file is read, before Zigbee2mqtt
   restarts with it (not before: the file may hold another one). A password written by hand in the file
-  wins, and Gladys keeps it at its next start; a reference to another file (`'!secret.yaml auth_token'`)
+  wins, and Gladys keeps it at its next start; when it is not the one Gladys saved (changed by hand, or from
+  the settings of the interface, while Zigbee2mqtt may still run with the previous one), Zigbee2mqtt is
+  restarted once for it, the file not written again; a reference to another file (`'!secret.yaml auth_token'`)
   is left as is, and Gladys knows no password then. A reference is told as Zigbee2mqtt tells it
   (`parseValueRef` of its settings, `/!(.*) (.*)/`): a "!" followed further by a space, so that a
   password written by hand such as `!MyPassw0rd` stays a password. An installation without one gets it at the next start

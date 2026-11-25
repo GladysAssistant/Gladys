@@ -385,9 +385,13 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   // The password of the interface: one written by hand in the file wins, and Gladys keeps it; else the one of Gladys is
   // written. A reference to another file (`!secret.yaml auth_token`) is left as is: Gladys does not know the password.
   const { auth_token: authToken } = loadedConfig.frontend;
+  let passwordChanged = false;
   if (typeof authToken === 'string' && VALUE_REFERENCE.test(authToken)) {
     config.z2mFrontendAuthToken = null;
   } else if (typeof authToken === 'string' && authToken !== '') {
+    // Changed in the file since Gladys saved it (by hand, or from the settings of the interface): Zigbee2mqtt may still
+    // run with the previous one, restarted for the one Gladys shows and links, without writing the file again
+    passwordChanged = authToken !== config.z2mFrontendAuthToken;
     config.z2mFrontendAuthToken = authToken;
   } else if (config.z2mFrontendAuthToken) {
     loadedConfig.frontend.auth_token = config.z2mFrontendAuthToken;
@@ -399,7 +403,7 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
     await writeConfigFile(configFilepath, loadedConfig);
   }
 
-  return { configChanged: configCreated || configChanged, adapterChanged };
+  return { configChanged: configCreated || configChanged || passwordChanged, adapterChanged };
 }
 
 module.exports = {

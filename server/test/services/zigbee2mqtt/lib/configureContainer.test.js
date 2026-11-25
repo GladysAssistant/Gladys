@@ -640,10 +640,15 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
   });
 
-  it('it should keep the password of the interface written by hand, and give it to Gladys', async () => {
+  it('it should keep the password of the interface written by hand, give it to Gladys, and restart for it', async () => {
     // PREPARE
+    // Changed by hand while Zigbee2mqtt runs with the one Gladys saved: the comment tells the file is not written again
     const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
-    fs.writeFileSync(configFilePath, content.replace('  port: 12000\n', '  port: 12000\n  auth_token: my-password\n'));
+    const handWritten = `# written by hand\n${content.replace(
+      '  port: 12000\n',
+      '  port: 12000\n  auth_token: my-password\n',
+    )}`;
+    fs.writeFileSync(configFilePath, handWritten);
     const config = {
       z2mTcpPort: '12000',
       z2mFrontendAuthToken: 'gladys-password',
@@ -651,8 +656,24 @@ describe('zigbee2mqtt configureContainer', () => {
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
     // ASSERT
-    expect(changed.configChanged).to.equal(false);
-    expect(fs.readFileSync(configFilePath, 'utf8')).to.include('  auth_token: my-password\n');
+    // Restarted: Zigbee2mqtt may still ask for the previous one, not the one Gladys now shows and links
+    expect(changed.configChanged).to.equal(true);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.equal(handWritten);
+    expect(config.z2mFrontendAuthToken).to.equal('my-password');
+  });
+
+  it('it should not restart for the password of the interface written by hand that Gladys already knows', async () => {
+    // PREPARE
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(configFilePath, content.replace('  port: 12000\n', '  port: 12000\n  auth_token: my-password\n'));
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'my-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
     expect(config.z2mFrontendAuthToken).to.equal('my-password');
   });
 
@@ -690,7 +711,8 @@ describe('zigbee2mqtt configureContainer', () => {
     // EXECUTE
     const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
     // ASSERT
-    expect(changed.configChanged).to.equal(false);
+    // Another password than the one Gladys saved: restarted for it, as a password and not as a reference
+    expect(changed.configChanged).to.equal(true);
     expect(fs.readFileSync(configFilePath, 'utf8')).to.include("  auth_token: '!MyPassw0rd'\n");
     expect(config.z2mFrontendAuthToken).to.equal('!MyPassw0rd');
   });
