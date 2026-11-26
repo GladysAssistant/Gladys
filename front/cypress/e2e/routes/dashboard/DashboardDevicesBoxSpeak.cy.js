@@ -169,6 +169,17 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
     speakButton().should('have.focus');
   });
 
+  it('Should give the focus back to its button with a mouse that does not focus it on click (Safari)', () => {
+    setMouse(true);
+    // a click that does not move the focus, as Safari does on a button: the sheet then remembers
+    // <body> as the element that had the focus when it opened
+    speakButton().then(([button]) => button.click());
+    field().should('have.focus');
+    cy.get('[data-cy="sheet-close"]').click();
+    sheet().should('not.exist');
+    speakButton().should('have.focus');
+  });
+
   it('Should be ready to type into on a touch screen too, its keyboard held by a stand-in field', () => {
     setMouse(false);
     speakButton().click();
