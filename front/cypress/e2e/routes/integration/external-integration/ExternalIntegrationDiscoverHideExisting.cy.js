@@ -103,6 +103,13 @@ describe('External integration - discovery, hide devices already added', () => {
     cardTitles().should('have.length', 0);
     cy.contains('integration.externalIntegration.discover.allDevicesHidden').should('exist');
     cy.contains('integration.externalIntegration.discover.noSearchResults').should('not.exist');
+    // an active search answers before "everything is hidden"
+    cy.get('.card-header input[type=text]').type('unknown');
+    cy.contains('integration.externalIntegration.discover.noSearchResults').should('exist');
+    cy.contains('integration.externalIntegration.discover.allDevicesHidden').should('not.exist');
+    cy.get('.card-header input[type=text]').clear();
+    cy.get('.card-header input[type=text]').type('Added');
+    cy.contains('integration.externalIntegration.discover.searchMatchesHiddenDevices').should('exist');
   });
   it('keeps a device added during the visit listed, with its badge, until the page is loaded again', () => {
     let discovered = [DISCOVERED_DEVICES[0]];

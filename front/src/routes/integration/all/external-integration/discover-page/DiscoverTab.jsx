@@ -37,19 +37,19 @@ const matchesSearch = (device, search) =>
 const isHidden = (device, addedThisVisit) =>
   device.created && !device.structure_changed && !(addedThisVisit && addedThisVisit.has(device.external_id));
 
-// the empty state of a list that shows nothing although devices were found:
-// everything hidden by the toggle, a search matching only hidden devices, or
-// a search matching nothing at all
-const getEmptyListTextId = ({ discoveredDevices, visibleDevices, filteredDevices, hiddenSearchMatch }) => {
+// the empty state of a list that shows nothing although devices were found.
+// An active search answers first: it matches only hidden devices, or nothing
+// at all; without one, everything is hidden by the toggle
+const getEmptyListTextId = ({ discoveredDevices, filteredDevices, search, hiddenSearchMatch }) => {
   if (!discoveredDevices || discoveredDevices.length === 0 || filteredDevices.length > 0) {
     return null;
   }
-  if (visibleDevices.length === 0) {
-    return 'integration.externalIntegration.discover.allDevicesHidden';
+  if (search) {
+    return hiddenSearchMatch
+      ? 'integration.externalIntegration.discover.searchMatchesHiddenDevices'
+      : 'integration.externalIntegration.discover.noSearchResults';
   }
-  return hiddenSearchMatch
-    ? 'integration.externalIntegration.discover.searchMatchesHiddenDevices'
-    : 'integration.externalIntegration.discover.noSearchResults';
+  return 'integration.externalIntegration.discover.allDevicesHidden';
 };
 
 const DiscoverTab = ({
@@ -79,7 +79,7 @@ const DiscoverTab = ({
   const hiddenSearchMatch =
     Boolean(search && hideExistingDevices && discoveredDevices) &&
     discoveredDevices.some(device => isHidden(device, addedThisVisit) && matchesSearch(device, search));
-  const emptyListTextId = getEmptyListTextId({ discoveredDevices, visibleDevices, filteredDevices, hiddenSearchMatch });
+  const emptyListTextId = getEmptyListTextId({ discoveredDevices, filteredDevices, search, hiddenSearchMatch });
   const scanning = scanStatus === RequestStatus.Getting;
   // On a phone: the scan as the button of the page, then one row per device found
   // (docs/specs/mobile-pages/integration-devices.md)
