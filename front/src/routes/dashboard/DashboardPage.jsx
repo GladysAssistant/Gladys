@@ -38,6 +38,9 @@ const DashboardPage = ({ children, ...props }) => {
       // a pinch-zoom also shrinks the visual viewport, but overlays nothing
       const lift = viewport.scale > 1.01 ? 0 : Math.max(0, Math.round(overlaid));
       dockRef.current.style.setProperty('--dock-lift', `${lift}px`);
+      // mirrored on <html>: what the app shell renders on <body> above the dock (the toast of
+      // a failed device command) has to follow it
+      document.documentElement.style.setProperty('--dock-lift', `${lift}px`);
     };
     viewport.addEventListener('resize', updateDockLift);
     viewport.addEventListener('scroll', updateDockLift);
@@ -45,6 +48,7 @@ const DashboardPage = ({ children, ...props }) => {
     return () => {
       viewport.removeEventListener('resize', updateDockLift);
       viewport.removeEventListener('scroll', updateDockLift);
+      document.documentElement.style.removeProperty('--dock-lift');
     };
   }, []);
 
@@ -174,6 +178,24 @@ const DashboardPage = ({ children, ...props }) => {
                 {props.gatewayInstanceNotFound && (
                   <div class="alert alert-warning">
                     <Text id="dashboard.gatewayInstanceNotFoundError" />
+                  </div>
+                )}
+                {/* a live region that is always there: a failure after the page mounted is read */}
+                <div aria-live="polite">
+                  {props.dashboardLoadFailed && (
+                    <div class="alert alert-warning" data-cy="dashboard-load-error">
+                      <Text id="dashboard.loadError" />
+                    </div>
+                  )}
+                </div>
+                {props.tabletModeParamError && (
+                  <div class="alert alert-danger" data-cy="tablet-mode-param-error">
+                    <Text id="dashboard.tabletModeParamError" fields={{ value: props.tabletModeParamError }} />
+                  </div>
+                )}
+                {props.tabletModeActivationFailed && (
+                  <div class="alert alert-danger" data-cy="tablet-mode-activation-error">
+                    <Text id="dashboard.tabletModeActivationError" />
                   </div>
                 )}
                 <SetTabletMode

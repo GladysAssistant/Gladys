@@ -1,6 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import ServicesPage from './ServicesPage';
+import MobileServicesPage from './MobileServicesPage';
+import { withMobileViewport } from '../../../components/mobile';
 import update from 'immutability-helper';
 
 class SettingsServices extends Component {
@@ -43,9 +45,12 @@ class SettingsServices extends Component {
     this.getServices();
   }
 
-  render(props, { services }) {
+  // On a phone the services are rows, each opening its sheet
+  // (docs/specs/mobile-pages/settings-pages.md, C): same state, same requests
+  render({ isMobile, ...props }, { services }) {
+    const Page = isMobile ? MobileServicesPage : ServicesPage;
     return (
-      <ServicesPage
+      <Page
         {...props}
         services={services}
         startService={this.startService}
@@ -56,4 +61,4 @@ class SettingsServices extends Component {
   }
 }
 
-export default connect('httpClient', {})(SettingsServices);
+export default connect('httpClient', {})(withMobileViewport(SettingsServices));

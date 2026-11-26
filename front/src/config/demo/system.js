@@ -137,7 +137,8 @@ const system = {
     available: true,
     can_ntp: true,
     ntp_enabled: true,
-    ntp_synchronized: true
+    ntp_synchronized: true,
+    in_container: false
   },
   'get /api/v1/system/disk': {
     filesystem: '/dev/disk1s1',

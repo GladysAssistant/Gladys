@@ -9,7 +9,15 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature, isStringStateFeature } = require('../../utils/device');
-const { AbortScene, SceneStopped, NotFoundError } = require('../../utils/coreErrors');
+const {
+  AbortScene,
+  SceneStopped,
+  NotFoundError,
+  BadParameters,
+  VoiceUnavailableError,
+  VOICE_UNAVAILABLE_REASONS,
+} = require('../../utils/coreErrors');
+const { Error402, Error403, Error429 } = require('../../utils/httpErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRanges');
@@ -18,6 +26,8 @@ const { isInTimeRanges, resolveTriggerTimeRanges } = require('../../utils/timeRa
 // fired: past it, the condition computes the state from the ranges again.
 const TIME_RANGE_TRUST_MS = 60 * 1000;
 const logger = require('../../utils/logger');
+const { GLADYS_PLUS_PROVIDER } = require('../tts/constants');
+const { MAX_TTS_TEXT_LENGTH } = require('../external-integration/constants');
 const executeActionsFactory = require('./scene.executeActions');
 const { evaluate } = require('./scene.formula');
 
@@ -117,6 +127,66 @@ async function setSwitchesValue(self, action, getValue) {
   });
 }
 
+/**
+ * @description Read a text out loud on a device, for a caller who asked for it (`speak`, the
+ * "Speak" control of the devices widget): the device receives the URL of a clip of the voice of
+ * Gladys, never the text, as with the "Talk on a speaker" action. The text is said as it is: no
+ * variable is injected, and a URL or a number typed as a text is only words.
+ * @param {object} self - The scene manager.
+ * @param {object} action - The action, whose value is the text.
+ * @param {object} device - The device.
+ * @param {object} deviceFeature - Its feature, a music / play_notification one.
+ * @returns {Promise} Resolves once the device has the URL.
+ * @example
+ * await speakOnDevice(self, { value: 'Dinner is ready', speak: true }, device, deviceFeature);
+ */
+async function speakOnDevice(self, action, device, deviceFeature) {
+  const { value } = action;
+  if (
+    deviceFeature.category !== DEVICE_FEATURE_CATEGORIES.MUSIC ||
+    deviceFeature.type !== DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION
+  ) {
+    throw new BadParameters('Only a music / play_notification feature can read a text out loud');
+  }
+  if (typeof value !== 'string') {
+    throw new BadParameters('A text to read out loud is a string');
+  }
+  if (value.trim() === '') {
+    throw new AbortScene('ACTION_VALUE_EMPTY');
+  }
+  // refused before the voice is asked for: a voice integration does not take a longer text
+  if (value.length > MAX_TTS_TEXT_LENGTH) {
+    throw new BadParameters(`A text to read out loud has at most ${MAX_TTS_TEXT_LENGTH} characters`);
+  }
+  // in the language of its author, as the voice assistant answers them
+  const author = action.user_id ? self.stateManager.get('userById', action.user_id) : null;
+  let url = null;
+  try {
+    ({ url } = await self.tts.getSpeechUrl({ text: value, language: author ? author.language : null }));
+  } catch (e) {
+    logger.warn(e);
+    // Gladys Plus being the voice without a subscription (402, 403, or no Gladys Plus account
+    // linked at all: the voice of a fresh instance) or with its quota reached (429) is not a
+    // broken voice: the user is told what to do. The same codes thrown by a voice integration
+    // mean nothing to them (docs/specs/external-integrations/capabilities/tts-type.md).
+    if ((await self.tts.getActiveProvider()) === GLADYS_PLUS_PROVIDER) {
+      const { QUOTA_REACHED, SUBSCRIPTION_REQUIRED } = VOICE_UNAVAILABLE_REASONS;
+      if (e instanceof Error429) {
+        throw new VoiceUnavailableError('Gladys Plus refused to turn the text into speech', QUOTA_REACHED);
+      }
+      if (e instanceof Error402 || e instanceof Error403 || !(await self.gateway.getStatus()).configured) {
+        throw new VoiceUnavailableError('Gladys Plus refused to turn the text into speech', SUBSCRIPTION_REQUIRED);
+      }
+    }
+  }
+  // Not a failure of the device: the user is told that the voice is the problem. Gladys Plus
+  // can also answer without a URL.
+  if (!url) {
+    throw new VoiceUnavailableError('The text could not be turned into speech');
+  }
+  return self.device.setValue(device, deviceFeature, url);
+}
+
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
     let device;
@@ -148,6 +218,11 @@ const actionsFunc = {
         throw new AbortScene('ACTION_VALUE_EMPTY');
       }
       return self.device.setValue(device, deviceFeature, String(value));
+    }
+
+    // A text to read out loud, when the caller says so (the devices widget)
+    if (action.speak === true) {
+      return speakOnDevice(self, action, device, deviceFeature);
     }
 
     if (action.evaluate_value !== undefined) {

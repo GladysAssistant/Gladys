@@ -69,6 +69,19 @@ describe('zigbee2mqtt connect', () => {
     expect(zigbee2mqttManager.mqttClient).to.eq(null);
   });
 
+  it('should forget the values received from the previous broker', async () => {
+    // PREPARE
+    zigbee2mqttManager.mqttRunning = false;
+    zigbee2mqttManager.mqttClient = mqttClient;
+    zigbee2mqttManager.lastReceivedStates = {
+      '0x00158d00033e88d5': { battery: { value: 59, receivedAt: '2026-11-15T09:00:00.000Z' } },
+    };
+    // EXECUTE
+    await zigbee2mqttManager.connect(configuration);
+    // ASSERT
+    expect(zigbee2mqttManager.lastReceivedStates).to.deep.equal({});
+  });
+
   it('it should not try to connect to mqtt', async () => {
     // PREPARE
     zigbee2mqttManager.mqttRunning = false;
@@ -117,7 +130,14 @@ describe('zigbee2mqtt connect', () => {
         mqttExist: true,
         mqttRunning: true,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -125,9 +145,13 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
     assert.calledOnceWithExactly(mqttClient.subscribe, 'zigbee2mqtt/#');
@@ -163,7 +187,14 @@ describe('zigbee2mqtt connect', () => {
         mqttExist: false,
         mqttRunning: true,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -171,9 +202,13 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: { code: null, message: 'mqtt_error' },
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
   });
@@ -264,7 +299,14 @@ describe('zigbee2mqtt connect', () => {
         mqttExist: false,
         mqttRunning: true,
         networkModeValid: true,
+        configured: null,
+        stopped: false,
+        stoppedAt: null,
+        setupPending: false,
+        updatePending: false,
+        serviceStarted: false,
         usbConfigured: false,
+        dongleMissing: false,
         networkAdapterConfigured: false,
         z2mEnabled: true,
         zigbee2mqttConnected: false,
@@ -272,9 +314,13 @@ describe('zigbee2mqtt connect', () => {
         zigbee2mqttExist: false,
         zigbee2mqttRunning: false,
         coordinatorFirmware: null,
+        z2mVersion: null,
+        deviceCount: null,
         z2mContainerError: null,
         ezspFallback: false,
         mqttConnectionError: null,
+        installation: { state: 'idle', kind: null, phases: [], progress: 0, error: null, durationMs: null },
+        prefetch: { state: 'idle', progress: 0, freeBytes: null, neededBytes: null, error: null },
       },
     });
   });

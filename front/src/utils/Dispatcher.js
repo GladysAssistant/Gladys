@@ -46,7 +46,12 @@ export class Dispatcher {
     }
 
     this.events[event].listeners.forEach(listener => {
-      listener(details);
+      // a listener that throws must not keep the event from the ones after it
+      try {
+        listener(details);
+      } catch (e) {
+        console.error(e);
+      }
     });
   }
 }

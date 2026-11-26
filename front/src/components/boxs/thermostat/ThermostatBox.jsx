@@ -13,8 +13,7 @@ import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/
 import { calendarDaysAhead } from '../../../../../server/utils/thermostatSchedule';
 import {
   defaultPresetTemps,
-  DEFAULT_MIN_TEMP,
-  DEFAULT_MAX_TEMP,
+  defaultTempRange,
   DEFAULT_HYSTERESIS_START,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
@@ -33,6 +32,7 @@ import CircularGauge from './CircularGauge';
 import { angleToTemp as angleToSetpoint, getAngleFromPointer, isAngleInArc } from './gaugeGeometry';
 import { loadDeviceConfig } from './deviceConfig';
 import { isRunningFromStateFeature } from './operatingState';
+import { sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 
 const PRESET_ICONS = {
   off: 'fe-power',
@@ -107,6 +107,9 @@ const numOr = (value, fallback) => {
 };
 
 class ThermostatBox extends Component {
+  // Config loads started so far: only the latest is committed (see loadConfig).
+  configLoads = 0;
+
   state = {
     setpoint: null,
     currentTemp: null,
@@ -115,6 +118,8 @@ class ThermostatBox extends Component {
     isManualMode: false,
     error: false,
     noConfig: false,
+    // The thermostat the box points to was deleted (see loadConfig).
+    missing: false,
     remoteConfig: null,
     featureMin: null,
     featureMax: null,
@@ -213,19 +218,78 @@ class ThermostatBox extends Component {
     const cfg = this.state.remoteConfig;
     return !!(cfg && cfg.pilot_wire_feature) && !this.isHeaterRegulated();
   };
-  getMinTemp = () => {
-    // Device feature native min has top priority
-    if (this.state.featureMin !== null) return this.state.featureMin;
+  // The dial spans the range set on the thermostat (THERMOSTAT_MIN_TEMP /
+  // _MAX_TEMP, or the shared default), in the setpoint feature's unit. The range
+  // the device advertises only narrows it, never widens it: Matter advertises
+  // -100-200 °C, and taking it first let the dial reach 166 °C on a thermostat
+  // set to 8-25 (spec F). Kept until one of its inputs changes: a drag of the
+  // dial reads it on every pointer move.
+  getDialRange = () => {
     const cfg = this.getConfig();
-    if (cfg.temp_min !== undefined && cfg.temp_min !== null) return Number(cfg.temp_min);
-    return DEFAULT_MIN_TEMP;
+    const { featureUnit, featureMin, featureMax } = this.state;
+    const key = [
+      cfg.temp_min,
+      cfg.temp_max,
+      cfg.temp_unit,
+      this.isExternal(),
+      featureUnit,
+      featureMin,
+      featureMax
+    ].join('|');
+    if (!this.dialRange || this.dialRange.key !== key) {
+      this.dialRange = { key, range: this.computeDialRange(cfg) };
+    }
+    return this.dialRange.range;
   };
-  getMaxTemp = () => {
-    // Device feature native max has top priority
-    if (this.state.featureMax !== null) return this.state.featureMax;
-    const cfg = this.getConfig();
-    if (cfg.temp_max !== undefined && cfg.temp_max !== null) return Number(cfg.temp_max);
-    return DEFAULT_MAX_TEMP;
+
+  computeDialRange = cfg => {
+    // In the thermostat's unit, like its bounds: 5-35 read as Fahrenheit.
+    const defaults = defaultTempRange(cfg.temp_unit);
+    let min = numOr(cfg.temp_min, defaults.min);
+    let max = numOr(cfg.temp_max, defaults.max);
+    // An inverted range, or one with no width, is refused at save time; one an
+    // older device still carries stands for the default range, as on the server
+    // (D.0) — honoured, it turned + and − round. Compared before the unit
+    // conversion, whose rounding can make two distinct bounds equal (13 and
+    // 12.5 °C are both 55 °F).
+    if (min >= max) {
+      ({ min, max } = defaults);
+    }
+    min = this.toSetpointFeatureUnit(min);
+    max = this.toSetpointFeatureUnit(max);
+    // Two distinct bounds the conversion rounded together leave a dial with no
+    // width: it takes the default range instead.
+    if (min >= max) {
+      min = this.toSetpointFeatureUnit(defaults.min);
+      max = this.toSetpointFeatureUnit(defaults.max);
+    }
+    // An inverted advertised range is no range either. On a virtual thermostat
+    // the form copies its bounds onto the feature's own min/max.
+    const advertisedOrdered =
+      this.state.featureMin === null ||
+      this.state.featureMax === null ||
+      this.state.featureMin <= this.state.featureMax;
+    const featureMin = advertisedOrdered ? this.state.featureMin : null;
+    const featureMax = advertisedOrdered ? this.state.featureMax : null;
+    const low = featureMin !== null ? Math.max(min, featureMin) : min;
+    const high = featureMax !== null ? Math.min(max, featureMax) : max;
+    // Two ranges that only touch (5-35 on a device advertising 35-60) leave a
+    // single value, a dial + and − do nothing on: no width is no range either.
+    if (low < high) {
+      return { min: low, max: high };
+    }
+    // A range the device cannot reach would pin the dial to a single value: it
+    // follows the device instead. With only one bound advertised, the open side
+    // keeps the width of the configured range (a device topping out at 4 under
+    // a 5-35 range gets -26-4, not 4-4).
+    const span = max - min;
+    if (featureMin !== null && featureMax !== null) {
+      return { min: featureMin, max: featureMax };
+    }
+    if (featureMin !== null) {
+      return { min: featureMin, max: featureMin + span };
+    }
+    return { min: featureMax - span, max: featureMax };
   };
 
   // Effective temperature unit: device feature unit takes priority over user preference
@@ -305,10 +369,28 @@ class ThermostatBox extends Component {
   };
 
   loadConfig = async () => {
+    // Only the latest load is committed. Loads overlap — a config update while
+    // the card loads, another thermostat picked in the editor — and the answers
+    // come back in any order: an older one would overwrite the newer, bring a
+    // deleted thermostat's controls back, or flag a new pick as deleted.
+    this.configLoads += 1;
+    const load = this.configLoads;
     const remoteConfig = await loadDeviceConfig(this.props.httpClient, this.props.box.thermostat_feature);
-    if (!remoteConfig) {
+    if (load !== this.configLoads) {
       return null;
     }
+    if (!remoteConfig) {
+      // No thermostat picked: the card asks for one (noConfig), not for another.
+      this.setState({ missing: false });
+      return null;
+    }
+    // A thermostat deleted since the box was set: nothing to draw nor to drive.
+    // Read on every load, not only the first: a config update reloads an open
+    // card, and it fell back on the default settings and drew a comfort
+    // setpoint for a device that no longer exists. A failed request proves
+    // nothing either way, so a deletion already seen stands until a load finds
+    // the thermostat.
+    const missing = Boolean(remoteConfig.missing || (remoteConfig.failed && this.state.missing));
     await new Promise(resolve =>
       this.setState(prev => {
         // The device carries the mode this card wrote: nothing is pending any more.
@@ -317,7 +399,8 @@ class ThermostatBox extends Component {
           remoteConfig.mode !== null &&
           remoteConfig.mode !== undefined &&
           Number(remoteConfig.mode) === prev.pendingMode;
-        return confirmed ? { remoteConfig, pendingMode: null } : { remoteConfig };
+        const update = missing ? { remoteConfig, missing, setpoint: null } : { remoteConfig, missing };
+        return confirmed ? { ...update, pendingMode: null } : update;
       }, resolve)
     );
     return remoteConfig;
@@ -477,7 +560,7 @@ class ThermostatBox extends Component {
   writeFeature = async (feature, value) => {
     if (!feature) return false;
     try {
-      await this.props.httpClient.post(`/api/v1/device_feature/${feature.selector}/value`, { value });
+      await sendDeviceFeatureValue(this.props.httpClient, feature.selector, value);
       return true;
     } catch (e) {
       console.error('Failed to write a thermostat feature:', e);
@@ -693,9 +776,32 @@ class ThermostatBox extends Component {
     }
   };
 
+  // The features this card writes: the setpoint, the preset and the mode
+  getWrittenFeatureSelectors = () => {
+    const cfg = this.state.remoteConfig;
+    return [
+      this.props.box.thermostat_feature,
+      cfg && cfg.presetFeature && cfg.presetFeature.selector,
+      cfg && cfg.modeFeature && cfg.modeFeature.selector
+    ].filter(Boolean);
+  };
+
   handleWebsocketMessage = payload => {
     const { box } = this.props;
     const thermostatFeature = box.thermostat_feature;
+    // A state flagged `rollback` is Gladys saying that a write failed, and giving the real
+    // state back (components/device/DeviceCommandError.jsx). Everything the card holds since
+    // the tap — the setpoint held as manual, the value it waits for, the mode it expects —
+    // is what would drop that state, and none of it landed. The card is rebuilt the way a
+    // reload builds it, from the device: a failed write may have been one of several (a start
+    // from a stop writes the mode, the preset and the setpoint).
+    if (payload.rollback && this.getWrittenFeatureSelectors().includes(payload.device_feature_selector)) {
+      this.releaseSetpointHold();
+      this.forgetExpectedMode();
+      this.setState({ pendingMode: null });
+      this.initData();
+      return;
+    }
     const humidityFeature = (this.state.remoteConfig && this.state.remoteConfig.humidity_feature) || null;
     if (thermostatFeature && payload.device_feature_selector === thermostatFeature) {
       // Don't overwrite a setpoint the user is holding here. `isManualMode` is
@@ -784,7 +890,8 @@ class ThermostatBox extends Component {
   // that could disagree with the device the regulation loop actually reads.
   handleThermostatConfigUpdated = async () => {
     if (!this.props.box.thermostat_feature) return;
-    await this.loadConfig();
+    const remoteConfig = await this.loadConfig();
+    if (!remoteConfig || this.state.missing) return;
     // The schedule before the state that reads it: a thermostat following its
     // programme takes its preset from the point in force.
     await this.loadSchedule();
@@ -923,7 +1030,8 @@ class ThermostatBox extends Component {
     // The schedule first: a thermostat following it takes its preset from the
     // point in force, which loadMode reads out of it.
     await this.loadSchedule();
-    await this.loadConfig();
+    const remoteConfig = await this.loadConfig();
+    if (!remoteConfig || this.state.missing) return;
     const { activePreset, isManualMode } = this.loadMode();
     this.setState({ activePreset, isManualMode });
   };
@@ -1161,7 +1269,13 @@ class ThermostatBox extends Component {
   };
 
   initData = async () => {
+    const thermostatFeature = this.props.box.thermostat_feature;
     await this.loadConfig();
+    // A later pick runs its own initData; a deleted thermostat has nothing more
+    // to load (see loadConfig).
+    if (this.props.box.thermostat_feature !== thermostatFeature || this.state.missing) {
+      return;
+    }
     // The schedule before the state that reads it: a thermostat following its
     // programme takes its preset from the point in force, and the banner needs
     // the schedule to exist at all.
@@ -1251,14 +1365,16 @@ class ThermostatBox extends Component {
   // purely local, nothing is written to the device, so the widget stays a
   // proposal until the user turns the dial or picks a preset.
   applyFallbackSetpoint = () => {
-    const { setpoint, noConfig, error } = this.state;
+    const { setpoint, noConfig, error, missing } = this.state;
     if (setpoint !== null && setpoint !== undefined) return;
-    if (noConfig || error || !this.props.box.thermostat_feature) return;
+    if (noConfig || error || missing || !this.props.box.thermostat_feature) return;
     const cfg = this.getConfig();
     const comfort = numOr(cfg.preset_comfort, defaultPresetTemps(cfg.default_mode).comfort);
     // The comfort preset can sit outside the device's own range, which would
     // put the needle off the arc.
-    const fallback = Math.min(this.getMaxTemp(), Math.max(this.getMinTemp(), comfort));
+    // The preset is in the thermostat's unit, the range in the feature's.
+    const range = this.getDialRange();
+    const fallback = Math.min(range.max, Math.max(range.min, this.toSetpointFeatureUnit(comfort)));
     this.setState({ setpoint: fallback });
   };
 
@@ -1360,13 +1476,16 @@ class ThermostatBox extends Component {
     const { box } = this.props;
     if (!box.thermostat_feature) return;
     try {
-      await this.props.httpClient.post(`/api/v1/device_feature/${box.thermostat_feature}/value`, { value });
+      await sendDeviceFeatureValue(this.props.httpClient, box.thermostat_feature, value);
     } catch (e) {
       console.error(e);
     }
   };
 
-  angleToTemp = angleDeg => angleToSetpoint(angleDeg, this.getMinTemp(), this.getMaxTemp());
+  angleToTemp = angleDeg => {
+    const { min, max } = this.getDialRange();
+    return angleToSetpoint(angleDeg, min, max);
+  };
 
   onPointerDown = e => {
     if (!this.svgRef) return;
@@ -1458,12 +1577,16 @@ class ThermostatBox extends Component {
 
   increment = () => {
     const step = 0.5;
-    this.stepSetpoint(Math.min(this.getMaxTemp(), this.state.setpoint + step));
+    // Bounded both ways: a setpoint the programme left outside the range
+    // (5 °C under 10-25) would otherwise step to 5.5 rather than into the range.
+    const { min, max } = this.getDialRange();
+    this.stepSetpoint(Math.min(max, Math.max(min, this.state.setpoint + step)));
   };
 
   decrement = () => {
     const step = 0.5;
-    this.stepSetpoint(Math.max(this.getMinTemp(), this.state.setpoint - step));
+    const { min, max } = this.getDialRange();
+    this.stepSetpoint(Math.max(min, Math.min(max, this.state.setpoint - step)));
   };
 
   // A tap on + or −. On a stopped thermostat it also starts it again, on the
@@ -1644,6 +1767,7 @@ class ThermostatBox extends Component {
       activePreset,
       error,
       noConfig,
+      missing,
       isManualMode,
       manualUntil,
       manualSetpointOverride,
@@ -1655,8 +1779,7 @@ class ThermostatBox extends Component {
     }
   ) {
     const cfg = this.getConfig();
-    const minTemp = this.getMinTemp();
-    const maxTemp = this.getMaxTemp();
+    const { min: minTemp, max: maxTemp } = this.getDialRange();
     const configMode = cfg.default_mode || 'heating';
     // The gauge builds one sentence out of these for screen readers; taken from
     // the dictionary directly because it composes them with live values rather
@@ -1824,7 +1947,13 @@ class ThermostatBox extends Component {
               <Text id="dashboard.boxes.thermostat.noConfig" />
             </div>
           )}
-          {!error && !noConfig && setpoint !== null && (
+          {missing && !noConfig && (
+            <div class="alert alert-warning">
+              <i class="fe fe-alert-triangle mr-2" />
+              <Text id="dashboard.boxes.thermostat.missing" />
+            </div>
+          )}
+          {!error && !noConfig && !missing && setpoint !== null && (
             <div>
               <div class="d-flex justify-content-center mb-3">
                 <div ref={el => (this.svgRef = el)} class={style.gaugeContainer}>
@@ -1998,7 +2127,12 @@ class ThermostatBox extends Component {
                             {manualUntilLabel} {untilWhen}
                           </span>
                         </span>
-                        <button class={style.manualBannerCancel} onClick={this.cancelManualMode} title={cancelLabel}>
+                        <button
+                          class={style.manualBannerCancel}
+                          onClick={this.cancelManualMode}
+                          title={cancelLabel}
+                          data-cy="thermostat-manual-banner-cancel"
+                        >
                           <i class="fe fe-x" />
                         </button>
                       </div>
@@ -2113,9 +2247,12 @@ class ThermostatBox extends Component {
                             bar used to disappear, and the card lost 56px of height
                             — every widget beside it on the dashboard shifted, and
                             came back when the window was shut. */}
+                    {/* `lang` picks the dictionary a name too long for its
+                            column is hyphenated with (see style.css). */}
                     <div
                       class={cx(style.segmentedControl, { [style.segmentedControlDisabled]: isWindowOpen })}
                       aria-disabled={isWindowOpen ? 'true' : undefined}
+                      lang={props.user && props.user.language ? props.user.language : undefined}
                     >
                       {presets.map(preset => {
                         const presetTitle =
@@ -2155,7 +2292,16 @@ class ThermostatBox extends Component {
                             {/* The name under the icon: `title` only shows on
                                     hover, so on a wall tablet the bar was six
                                     unlabelled pictograms. */}
-                            <span class={style.segmentBtnLabel}>{presetTitle}</span>
+                            <span class={style.segmentBtnLabel}>
+                              <span class={style.segmentBtnLabelText}>{presetTitle}</span>
+                              {/* The name in bold, invisible: it holds the label
+                                      at the height the active weight needs, so
+                                      picking a preset does not make the row
+                                      taller (see style.css). */}
+                              <span class={style.segmentBtnLabelReserve} aria-hidden="true">
+                                {presetTitle}
+                              </span>
+                            </span>
                           </button>
                         );
                       })}

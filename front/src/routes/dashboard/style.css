@@ -564,7 +564,8 @@
   color: #2e8f5b;
 }
 
-:global(.glass-theme .card .alert a) {
+/* not a link styled as a button: it keeps its own colors */
+:global(.glass-theme .card .alert a:not(.btn)) {
   color: inherit;
   text-decoration: underline;
   font-weight: 600;
@@ -1554,7 +1555,10 @@
    exactly as they are, so acAdaptiveControls keeps collapsing an oversized
    button group to a dropdown there; in a compact card the group first drops
    under the name, and only overflows (which the coordinator measures) if it
-   is wider than the whole row. */
+   is wider than the whole row. A browser without container queries (an old
+   wall-tablet WebView) cannot measure the card: it gets this compact mode in
+   every card, copied by the build (vite-plugins/container-query-fallback.js)
+   — which is why every selector here is scoped to .device-widget-table. */
 @container device-widget (max-width: 20rem) {
   /* The pill moves from the three cells to the row: painted on the cells,
      it breaks apart as soon as one of them wraps to a second line. */
@@ -1612,7 +1616,7 @@
   }
 
   @media (pointer: coarse) {
-    :global(.glass-theme .device-list-table .device-row-tappable:active td) {
+    :global(.glass-theme .device-widget-table .device-row-tappable:active td) {
       background-color: transparent;
     }
 

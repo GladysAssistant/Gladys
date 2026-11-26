@@ -169,3 +169,20 @@
   max-width: 26rem;
   margin: 0 auto 1.25rem;
 }
+
+/* ---------- the list on a phone (MobileHousePage) ---------- */
+
+.mobileSubtitle {
+  margin-bottom: 0.9rem;
+}
+
+/* room for the floating "+" under the last row */
+.mobileList {
+  padding-bottom: 5.5rem;
+}
+
+/* "Unsaved changes" under the summary of a row */
+.mobileRowBadge {
+  display: flex;
+  margin-top: 2px;
+}

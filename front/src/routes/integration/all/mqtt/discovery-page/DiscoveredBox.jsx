@@ -4,6 +4,8 @@ import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import { MobileNotice, MobilePill } from '../../../../../components/mobile';
+import { MobileDeviceItem } from '../../../../../components/integration/mobile';
 
 class DiscoveredBox extends Component {
   updateName = e => {
@@ -14,10 +16,12 @@ class DiscoveredBox extends Component {
     this.props.updateDeviceField(this.props.device.external_id, 'room_id', e.target.value);
   };
 
+  // resolves to false when the device could not be saved (the phone sheet then stays open)
   saveDevice = async () => {
     this.setState({
       loading: true
     });
+    let saved = true;
     try {
       await this.props.saveDevice(this.props.device.external_id);
       this.setState({
@@ -27,10 +31,12 @@ class DiscoveredBox extends Component {
       this.setState({
         saveError: RequestStatus.Error
       });
+      saved = false;
     }
     this.setState({
       loading: false
     });
+    return saved;
   };
 
   render({ device = {}, houses = [] }, { loading, saveError }) {
@@ -42,6 +48,80 @@ class DiscoveredBox extends Component {
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
     const alreadyExistsButton = supportedDevice && !enableSaveButton && !enableUpdateButton;
+
+    // On a phone: a row and its sheet, fed by the handlers of the card
+    // (docs/specs/mobile-pages/integration-devices.md)
+    if (this.props.isMobile) {
+      let status = null;
+      let primaryAction;
+      if (!supportedDevice) {
+        status = (
+          <MobilePill>
+            <Text id="mobileDeviceList.notSupported" />
+          </MobilePill>
+        );
+      } else if (enableUpdateButton) {
+        status = (
+          <MobilePill tone="accent">
+            <Text id="mobileDeviceList.updateAvailable" />
+          </MobilePill>
+        );
+        primaryAction = {
+          label: <Text id="integration.mqtt.discover.updateButton" />,
+          onClick: this.saveDevice,
+          toast: <Text id="mobileDeviceList.updated" />
+        };
+      } else if (alreadyExistsButton) {
+        status = (
+          <MobilePill tone="success">
+            <Text id="mobileDeviceList.inGladys" />
+          </MobilePill>
+        );
+        primaryAction = { label: <Text id="integration.mqtt.discover.alreadyExistsButton" />, disabled: true };
+      } else {
+        primaryAction = {
+          label: <Text id="integration.mqtt.discover.saveButton" />,
+          onClick: this.saveDevice,
+          toast: <Text id="mobileDeviceList.added" />
+        };
+      }
+      return (
+        <MobileDeviceItem
+          device={device}
+          houses={houses}
+          subtitle={device.model || device.external_id}
+          status={status}
+          notices={
+            !supportedDevice && (
+              <MobileNotice tone="warning" icon="alert-triangle">
+                <Text id="integration.mqtt.discover.deviceNotHandled" />
+              </MobileNotice>
+            )
+          }
+          onNameChange={this.updateName}
+          onRoomChange={supportedDevice ? this.updateRoom : undefined}
+          namePlaceholderId="integration.mqtt.discover.namePlaceholder"
+          fieldsDisabled={!supportedDevice}
+          guard={false}
+          showFeatures={supportedDevice}
+          details={
+            supportedDevice
+              ? [
+                  { label: <Text id="integration.mqtt.discover.modelLabel" />, value: device.model },
+                  {
+                    label: <Text id="integration.mqtt.discover.externalIdLabel" />,
+                    value: device.external_id,
+                    mono: true
+                  }
+                ]
+              : []
+          }
+          saveError={saveError && <Text id="integration.mqtt.discover.saveError" />}
+          primaryAction={primaryAction}
+          dataCy="mqtt-discovered-row"
+        />
+      );
+    }
 
     return (
       <div class="col-md-6">

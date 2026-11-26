@@ -4,6 +4,8 @@ import linkState from 'linkstate';
 import SignupForm from './SignupForm';
 import SignupBase from './SignupBase';
 import SignupGeneratingKeys from './SignupGeneratingKeys';
+import MobileSignupGateway from './MobileSignupGateway';
+import { withMobileViewport } from '../../components/mobile';
 
 const ACCEPTED_LANGUAGES = ['en', 'fr'];
 const DEFAULT_LANGUAGE = 'en';
@@ -48,7 +50,14 @@ class SignupPage extends Component {
   validateForm = event => {
     event.preventDefault();
 
-    this.setState({ currentStep: 2 });
+    // a new attempt starts from a clean form: what the previous one was refused for is gone
+    this.setState({
+      currentStep: 2,
+      fieldsErrored: [],
+      accountAlreadyExist: false,
+      unknownError: false,
+      tokenError: false
+    });
 
     let currentBrowserLanguage = (navigator.language || navigator.userLanguage).toLowerCase().substr(0, 2);
 
@@ -131,6 +140,30 @@ class SignupPage extends Component {
       tokenError
     }
   ) {
+    // the account creation on a phone (docs/specs/mobile-pages/auth.md, D.8): same state, same
+    // handlers
+    if (this.props.isMobile) {
+      return (
+        <MobileSignupGateway
+          name={name}
+          email={email}
+          password={password}
+          accountAlreadyExist={accountAlreadyExist}
+          fieldsErrored={fieldsErrored}
+          updateName={linkState(this, 'name')}
+          updateEmail={linkState(this, 'email')}
+          updatePassword={linkState(this, 'password')}
+          validateForm={this.validateForm}
+          signupCompleted={signupCompleted}
+          browserCompatible={browserCompatible}
+          token={this.props.token}
+          invitationError={invitationError}
+          unknownError={unknownError}
+          tokenError={tokenError}
+          currentStep={currentStep}
+        />
+      );
+    }
     return (
       <SignupBase currentStep={currentStep}>
         {currentStep === 1 && (
@@ -159,4 +192,4 @@ class SignupPage extends Component {
   }
 }
 
-export default connect('session', {})(SignupPage);
+export default connect('session', {})(withMobileViewport(SignupPage));

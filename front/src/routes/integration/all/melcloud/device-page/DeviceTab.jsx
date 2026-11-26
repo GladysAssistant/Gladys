@@ -111,6 +111,7 @@ class DeviceTab extends Component {
                   melcloudDevices.length > 0 &&
                   melcloudDevices.map((device, index) => (
                     <MELCloudDeviceBox
+                      key={device.external_id}
                       editable
                       saveButton
                       deleteButton

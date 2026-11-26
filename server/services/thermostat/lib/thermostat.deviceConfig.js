@@ -6,9 +6,8 @@ const {
   DEFAULT_TPI_PROPORTIONAL_BAND,
   DEFAULT_MODE,
   DEFAULT_CONTROL_TYPE,
-  DEFAULT_MIN_TEMP,
-  DEFAULT_MAX_TEMP,
   DEFAULT_TEMP_UNIT,
+  defaultTempRange,
   DEFAULT_THERMOSTAT_TYPE,
   DEFAULT_WINDOW_DELAY_SECONDS,
   MAX_WINDOW_DELAY_SECONDS,
@@ -68,6 +67,18 @@ function buildParamsConfig(device) {
   const presetDefaults = defaultPresetTemps(getParam('THERMOSTAT_MODE') || DEFAULT_MODE);
   // One sensor or several (A.1.1): the loop regulates on their average.
   const temperatureFeatures = parseSelectorList(getParam('THERMOSTAT_TEMPERATURE_FEATURE'));
+  const tempUnit = getParam('THERMOSTAT_TEMP_UNIT') || DEFAULT_TEMP_UNIT;
+  // Missing bounds default in the thermostat's own unit: in Celsius on a
+  // Fahrenheit thermostat, a 70 °F setpoint was clamped to 35 °F, and 35 °F was
+  // its cooling stop setpoint (C.0).
+  const defaultRange = defaultTempRange(tempUnit);
+  // A range with no width or an inverted one is refused at save time; one an
+  // older device still carries stands for the default range (D.0), for every
+  // reader at once: the clamp, the dial and the cooling stop setpoint, which
+  // read 8 °C off a 25 / 8 range and asked the unit to cool as hard as it can.
+  const savedMin = toNumber(getParam('THERMOSTAT_MIN_TEMP'), defaultRange.min);
+  const savedMax = toNumber(getParam('THERMOSTAT_MAX_TEMP'), defaultRange.max);
+  const tempRange = savedMin < savedMax ? { min: savedMin, max: savedMax } : defaultRange;
   return {
     temperature_features: temperatureFeatures,
     humidity_feature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || null,
@@ -108,9 +119,9 @@ function buildParamsConfig(device) {
     ),
     default_mode: getParam('THERMOSTAT_MODE') || DEFAULT_MODE,
     control_type: getParam('THERMOSTAT_CONTROL_TYPE') || DEFAULT_CONTROL_TYPE,
-    temp_min: toNumber(getParam('THERMOSTAT_MIN_TEMP'), DEFAULT_MIN_TEMP),
-    temp_max: toNumber(getParam('THERMOSTAT_MAX_TEMP'), DEFAULT_MAX_TEMP),
-    temp_unit: getParam('THERMOSTAT_TEMP_UNIT') || DEFAULT_TEMP_UNIT,
+    temp_min: tempRange.min,
+    temp_max: tempRange.max,
+    temp_unit: tempUnit,
     // Null rather than the default when the param is absent: an absent duration
     // is a setting of its own — "hand the thermostat back at the next schedule
     // point" (C.3), the Tado and Netatmo behaviour — and filling it in here made

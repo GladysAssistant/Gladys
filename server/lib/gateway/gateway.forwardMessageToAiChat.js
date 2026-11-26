@@ -16,7 +16,7 @@ const {
 const { Error402, Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
-const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
+const { buildChatApiMessages, stripSceneMessagePrefix } = require('../message/message.getPreviousQuestionsForUser');
 const { resolveAiChatModel } = require('../../utils/aiChatModels');
 const { filterMcpToolsByCategories } = require('./gateway.classifyAiChatToolCategories');
 const { describeAiChatError } = require('./gateway.aiChat');
@@ -519,10 +519,10 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     logger.debug(`[AI_CHAT] Using timezone=${timezoneName}`);
 
     // Build a compact conversation for the model.
-    const messagesForApi = [
-      { role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName, new Date(), { includeSceneRules }) },
-    ];
-    messagesForApi.push(...exchangesToApiMessages(previousQuestions));
+    const messagesForApi = buildChatApiMessages(
+      buildSystemPromptWithCurrentTime(timezoneName, new Date(), { includeSceneRules }),
+      previousQuestions,
+    );
 
     const userContent = [];
     if (message.text) {
@@ -717,8 +717,11 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       }
     }
 
-    const assistantContent = assistantMessage?.content;
-    let finalAnswer = typeof assistantContent === 'string' ? assistantContent.trim() : '';
+    // the history marks the messages sent by scenes with a prefix: a model copying it must neither show
+    // it to the user (chat, messaging channels, voice) nor hide a NO_RESPONSE or a tool trace behind it
+    const assistantContent =
+      typeof assistantMessage?.content === 'string' ? stripSceneMessagePrefix(assistantMessage.content.trim()) : '';
+    let finalAnswer = assistantContent;
     const rawFinalAnswer = finalAnswer;
     if (isNoResponseSentinel(finalAnswer)) {
       logger.info('[AI_CHAT] Assistant returned NO_RESPONSE sentinel');
@@ -748,9 +751,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       logger.debug(`[AI_CHAT] Using scene_create error as final answer: ${debugPreview(finalAnswer, 400)}`);
     }
 
-    const rawAssistantContent = assistantMessage?.content;
-    const wasNoResponseSentinel =
-      typeof rawAssistantContent === 'string' && isNoResponseSentinel(rawAssistantContent.trim());
+    const wasNoResponseSentinel = isNoResponseSentinel(assistantContent);
     const shouldSendText = Boolean(
       finalAnswer && shouldSendAssistantTextReply(finalAnswer, imagesSentToUser.length > 0),
     );

@@ -1,3 +1,5 @@
+import { COLLAPSED_BY_DEFAULT_QUERY } from '../../../../src/utils/sidebarPreference';
+
 // The navigation rail collapsed on desktop (docs/specs/dashboard-flexible-
 // layout-and-widgets.md, H2): a per-device preference that gives the rail's
 // column back to the page, and leaves the mobile drawer alone.
@@ -51,6 +53,61 @@ describe('Collapsible sidebar', () => {
     cy.window().then(win => {
       expect(win.localStorage.getItem('sidebar-collapsed')).to.equal('false');
     });
+  });
+
+  it('Should start collapsed on a touch screen narrower than 1200px, until the device has a choice', () => {
+    // a wall tablet in landscape: the test browser has a mouse, so the touch
+    // screen is the answer matchMedia gives to the query of the default
+    const visitAsTouchScreen = () =>
+      cy.visit('/dashboard', {
+        onBeforeLoad: win => {
+          const matchMedia = win.matchMedia.bind(win);
+          win.matchMedia = query =>
+            query === COLLAPSED_BY_DEFAULT_QUERY
+              ? {
+                  matches: true,
+                  media: query,
+                  onchange: null,
+                  addListener: () => {},
+                  removeListener: () => {},
+                  addEventListener: () => {},
+                  removeEventListener: () => {},
+                  dispatchEvent: () => false
+                }
+              : matchMedia(query);
+        }
+      });
+    cy.viewport(1024, 600);
+    visitAsTouchScreen();
+
+    // no choice yet: the rail starts collapsed, and the default is not stored
+    cy.get('[data-cy="sidebar-expand-button"]').should('be.visible');
+    cy.get('[data-cy="sidebar-nav"]').should('not.be.visible');
+    pagePaddingLeft().should('equal', 52);
+    cy.window().then(win => {
+      expect(win.localStorage.getItem('sidebar-collapsed')).to.equal(null);
+    });
+
+    // expanding it is a choice of the device, which wins over the default
+    cy.get('[data-cy="sidebar-expand-button"]').click();
+    cy.get('[data-cy="sidebar-nav"]').should('be.visible');
+    cy.get('body').should('not.have.class', 'gladys-sidebar-animating');
+    pagePaddingLeft().should('equal', 240);
+    cy.window().then(win => {
+      expect(win.localStorage.getItem('sidebar-collapsed')).to.equal('false');
+    });
+    visitAsTouchScreen();
+    cy.get('[data-cy="sidebar-nav"]').should('be.visible');
+    cy.get('[data-cy="sidebar-expand-button"]').should('not.exist');
+    pagePaddingLeft().should('equal', 240);
+  });
+
+  it('Should keep the rail of a desktop window narrower than 1200px', () => {
+    cy.viewport(1024, 600);
+    cy.visit('/dashboard');
+    cy.get('[data-cy="sidebar-nav"]').should('be.visible');
+    cy.get('[data-cy="sidebar-expand-button"]').should('not.exist');
+    pagePaddingLeft().should('equal', 240);
   });
 
   it('Should leave the mobile drawer alone when the rail is collapsed', () => {

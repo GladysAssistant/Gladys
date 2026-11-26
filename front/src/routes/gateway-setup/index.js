@@ -140,6 +140,7 @@ class LinkGatewayUser extends Component {
         notAcceptedLocallyReason={notAcceptedLocallyReason}
         stillNotAcceptedLocally={stillNotAcceptedLocally}
         keysFingerprints={props.session.getKeysFingerprints()}
+        selectedUser={this.state.selectedUser}
         selectUser={this.selectUser}
         saveUser={this.saveUser}
         retry={this.retry}

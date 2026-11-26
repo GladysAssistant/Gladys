@@ -1,8 +1,10 @@
 import { Text, Localizer } from 'preact-i18n';
 import AuthLayout from '../../components/auth/AuthLayout';
 import TwoFactorAppList from '../../components/gateway/TwoFactorAppList';
+import MobileConfigureTwoFactor from './MobileConfigureTwoFactor';
+import { withMobileViewport } from '../../components/mobile';
 
-const ConfigureTwoFactorForm = ({ children, ...props }) => (
+const DesktopConfigureTwoFactorForm = ({ children, ...props }) => (
   <AuthLayout titleId="gatewayTwoFactorAuth.title">
     {props.step === 1 && (
       <div class="card">
@@ -104,4 +106,7 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
   </AuthLayout>
 );
 
-export default ConfigureTwoFactorForm;
+const ConfigureTwoFactorForm = ({ isMobile, ...props }) =>
+  isMobile ? <MobileConfigureTwoFactor {...props} /> : <DesktopConfigureTwoFactorForm {...props} />;
+
+export default withMobileViewport(ConfigureTwoFactorForm);

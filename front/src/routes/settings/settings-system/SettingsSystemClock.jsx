@@ -11,9 +11,14 @@ import { measureClockOffset, isClockOffsetSignificant } from '../../../utils/clo
 // hours after the time synchronization is turned off (timedatectl set-ntp
 // false), while the clock already drifts. It only means the host keeps its
 // clock on time when a time service is on — the one timedated manages, or,
-// when timedated knows of none (CanNTP false), one it does not manage.
+// when timedated knows of none (CanNTP false), one it does not manage. The
+// host can also be a container (Docker in a Proxmox LXC): its clock is the one
+// of the machine hosting it, whose time service is out of sight of timedated.
 const hostKeepsTime = timeSync =>
-  !!timeSync && timeSync.available && timeSync.ntp_synchronized && (timeSync.ntp_enabled || !timeSync.can_ntp);
+  !!timeSync &&
+  timeSync.available &&
+  timeSync.ntp_synchronized &&
+  (timeSync.ntp_enabled || !timeSync.can_ntp || timeSync.in_container);
 
 // Compares the clock of the server with the clock of this device, and tells
 // whether the machine running Gladys keeps its clock on time on its own
@@ -60,10 +65,16 @@ class SettingsSystemClock extends Component {
   };
 
   enableTimeSync = async () => {
-    this.setState({ enabling: true, enableError: null });
+    this.setState({ enabling: true, enableError: null, enabled: false });
     try {
       const timeSync = await this.props.httpClient.post('/api/v1/system/clock/sync');
-      this.setState({ timeSync, enabled: true, restartAdvised: true });
+      // the restart advice only follows a synchronization that did start: a
+      // service that did not start corrected nothing yet
+      this.setState(prevState => ({
+        timeSync,
+        enabled: true,
+        restartAdvised: prevState.restartAdvised || !!timeSync.ntp_enabled
+      }));
     } catch (e) {
       console.error(e);
       this.setState({
@@ -100,6 +111,14 @@ class SettingsSystemClock extends Component {
         </div>
       );
     }
+    // nothing can be turned on from inside a container: no button here
+    if (timeSync.in_container) {
+      return (
+        <div class="alert alert-warning">
+          <Text id="systemSettings.clockSyncContainer" />
+        </div>
+      );
+    }
     if (timeSync.ntp_enabled) {
       return (
         <div class="alert alert-warning">
@@ -116,6 +135,11 @@ class SettingsSystemClock extends Component {
       return (
         <div class="alert alert-warning">
           <Text id="systemSettings.clockSyncDisabled" />
+          {enabled && (
+            <div class="mt-2 text-danger">
+              <Text id="systemSettings.clockSyncNotStarted" />
+            </div>
+          )}
           {enableError && (
             <div class="mt-2 text-danger">
               <Text id="systemSettings.clockSyncEnableError" />
@@ -182,7 +206,12 @@ class SettingsSystemClock extends Component {
                 <Text id="systemSettings.clockRestartHint" />
               </p>
             )}
-            <button type="button" class="btn btn-secondary btn-sm" onClick={this.checkAgain} disabled={loading}>
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              onClick={this.checkAgain}
+              disabled={loading || state.enabling}
+            >
               <Text id="systemSettings.clockCheckAgain" />
             </button>
           </div>

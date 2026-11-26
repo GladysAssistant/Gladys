@@ -1,7 +1,11 @@
 const logger = require('../../utils/logger');
 const { AI_CHAT_TOOL_CATEGORIES, AI_CHAT_TOOL_CATEGORIES_LIST, AI_CHAT_PURPOSES } = require('../../utils/constants');
+const { limitExchanges } = require('../message/message.getPreviousQuestionsForUser');
 
+// User exchanges given to the router, plus at most MAX_ROUTER_SCENE_MESSAGES scene messages after the
+// oldest of them: scene messages never push out the exchange a short reply answers.
 const MAX_ROUTER_HISTORY_EXCHANGES = 3;
+const MAX_ROUTER_SCENE_MESSAGES = 3;
 const MAX_ROUTER_HISTORY_CHARS = 200;
 
 const ROUTER_SYSTEM_PROMPT = `You are an intent router for a smart home assistant. Classify the user's last message into one or more of these categories:
@@ -40,7 +44,10 @@ function truncateForRouter(str, limitChars) {
  */
 function buildRouterUserContent(messageText, previousQuestions = []) {
   const parts = [];
-  const recentExchanges = (previousQuestions ?? []).slice(-MAX_ROUTER_HISTORY_EXCHANGES);
+  const recentExchanges = limitExchanges(previousQuestions ?? [], {
+    exchangeLimit: MAX_ROUTER_HISTORY_EXCHANGES,
+    sceneMessageLimit: MAX_ROUTER_SCENE_MESSAGES,
+  });
   recentExchanges.forEach(({ question, answer }) => {
     if (question) {
       parts.push(`Previous user message: ${truncateForRouter(question, MAX_ROUTER_HISTORY_CHARS)}`);

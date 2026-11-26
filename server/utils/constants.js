@@ -2208,6 +2208,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   DEVICE: {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
+    // A value a user asked for could not be set on the device: sent to that user only,
+    // with one of DEVICE_SET_VALUE_ERROR_CAUSES
+    SET_VALUE_ERROR: 'device.set-value-error',
   },
   JOB: {
     NEW: 'job.new',
@@ -2277,6 +2280,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
+    // the devices seen joining since joining last opened, and where each stands
+    PAIRING: 'zigbee2mqtt.pairing',
+    // the progress of an installation, sent at most twice a second
+    INSTALL_PROGRESS: 'zigbee2mqtt.install-progress',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
@@ -2456,6 +2463,25 @@ const DASHBOARD_BOX_MAX_ITEMS = {
   ACTIONS: 20,
 };
 
+// Why a value asked by a user could not be set (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR):
+// the front picks its sentence from it, the raw error never leaves the server
+const DEVICE_SET_VALUE_ERROR_CAUSES = {
+  // the integration could not drive the device (no answer, error of the device or of its cloud)
+  UNREACHABLE: 'unreachable',
+  // the integration of the device is not configured, or not connected
+  NOT_CONFIGURED: 'not-configured',
+  // the device, its feature or its integration no longer exists
+  NOT_FOUND: 'not-found',
+  // the value was refused before anything was sent to the device
+  REFUSED: 'refused',
+  // the text could not be turned into speech: the device was not reached for
+  VOICE_UNAVAILABLE: 'voice-unavailable',
+  // the same, because Gladys Plus is the voice and there is no subscription
+  VOICE_SUBSCRIPTION_REQUIRED: 'voice-subscription-required',
+  // the same, because Gladys Plus is the voice and its quota is reached
+  VOICE_QUOTA_REACHED: 'voice-quota-reached',
+};
+
 const ERROR_MESSAGES = {
   HOUSE_HAS_NO_COORDINATES: 'HOUSE_HAS_NO_COORDINATES',
   SERVICE_NOT_CONFIGURED: 'SERVICE_NOT_CONFIGURED',
@@ -2534,6 +2560,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES: 'device-state-purge-orphaned-duckdb-states',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
+  SERVICE_ZIGBEE2MQTT_INSTALL: 'service-zigbee2mqtt-install',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
   SERVICE_MATTER_BACKUP: 'service-matter-backup',
   MIGRATE_SQLITE_TO_DUCKDB: 'migrate-sqlite-to-duckdb',
@@ -2551,6 +2578,7 @@ const JOB_TYPES = {
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
+  DEVICE_DESTROY: 'device-destroy',
 };
 
 const JOB_STATUS = {
@@ -2816,6 +2844,7 @@ module.exports.DASHBOARD_BACKGROUND_SCENE_LIST = DASHBOARD_BACKGROUND_SCENE_LIST
 module.exports.DASHBOARD_BOX_MAX_ITEMS = DASHBOARD_BOX_MAX_ITEMS;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+module.exports.DEVICE_SET_VALUE_ERROR_CAUSES = DEVICE_SET_VALUE_ERROR_CAUSES;
 
 module.exports.WEATHER_UNITS = WEATHER_UNITS;
 

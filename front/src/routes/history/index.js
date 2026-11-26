@@ -277,6 +277,11 @@ class History extends Component {
   };
 
   onNewState = payload => {
+    // A widget put back on its real state after a failed command (DeviceCommandError.jsx):
+    // nothing happened on the device, there is no event to show
+    if (payload.rollback) {
+      return;
+    }
     // When browsing a past date, don't disturb the view with live events
     if (this.state.selectedDate) {
       return;

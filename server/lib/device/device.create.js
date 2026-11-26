@@ -9,33 +9,36 @@ const { enforceEnergyHierarchy } = require('../../utils/enforceEnergyHierarchy')
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const logger = require('../../utils/logger');
 const { syncFeatureSupportedOptions } = require('./device.syncFeatureSupportedOptions');
+const { isEnergyCursorParam } = require('../../services/energy-monitoring/utils/constants');
 
-const getById = async (id) => {
+const getById = async (id, transaction) => {
   return db.Device.findOne({
     where: {
       id,
     },
     include: getStandardDeviceIncludes(),
+    transaction,
   });
 };
 
-const getByExternalId = async (externalId) => {
+const getByExternalId = async (externalId, transaction) => {
   return db.Device.findOne({
     where: {
       external_id: externalId,
     },
     include: getStandardDeviceIncludes(),
+    transaction,
   });
 };
 
-const getDeviceInDb = async (device) => {
+const getDeviceInDb = async (device, transaction) => {
   if (device.id) {
-    const deviceById = await getById(device.id);
+    const deviceById = await getById(device.id, transaction);
     if (deviceById) {
       return deviceById;
     }
   }
-  const deviceByExternalId = await getByExternalId(device.external_id);
+  const deviceByExternalId = await getByExternalId(device.external_id, transaction);
   return deviceByExternalId;
 };
 
@@ -85,6 +88,7 @@ async function create(device) {
   delete device.params;
 
   let actionEvent = EVENTS.DEVICE.CREATE;
+  let paramsToSave = params;
   let oldPollFrequency = null;
 
   const deviceFeaturesIdsToPurge = [];
@@ -99,9 +103,12 @@ async function create(device) {
   // The transaction is IMMEDIATE so the SQLite write lock is taken at BEGIN (where the
   // SQLITE_BUSY retry can wait for it) instead of failing when a deferred transaction
   // tries to upgrade its lock at the INSERT while another connection is writing.
+  // Every query below MUST go through `transaction`, reads included: while the
+  // transaction holds the write lock, the main connection can be stuck behind writes
+  // waiting for that very lock, so a query sent there deadlocks the whole instance.
   await db.sequelize.transaction({ type: Transaction.TYPES.IMMEDIATE }, async (transaction) => {
     // first verify that device doesn't already exist
-    let deviceInDb = await getDeviceInDb(device);
+    let deviceInDb = await getDeviceInDb(device, transaction);
 
     let deviceToReturn = null;
 
@@ -138,9 +145,18 @@ async function create(device) {
         }
       });
 
+      // The cursors of the energy jobs (ENERGY_INDEX_LAST_PROCESSED*) are owned by the core:
+      // a save posting a device read earlier would write back an old watermark and the next
+      // run would count an interval twice. On an existing device, a posted value is ignored
+      // and the stored one is never deleted (docs/specs/energy-hierarchy.md, section C.1).
+      const storedCursorIds = deviceInDb.params
+        .filter((existingParam) => isEnergyCursorParam(existingParam.name))
+        .map((existingParam) => existingParam.id);
+      paramsToSave = params.filter((param) => !isEnergyCursorParam(param.name) && !storedCursorIds.includes(param.id));
+
       // we delete all params which doesn't exist anymore
       await Promise.map(deviceInDb.params, async (existingParam) => {
-        if (!matchParamInList(existingParam, params)) {
+        if (!isEnergyCursorParam(existingParam.name) && !matchParamInList(existingParam, paramsToSave)) {
           await existingParam.destroy({ transaction });
         }
       });
@@ -196,6 +212,7 @@ async function create(device) {
             where: {
               id: matchedFeature.id,
             },
+            transaction,
           });
           // The purge below is a background JOB: a t_job row, several DuckDB &
           // SQLite counts and their websocket broadcasts, per feature. It is only
@@ -279,14 +296,16 @@ async function create(device) {
       return savedFeature;
     });
 
-    const newParams = await Promise.map(params, async (param) => {
+    const existingParams = deviceToReturn.params.filter((param) => !isEnergyCursorParam(param.name));
+    const newParams = await Promise.map(paramsToSave, async (param) => {
       // if the param already already exist
-      const matchedParam = matchParamInList(param, deviceToReturn.params);
+      const matchedParam = matchParamInList(param, existingParams);
       if (matchedParam) {
         const deviceParam = await db.DeviceParam.findOne({
           where: {
             id: matchedParam.id,
           },
+          transaction,
         });
         await deviceParam.update(param, { transaction });
         return deviceParam.get({ plain: true });

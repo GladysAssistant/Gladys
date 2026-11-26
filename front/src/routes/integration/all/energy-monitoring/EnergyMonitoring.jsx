@@ -7,7 +7,10 @@ import ContractsPage from './contracts/Contracts';
 import ContractWizard from './contracts/ContractWizard';
 import CalendarsSection from './contracts/Calendars';
 import MyDevices from './MyDevices';
+import MobileEnergySettings from './MobileEnergySettings';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { withMobileViewport } from '../../../../components/mobile';
+import { isSheetEntryOnTop } from '../../../../components/sheet/sheetHistory';
 import IntegrationSubPageLayout from '../../../../components/integration/IntegrationSubPageLayout';
 import {
   DEVICE_FEATURE_CATEGORIES,
@@ -36,7 +39,7 @@ class EnergyMonitoringPage extends Component {
       await this.props.httpClient.post('/api/v1/service/energy-monitoring/calculate-cost-from-beginning', {});
       this.setState({ settingsSuccess: 'ok' });
       // Redirect to jobs page
-      route('/dashboard/settings/jobs');
+      route('/dashboard/settings/jobs', isSheetEntryOnTop());
     } catch (e) {
       this.setState({ settingsError: e });
     } finally {
@@ -57,7 +60,7 @@ class EnergyMonitoringPage extends Component {
       );
       this.setState({ consumptionSettingsSuccess: 'ok' });
       // Redirect to jobs page
-      route('/dashboard/settings/jobs');
+      route('/dashboard/settings/jobs', isSheetEntryOnTop());
     } catch (e) {
       this.setState({ consumptionSettingsError: e });
     } finally {
@@ -349,10 +352,22 @@ class EnergyMonitoringPage extends Component {
             selector={editedContractSelector}
           />
         )}
-        {showingSettings && renderSettings()}
+        {showingSettings && !props.isMobile && renderSettings()}
+        {showingSettings && props.isMobile && (
+          <MobileEnergySettings
+            httpClient={props.httpClient}
+            intl={props.intl}
+            calculatingFromBeginning={state.calculatingFromBeginning}
+            calculatingConsumptionFromBeginning={state.calculatingConsumptionFromBeginning}
+            settingsError={state.settingsError}
+            consumptionSettingsError={state.consumptionSettingsError}
+            calculateFromBeginning={this.calculateFromBeginning}
+            calculateConsumptionFromIndexFromBeginning={this.calculateConsumptionFromIndexFromBeginning}
+          />
+        )}
       </IntegrationSubPageLayout>
     );
   }
 }
 
-export default withIntlAsProp(EnergyMonitoringPage);
+export default withIntlAsProp(withMobileViewport(EnergyMonitoringPage));

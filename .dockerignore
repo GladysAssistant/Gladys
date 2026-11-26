@@ -2,6 +2,7 @@
 server/test
 dump.rdb
 server/*.db
+server/gladys-data
 .env
 **/.nyc_output
 lib-cov

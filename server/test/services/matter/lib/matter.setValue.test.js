@@ -17,6 +17,27 @@ const {
   LOCK,
 } = require('../../../../utils/constants');
 
+/**
+ * @description Build a disconnected node mock that connects synchronously when connect() is called.
+ * @returns {object} The node mock properties.
+ * @example
+ * const node = { ...createDisconnectedNode(), getDevices };
+ */
+function createDisconnectedNode() {
+  return {
+    isConnected: false,
+    connect() {
+      this.isConnected = true;
+    },
+    events: {
+      stateChanged: {
+        on: fake(),
+        off: fake(),
+      },
+    },
+  };
+}
+
 describe('Matter.setValue', () => {
   let matterHandler;
 
@@ -52,13 +73,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(6, clusterClient);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -92,13 +107,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(6, clusterClient);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -133,13 +142,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(6, clusterClient);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -185,13 +188,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(258, clusterClient);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -225,13 +222,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(258, clusterClient);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -273,13 +264,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(6, onOff);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -428,13 +413,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(6, onOff);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -474,13 +453,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(513, clusterClient);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -513,13 +486,7 @@ describe('Matter.setValue', () => {
     clusterClients.set(513, clusterClient);
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -649,13 +616,7 @@ describe('Matter.setValue', () => {
     const value = 0;
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([]),
     });
 
@@ -676,13 +637,7 @@ describe('Matter.setValue', () => {
     const clusterClients = new Map();
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -709,13 +664,7 @@ describe('Matter.setValue', () => {
     const clusterClients = new Map();
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -742,13 +691,7 @@ describe('Matter.setValue', () => {
     const clusterClients = new Map();
 
     matterHandler.nodesMap.set(12345n, {
-      isConnected: false,
-      connect: fake.resolves(null),
-      events: {
-        initialized: new Promise((resolve) => {
-          resolve();
-        }),
-      },
+      ...createDisconnectedNode(),
       getDevices: fake.returns([
         {
           number: 1,
@@ -1354,5 +1297,90 @@ describe('Matter.setValue', () => {
 
     const promise = matterHandler.setValue(lockGladysDevice, lockGladysFeature, LOCK.ACTION.LOCK);
     await chaiAssert.isRejected(promise, 'Device does not support DoorLock cluster');
+  });
+
+  it('should throw an error and send no command when the node stays unreachable', async () => {
+    const clock = sinon.useFakeTimers();
+    const clusterClients = new Map();
+    const clusterClient = {
+      on: fake.resolves(null),
+      off: fake.resolves(null),
+    };
+    clusterClients.set(6, clusterClient);
+    const node = {
+      isConnected: false,
+      connect: fake(),
+      events: {
+        // Already emitted once at startup in matter.js: never emitted again
+        initialized: new Promise(() => {}),
+        stateChanged: {
+          on: fake(),
+          off: fake(),
+        },
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    };
+    matterHandler.nodesMap.set(12345n, node);
+
+    try {
+      const promise = matterHandler.setValue({ external_id: 'matter:12345:1' }, { type: 'binary' }, 1);
+      const rejection = chaiAssert.isRejected(
+        promise,
+        'Matter: Node 12345 is unreachable, the command could not be sent',
+      );
+      await clock.tickAsync(15000);
+      await rejection;
+    } finally {
+      clock.restore();
+    }
+    assert.calledOnce(node.connect);
+    assert.notCalled(clusterClient.on);
+    assert.calledOnce(node.events.stateChanged.off);
+  });
+
+  it('should send the command once an already initialized node reconnects', async () => {
+    const clusterClients = new Map();
+    const clusterClient = {
+      on: fake.resolves(null),
+      off: fake.resolves(null),
+    };
+    clusterClients.set(6, clusterClient);
+    let stateObserver;
+    const node = {
+      isConnected: false,
+      connect: fake(),
+      events: {
+        // Already emitted once at startup in matter.js: never emitted again
+        initialized: new Promise(() => {}),
+        stateChanged: {
+          on: (observer) => {
+            stateObserver = observer;
+          },
+          off: fake(),
+        },
+      },
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    };
+    matterHandler.nodesMap.set(12345n, node);
+
+    const promise = matterHandler.setValue({ external_id: 'matter:12345:1' }, { type: 'binary' }, 1);
+    await Promise.resolve();
+    assert.calledOnce(node.connect);
+    node.isConnected = true;
+    stateObserver(0);
+    await promise;
+    assert.calledOnce(clusterClient.on);
   });
 });

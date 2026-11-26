@@ -44,6 +44,9 @@ async function fallbackToEzsp() {
   logger.warn('Zigbee2mqtt: coordinator firmware too old for the ember driver, falling back on the ezsp driver...');
   // Zigbee2mqtt is shown as starting again, not as refusing the firmware
   this.z2mContainerError = null;
+  // Counted from its first wait: run in the background, outside an installation too, it would create the Zigbee2mqtt
+  // container alongside an installation started meanwhile, under the same name (see refuseWhileInstalling)
+  this.runningOperations += 1;
   try {
     await this.saveOrDestroyVariable(setting.key, setting.value);
     await this.installZ2mContainer(config);
@@ -55,6 +58,8 @@ async function fallbackToEzsp() {
     config[setting.field] = previousValue;
     // Shown on the setup page, unless the installation already explained the failure
     this.z2mContainerError = this.z2mContainerError || { code: null, message: e.message };
+  } finally {
+    this.runningOperations -= 1;
   }
 }
 

@@ -60,6 +60,8 @@ describe('user.controller forgotPassword', () => {
       gladys.message.sendToUser,
       'tony',
       'Password reset instructions\nhttp://localhost:1444/reset-password?token=reset-token',
+      null,
+      { messageType: 'notification' },
     );
     sinonAssert.calledOnce(res.json);
     expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
@@ -79,7 +81,16 @@ describe('user.controller forgotPassword', () => {
     await controller.forgotPassword(req, res);
 
     sinonAssert.calledOnceWithExactly(gladys.brain.getReply, 'fr', 'user.forgot-password.code', {});
-    sinonAssert.calledOnceWithExactly(gladys.message.sendToUser, 'tony', 'Password reset instructions\nABCD-EFGH');
+    // a notification: a chat message would be replayed to the AI provider in the conversation history
+    sinonAssert.calledOnceWithExactly(
+      gladys.message.sendToUser,
+      'tony',
+      'Password reset instructions\nABCD-EFGH',
+      null,
+      {
+        messageType: 'notification',
+      },
+    );
     expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });
 
@@ -106,6 +117,8 @@ describe('user.controller forgotPassword', () => {
       gladys.message.sendToUser,
       'tony',
       'English instructions\nhttp://localhost:1444/reset-password?token=reset-token',
+      null,
+      { messageType: 'notification' },
     );
     expect(res.json.firstCall.args[0]).to.deep.equal({ success: true });
   });

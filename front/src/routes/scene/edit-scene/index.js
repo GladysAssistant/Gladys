@@ -1618,6 +1618,8 @@ class EditScene extends Component {
     await this.setState(newState);
     await this.addEmptyActionGroupIfNeeded();
     await this.cleanUpEmptyGroupAfterMove(originalPath);
+    // last: the steps above set a copy of the state that still holds the toast
+    this.withdrawUndoAfterMove();
   };
 
   moveCardGroup = async (sourcePath, destPath) => {
@@ -1677,6 +1679,8 @@ class EditScene extends Component {
       });
 
       await this.addEmptyActionGroupIfNeeded();
+      // last: the step above sets a copy of the state that still holds the toast
+      this.withdrawUndoAfterMove();
     } catch (error) {
       console.error('Error moving card group:', error);
       return null;
@@ -1949,18 +1953,77 @@ class EditScene extends Component {
 
   showToast = (textId, withUndo = false) => {
     clearTimeout(this.toastTimer);
+    this.stopWatchingEditsAfterDeletion();
     this.setState(prevState => ({
       toast: { id: (prevState.toast ? prevState.toast.id : 0) + 1, textId, withUndo }
     }));
-    this.toastTimer = setTimeout(
-      () => this.setState({ toast: null }),
-      withUndo ? UNDO_TOAST_DURATION_MS : TOAST_DURATION_MS
-    );
+    this.toastDuration = withUndo ? UNDO_TOAST_DURATION_MS : TOAST_DURATION_MS;
+    if (!this.toastHeld) {
+      this.toastTimer = setTimeout(this.hideToast, this.toastDuration);
+    }
+    if (withUndo && !this.state.isMobile) {
+      this.watchEditsAfterDeletion();
+    }
   };
 
   hideToast = () => {
     clearTimeout(this.toastTimer);
+    this.toastHeld = false;
+    this.stopWatchingEditsAfterDeletion();
     this.setState({ toast: null });
+  };
+
+  // The pointer is over the toast, or the keyboard is on its "Undo": it does not leave under
+  // the user's hand (docs/specs/scene-editor-mobile.md, C.7)
+  holdToast = () => {
+    this.toastHeld = true;
+    clearTimeout(this.toastTimer);
+  };
+
+  releaseToast = () => {
+    this.toastHeld = false;
+    clearTimeout(this.toastTimer);
+    if (this.state.toast) {
+      this.toastTimer = setTimeout(this.hideToast, this.toastDuration);
+    }
+  };
+
+  // On a wide screen the whole editor stays usable while "Undo" is offered, and undoing puts
+  // back the scene as it was before the deletion: whatever the user did since would go with it.
+  // So the first edit made after a deletion withdraws the "Undo" — the deletion stands, and
+  // nothing typed afterwards is ever taken back. (On a phone the toast sits on the timeline,
+  // where the next action is another sheet.)
+  watchEditsAfterDeletion = () => {
+    this.watchingEditsAfterDeletion = true;
+    EDIT_EVENTS.forEach(type => document.addEventListener(type, this.onEditAfterDeletion, true));
+  };
+
+  stopWatchingEditsAfterDeletion = () => {
+    this.watchingEditsAfterDeletion = false;
+    EDIT_EVENTS.forEach(type => document.removeEventListener(type, this.onEditAfterDeletion, true));
+  };
+
+  onEditAfterDeletion = event => {
+    const { target } = event;
+    // the toast itself ("Undo" clicked, or reached with the keyboard) is not an edit
+    const inToast = target && typeof target.closest === 'function' && target.closest('[data-cy="scene-toast"]');
+    if (inToast || isNotAnEdit(event)) {
+      return;
+    }
+    this.withdrawUndo();
+  };
+
+  withdrawUndo = () => {
+    this.undoSnapshot = null;
+    this.hideToast();
+  };
+
+  // A step or a condition dragged with the pointer is an edit that ends with no click (the drag
+  // engine swallows it): the move itself withdraws the "Undo" while it is watched for
+  withdrawUndoAfterMove = () => {
+    if (this.watchingEditsAfterDeletion) {
+      this.withdrawUndo();
+    }
   };
 
   // Snapshot of what a deletion changes, taken before it (some mutations rewrite the variable
@@ -2099,6 +2162,27 @@ class EditScene extends Component {
     this.showToast('editScene.mobile.triggerDeleted', true);
   };
 
+  // The desktop cards (docs/specs/scene-editor-mobile.md, C.7): their "x" deletes at once, so the
+  // deletion can be undone like on a phone. A card that still has no type (the type picker of a
+  // step or a trigger just added) holds nothing to bring back: it goes without a toast.
+  deleteActionFromCard = path => {
+    const action = this.getActionByPath(path);
+    if (action && action.type === null) {
+      this.deleteAction(path);
+      return;
+    }
+    this.deleteActionWithUndo(path);
+  };
+
+  deleteTriggerFromCard = index => {
+    const trigger = this.state.scene.triggers[index];
+    if (trigger && trigger.type === null) {
+      this.deleteTrigger(index);
+      return;
+    }
+    this.deleteTriggerWithUndo(index);
+  };
+
   // A sheet closed while its step still has no type: nothing half-created stays in the scene
   cancelEmptyAction = path => {
     const action = this.getActionByPath(path);
@@ -2146,6 +2230,15 @@ class EditScene extends Component {
 
   onViewportChange = isMobile => {
     this.setState({ isMobile });
+    // an "Undo" offered on one layout and still up on the other follows the rule of the new one:
+    // withdrawn by the next edit on a wide screen, not on a phone (spec C.7)
+    if (this.state.toast && this.state.toast.withUndo) {
+      if (isMobile) {
+        this.stopWatchingEditsAfterDeletion();
+      } else {
+        this.watchEditsAfterDeletion();
+      }
+    }
   };
 
   constructor(props) {
@@ -2216,6 +2309,7 @@ class EditScene extends Component {
     // a "Save and leave" still in flight must not navigate away from wherever the user went
     this.pendingLeave = null;
     clearTimeout(this.toastTimer);
+    this.stopWatchingEditsAfterDeletion();
     document.removeEventListener('click', this.closeEdition, true);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
@@ -2346,7 +2440,16 @@ class EditScene extends Component {
             saveAndStartScene={this.saveAndStartScene}
           />
         ) : (
-          <EditScenePage {...pageProps} />
+          <EditScenePage
+            {...pageProps}
+            deleteAction={this.deleteActionFromCard}
+            deleteActionGroup={this.deleteActionGroupWithUndo}
+            deleteTrigger={this.deleteTriggerFromCard}
+            toast={toast}
+            undo={this.undo}
+            holdToast={this.holdToast}
+            releaseToast={this.releaseToast}
+          />
         )}
         <LeaveConfirmSheet
           open={leaveConfirmOpen}

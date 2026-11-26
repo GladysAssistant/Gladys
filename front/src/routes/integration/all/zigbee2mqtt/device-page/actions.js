@@ -125,11 +125,12 @@ function createActions(store) {
       if (device.created_at) {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
-      const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
-        $splice: [[index, 1]]
-      });
+      // by identity, in the list as it is now: a search, a sort or another deletion may have
+      // replaced the list while this request was pending. A card not saved yet has no
+      // external_id, only the id given by addDevice: two of them must not go together
+      const isDeleted = device.created_at ? d => d.external_id === device.external_id : d => d.id === device.id;
       store.setState({
-        zigbee2mqttDevices
+        zigbee2mqttDevices: store.getState().zigbee2mqttDevices.filter(d => !isDeleted(d))
       });
     },
     async search(state, e) {

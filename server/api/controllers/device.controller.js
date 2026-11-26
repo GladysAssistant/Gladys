@@ -3,6 +3,9 @@ const { EVENTS, ACTIONS, ACTIONS_STATUS, SYSTEM_VARIABLE_NAMES } = require('../.
 const { BadParameters } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
 
+// A client id is echoed to the screens of its user: it has no reason to be long
+const MAX_CLIENT_ID_LENGTH = 64;
+
 module.exports = function DeviceController(gladys) {
   /**
    * @api {get} /api/v1/device/:device_selector getBySelector
@@ -44,6 +47,9 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function create(req, res) {
+    // only here: the integrations which save their devices by themselves are not users looking
+    // at a stale card
+    gladys.device.checkNotBeingDestroyed(req.body);
     const device = await gladys.device.create(req.body);
     res.json(device);
   }
@@ -61,9 +67,46 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @description Who asked for a value. The action is executed after the answer to the request:
+   * its author is kept with it, so a failure can be reported to them
+   * (WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR). `client_id` is an opaque id the front
+   * sends with its commands, one per open page: it comes back with the failure, so only the
+   * page which sent the command says so. A caller which sends none (a script, an API key)
+   * gets the state back on its screens, and no message.
+   * @param {object} req - The request.
+   * @returns {object} The author to attach to the action.
+   * @example
+   * getActionAuthor(req);
+   */
+  function getActionAuthor(req) {
+    const clientId = req.body.client_id;
+    return {
+      user_id: req.user.id,
+      client_id: typeof clientId === 'string' ? clientId.slice(0, MAX_CLIENT_ID_LENGTH) : null,
+    };
+  }
+
+  /**
+   * @description How the value is to be used, when the caller says so. `speak: true` asks for a
+   * text to be read out loud on a `music` / `play_notification` feature: the device gets the URL
+   * of a clip of the voice of Gladys, never the text (the "Speak" control of the devices widget).
+   * Without it, a value goes to the device as it is, a string included.
+   * @param {object} req - The request.
+   * @returns {object} The options to attach to the action.
+   * @example
+   * getValueOptions(req);
+   */
+  function getValueOptions(req) {
+    return req.body.speak === true ? { speak: true } : {};
+  }
+
+  /**
    * @api {post} /api/v1/device/:device_selector/:feature_category/:feature_type/value setValue
    * @apiName setValue
    * @apiGroup Device
+   * @apiParam {Any} value The value to set.
+   * @apiParam {Boolean} [speak] `true` to read the value, a text, out loud on a music / play_notification feature.
+   * @apiParam {String} [client_id] Id of the page which sends the command (see getActionAuthor).
    */
   async function setValue(req, res) {
     const action = {
@@ -73,8 +116,9 @@ module.exports = function DeviceController(gladys) {
       feature_type: req.params.feature_type,
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
+      ...getValueOptions(req),
     };
-    gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, ...getActionAuthor(req) });
     res.json(action);
   }
 
@@ -82,6 +126,9 @@ module.exports = function DeviceController(gladys) {
    * @api {post} /api/v1/device_feature/:device_feature_selector/value setValueFeature
    * @apiName setValueFeature
    * @apiGroup Device
+   * @apiParam {Any} value The value to set.
+   * @apiParam {Boolean} [speak] `true` to read the value, a text, out loud on a music / play_notification feature.
+   * @apiParam {String} [client_id] Id of the page which sends the command (see getActionAuthor).
    */
   async function setValueFeature(req, res) {
     const action = {
@@ -89,8 +136,9 @@ module.exports = function DeviceController(gladys) {
       device_feature: req.params.device_feature_selector,
       value: req.body.value,
       status: ACTIONS_STATUS.PENDING,
+      ...getValueOptions(req),
     };
-    gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+    gladys.event.emit(EVENTS.ACTION.TRIGGERED, { ...action, ...getActionAuthor(req) });
     res.json(action);
   }
 

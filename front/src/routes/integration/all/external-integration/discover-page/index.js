@@ -7,6 +7,7 @@ import debounce from 'debounce';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DiscoverTab from './DiscoverTab';
+import { withMobileViewport } from '../../../../../components/mobile';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { stripDeviceStatesForSave } from '../../../../../utils/device';
@@ -171,9 +172,10 @@ class ExternalIntegrationDiscoverPage extends Component {
     const discoveredDevice = this.state.discoveredDevices.find(device => device.external_id === externalId);
     // the list can be re-published (websocket refresh) between render and
     // click: the clicked device may be gone from the fresh list, and the
-    // re-render is about to remove its card anyway
+    // re-render is about to remove its card anyway. Nothing was created: false tells so to the
+    // phone sheet, which would otherwise announce a device added
     if (!discoveredDevice) {
-      return;
+      return false;
     }
     // the same standard POST creates the device or, when it already exists
     // (same external_id), applies the re-published definition (the
@@ -183,6 +185,7 @@ class ExternalIntegrationDiscoverPage extends Component {
     delete device.structure_changed;
     await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
     await this.getDiscoveredDevices();
+    return true;
   };
 
   onDiscoveredDevicesUpdated = payload => {
@@ -237,6 +240,7 @@ class ExternalIntegrationDiscoverPage extends Component {
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
         <DiscoverTab
           {...state}
+          isMobile={props.isMobile}
           selector={props.selector}
           scan={this.scan}
           createDevice={this.createDevice}
@@ -248,4 +252,4 @@ class ExternalIntegrationDiscoverPage extends Component {
   }
 }
 
-export default connect('user,session,httpClient')(ExternalIntegrationDiscoverPage);
+export default connect('user,session,httpClient')(withMobileViewport(ExternalIntegrationDiscoverPage));

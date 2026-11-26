@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
@@ -16,6 +17,7 @@ const ZBDONGLE_P = 'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P';
 describe('zigbee2mqtt getUsbPorts', () => {
   let manager;
   let usb;
+  let access;
 
   const getAdapter = async (port) => {
     usb.list = fake.resolves([port]);
@@ -38,10 +40,13 @@ describe('zigbee2mqtt getUsbPorts', () => {
       },
     };
     manager = new Zigbee2mqttManager(gladys, {}, serviceId);
+    // The /dev/serial/by-id/ links exist
+    access = sinon.stub(fs.promises, 'access').resolves();
   });
 
   afterEach(() => {
     sinon.reset();
+    access.restore();
   });
 
   it('should recognize a ZBDongle-E, and keep the serial ports of the machine (production machine)', async () => {
@@ -63,12 +68,14 @@ describe('zigbee2mqtt getUsbPorts', () => {
     expect(ports).to.deep.equal([
       {
         path: '/dev/ttyUSB0',
+        stablePath:
+          '/dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_8e73883472d9ee11bb48b74c37b89984-if00-port0',
         name: 'Itead Sonoff Zigbee 3.0 USB Dongle Plus V2',
         pnpId: 'usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_8e73883472d9ee11bb48b74c37b89984-if00-port0',
         adapter: ZBDONGLE_E,
       },
-      { path: '/dev/ttyS4', name: null, pnpId: undefined, adapter: null },
-      { path: '/dev/ttyS1', name: null, pnpId: undefined, adapter: null },
+      { path: '/dev/ttyS4', stablePath: '/dev/ttyS4', name: null, pnpId: undefined, adapter: null },
+      { path: '/dev/ttyS1', stablePath: '/dev/ttyS1', name: null, pnpId: undefined, adapter: null },
     ]);
   });
 
@@ -89,11 +96,27 @@ describe('zigbee2mqtt getUsbPorts', () => {
     expect(ports).to.deep.equal([
       {
         path: '/dev/ttyUSB0',
+        stablePath:
+          '/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0',
         name: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus',
         pnpId: 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0',
         adapter: ZBDONGLE_P,
       },
     ]);
+  });
+
+  it('should give the port as the path to store when its /dev/serial/by-id/ link is not shared with Gladys', async () => {
+    access.rejects(new Error('ENOENT'));
+    usb.list = fake.resolves([
+      {
+        path: '/dev/ttyUSB0',
+        pnpId: 'usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_d65fba180f86ec11bfdf571719c2d21c-if00-port0',
+      },
+    ]);
+
+    const [port] = await manager.getUsbPorts();
+
+    expect(port.stablePath).to.equal('/dev/ttyUSB0');
   });
 
   it('should name an unknown USB device after its USB device name, without serial number', async () => {
@@ -120,7 +143,9 @@ describe('zigbee2mqtt getUsbPorts', () => {
     const ports = await manager.getUsbPorts();
 
     // Without USB device name, the ZBDongle-E and ZBDongle-P can't be told apart: no model
-    expect(ports).to.deep.equal([{ path: '/dev/ttyUSB0', name: 'ITEAD', pnpId: undefined, adapter: null }]);
+    expect(ports).to.deep.equal([
+      { path: '/dev/ttyUSB0', stablePath: '/dev/ttyUSB0', name: 'ITEAD', pnpId: undefined, adapter: null },
+    ]);
   });
 
   it('should fail when the usb service is not available', async () => {

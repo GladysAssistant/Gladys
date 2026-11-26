@@ -39,6 +39,7 @@ const DeviceTab = ({ children, ...props }) => (
               props.eweLinkDevices.map((device, index) => (
                 <EweLinkDeviceBox
                   {...props}
+                  key={device.external_id}
                   editable
                   saveButton
                   deleteButton

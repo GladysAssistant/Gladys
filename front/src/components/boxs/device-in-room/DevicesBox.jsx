@@ -11,6 +11,8 @@ import {
 } from '../../../../../server/utils/constants';
 import DeviceCard from './DeviceCard';
 import debounce from 'debounce';
+import { getDeviceName } from '../../../utils/device';
+import { COMMAND_CLIENT_ID, getCommandNotSentCause, sendDeviceFeatureValue } from '../../../utils/deviceCommand';
 
 // A dynamic select holds a string state: its widget reads last_value_string
 const isTextSelectFeature = feature =>
@@ -25,7 +27,8 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
       if (isTextSelectFeature(feature)) {
         return {
           ...feature,
-          last_value_string: `${lastValue}`,
+          // null: no state at all (a failed first command puts the feature back there)
+          last_value_string: lastValue === null ? null : `${lastValue}`,
           last_value_changed: lastValueChange
         };
       }
@@ -60,6 +63,7 @@ class DevicesComponent extends Component {
       status: RequestStatus.Getting
     };
     this.wasDisconnected = false;
+    this.pendingCommands = new Map();
   }
 
   handleWebsocketConnected = ({ connected }) => {
@@ -130,7 +134,20 @@ class DevicesComponent extends Component {
     }
   };
 
+  // A state coming from Gladys while a command is on its way is the state to go back to if
+  // that command cannot be sent: it is newer than the one displayed before the command.
+  keepStateFromGladys = (selector, state) => {
+    const pendingCommand = this.pendingCommands.get(selector);
+    if (pendingCommand) {
+      pendingCommand.stateToGoBackTo = { ...pendingCommand.stateToGoBackTo, ...state };
+    }
+  };
+
   updateDeviceStateWebsocket = payload => {
+    this.keepStateFromGladys(payload.device_feature_selector, {
+      last_value: payload.last_value,
+      last_value_changed: payload.last_value_changed
+    });
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
       deviceFeatures = updateDeviceFeatures(
@@ -145,6 +162,10 @@ class DevicesComponent extends Component {
     }
   };
   updateDeviceTextWebsocket = payload => {
+    this.keepStateFromGladys(payload.device_feature, {
+      last_value_string: payload.last_value_string,
+      last_value_changed: payload.last_value_changed
+    });
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
       deviceFeatures = updateDeviceFeaturesString(
@@ -159,10 +180,8 @@ class DevicesComponent extends Component {
     }
   };
 
-  setValueDevice = async (deviceFeature, value) => {
-    await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-      value
-    });
+  setValueDevice = async (deviceFeature, value, options) => {
+    await sendDeviceFeatureValue(this.props.httpClient, deviceFeature.selector, value, options);
   };
 
   changeAllLightsStatusRoom = async () => {
@@ -178,21 +197,71 @@ class DevicesComponent extends Component {
     });
   };
 
-  updateValue = async (deviceFeature, value) => {
-    const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
-    await this.setState({
-      deviceFeatures
-    });
+  // What is known of a feature while commands for it are on their way: the state to go back
+  // to if one of them cannot be sent, the number of requests not answered yet, and whether a
+  // debounced one has not left yet. Several optimistic updates may precede one request (a
+  // slider is debounced) and several requests may overlap (two taps on a switch): the state
+  // to go back to is the one from before the first of them, or a newer one coming from Gladys,
+  // and it is kept until the last of them has settled.
+  getPendingCommand = deviceFeature => {
+    let pendingCommand = this.pendingCommands.get(deviceFeature.selector);
+    if (!pendingCommand) {
+      const displayed = this.state.deviceFeatures.find(feature => feature.selector === deviceFeature.selector);
+      const { last_value, last_value_string, last_value_changed } = displayed || deviceFeature;
+      pendingCommand = {
+        stateToGoBackTo: { last_value, last_value_string, last_value_changed },
+        requests: 0,
+        debounced: false
+      };
+      this.pendingCommands.set(deviceFeature.selector, pendingCommand);
+    }
+    return pendingCommand;
+  };
+
+  // Resolves with whether the request went through. `speak`: a text to read out loud, a command
+  // and not a state, which the feature does not show (MusicPlayNotificationDeviceFeature.jsx).
+  updateValue = async (deviceFeature, value, { speak = false } = {}) => {
+    const pendingCommand = this.getPendingCommand(deviceFeature);
+    pendingCommand.requests += 1;
+    pendingCommand.debounced = false;
+    if (!speak) {
+      const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
+      await this.setState({
+        deviceFeatures
+      });
+    }
     try {
-      await this.setValueDevice(deviceFeature, value);
+      await this.setValueDevice(deviceFeature, value, { speak });
+      return true;
     } catch (e) {
       console.error(e);
+      // The request did not go through: the command may not have been sent. Same message as a
+      // device Gladys could not drive, with its own cause: DeviceCommandError.jsx says so and
+      // puts the widgets back on the state below.
+      this.props.session.dispatcher.dispatch(WEBSOCKET_MESSAGE_TYPES.DEVICE.SET_VALUE_ERROR, {
+        client_id: COMMAND_CLIENT_ID,
+        cause: getCommandNotSentCause(e),
+        device_feature_selector: deviceFeature.selector,
+        device_feature_name: deviceFeature.name,
+        // the name the user reads in the widget
+        device_name: deviceFeature.new_label || getDeviceName(deviceFeature.device, deviceFeature),
+        value,
+        ...(speak ? { speak: true } : {}),
+        ...pendingCommand.stateToGoBackTo
+      });
+      return false;
+    } finally {
+      pendingCommand.requests -= 1;
+      if (pendingCommand.requests === 0 && !pendingCommand.debounced) {
+        this.pendingCommands.delete(deviceFeature.selector);
+      }
     }
   };
 
   setValueDeviceDebounce = debounce(this.updateValue.bind(this), 200);
 
   updateValueWithDebounce = async (deviceFeature, value) => {
+    this.getPendingCommand(deviceFeature).debounced = true;
     const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     this.setState({
       deviceFeatures

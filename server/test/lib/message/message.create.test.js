@@ -144,6 +144,8 @@ describe('message.create', () => {
       is_read: true,
       created_at: new Date('2023-02-09T09:58:05.766Z'),
     });
+    // sent by a scene after the answer to "Question 2" (an AI turn without tool call sends a single
+    // message): kept in the history, as a scene message
     await db.Message.create({
       text: 'Spontaneous message 3',
       sender_id: null,
@@ -178,6 +180,7 @@ describe('message.create', () => {
       previousQuestions: [
         { question: 'Question 1', answer: 'Answer 1' },
         { question: 'Question 2', answer: 'Answer 2' },
+        { question: null, answer: '[Scene message] Spontaneous message 3' },
       ],
     });
   });

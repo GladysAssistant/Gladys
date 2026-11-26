@@ -8,12 +8,15 @@ import AsyncRoute from 'preact-async-route';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
 import actions from '../actions/main';
+import { SESSION_REFUSED_EVENT } from '../utils/Session';
 import { EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS } from '../actions/externalIntegrationUpdates';
 import { catalogCategories } from '../config/integrations';
 
 import { getDefaultState } from '../utils/getDefaultState';
 
 import Header from './header';
+import ConnectionLostNotice from './header/ConnectionLostNotice';
+import DeviceCommandError from './device/DeviceCommandError';
 import Layout from './layout';
 import Redirect from './router/Redirect';
 import Login from '../routes/login';
@@ -220,7 +223,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate,session,gatewayTrialDaysLeft,gatewayTrialHasPaymentMethod,gatewayTrialStripePortalKey,gatewayPaymentRequired,instanceGladysVersion,clockOffset,gladysUnreachable,loggingOut',
   actions
 )(props => (
   <div id="app">
@@ -243,6 +246,7 @@ const AppRouter = connect(
       closeCollapsedMenu={props.closeCollapsedMenu}
       showCollapsedMenu={props.showCollapsedMenu}
       logout={props.logout}
+      loggingOut={props.loggingOut}
       session={props.session}
       gatewayTrialDaysLeft={props.gatewayTrialDaysLeft}
       gatewayTrialHasPaymentMethod={props.gatewayTrialHasPaymentMethod}
@@ -253,6 +257,14 @@ const AppRouter = connect(
       refreshInstanceVersionState={props.refreshInstanceVersionState}
       clockOffset={props.clockOffset}
       refreshClockOffsetState={props.refreshClockOffsetState}
+    />
+    {/* Outside the Header: that one renders nothing on a full-screen dashboard,
+        where a wall tablet most needs to be told that Gladys is unreachable. */}
+    <ConnectionLostNotice
+      currentUrl={props.currentUrl}
+      session={props.session}
+      user={props.user}
+      gladysUnreachable={props.gladysUnreachable}
     />
     <Layout currentUrl={props.currentUrl}>
       <Router onChange={props.handleRoute}>
@@ -479,8 +491,37 @@ const AppRouter = connect(
 
 class MainApp extends Component {
   componentWillMount() {
+    this.listenToSession(this.props.session);
     this.props.checkSession();
   }
+
+  componentDidUpdate(previousProps) {
+    // signing out puts a new session in the store
+    if (previousProps.session !== this.props.session) {
+      this.stopListeningToSession(previousProps.session);
+      this.listenToSession(this.props.session);
+    }
+  }
+
+  // Gladys refused to renew the access token while the session was reconnecting: the session
+  // was revoked or has expired, or the tablet was locked. The session check gets the same
+  // refusal, and knows where it leads: the sign-in page, or the keypad. Without it the page
+  // would stay as it is, with values that no longer move.
+  handleSessionRefused = () => {
+    this.props.checkSession();
+  };
+
+  listenToSession = session => {
+    if (session && session.dispatcher) {
+      session.dispatcher.addListener(SESSION_REFUSED_EVENT, this.handleSessionRefused);
+    }
+  };
+
+  stopListeningToSession = session => {
+    if (session && session.dispatcher) {
+      session.dispatcher.removeListener(SESSION_REFUSED_EVENT, this.handleSessionRefused);
+    }
+  };
 
   componentDidMount() {
     // Listen for system preference change
@@ -499,6 +540,7 @@ class MainApp extends Component {
     // Remove event listener to prevent memory leaks
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
     clearInterval(this.externalIntegrationUpdatesInterval);
+    this.stopListeningToSession(this.props.session);
   }
 
   handleSystemPreferenceChange = () => {
@@ -511,12 +553,13 @@ class MainApp extends Component {
     return (
       <IntlProvider definition={translationDefinition}>
         <AppRouter />
+        <DeviceCommandError />
       </IntlProvider>
     );
   }
 }
 
-const MainAppConnected = connect('user', actions)(MainApp);
+const MainAppConnected = connect('user,session', actions)(MainApp);
 
 const App = () => (
   <Provider store={store}>

@@ -10,12 +10,14 @@ import GatewayTrialIndicator from './GatewayTrialIndicator';
 import InstanceUpdateNotice from './InstanceUpdateNotice';
 import GatewaySubscriptionNotice from './GatewaySubscriptionNotice';
 import ClockOffsetNotice from './ClockOffsetNotice';
+import SurveyNotice from './SurveyNotice';
 import FeedbackLink from '../feedback/FeedbackLink';
 import { isInstanceBehindFront, isUpdateNoticeDismissed } from '../../utils/instanceVersion';
+import { shouldShowSurveyNotice } from '../../utils/survey';
 import sidebarActions from '../../actions/sidebar';
 import style from './style.css';
 
-const PAGES_WITHOUT_HEADER = [
+export const PAGES_WITHOUT_HEADER = [
   '/login',
   '/signup',
   '/signup/create-account-local',
@@ -177,6 +179,11 @@ class Header extends Component {
     this.setState({});
   };
 
+  // same for the survey notice: it writes its dismissal, the header re-reads it
+  handleSurveyNoticeDismiss = () => {
+    this.setState({});
+  };
+
   // The instance version is normally loaded at session check, but a
   // client-side login never gets there: /login is an open page checkSession
   // returns early from, and finishing the login routes here without
@@ -271,6 +278,8 @@ class Header extends Component {
     const showInstanceUpdateNotice =
       isInstanceBehindFront(props.instanceGladysVersion) && !isUpdateNoticeDismissed(props.instanceGladysVersion);
     const showClockOffsetNotice = Number.isFinite(props.clockOffset);
+    // not echoed by the dot below: a survey never needs the user's attention
+    const showSurveyNotice = shouldShowSurveyNotice({ user: props.user, session: props.session });
     // a notice waiting in a menu that is closed — the mobile drawer, or the
     // rail collapsed on desktop — is echoed by a dot on the button opening it
     const showTogglerDot = showInstanceUpdateNotice || props.gatewayPaymentRequired || showClockOffsetNotice;
@@ -408,8 +417,14 @@ class Header extends Component {
               refreshGatewayTrialState={props.refreshGatewayTrialState}
             />
           )}
+          {showSurveyNotice && <SurveyNotice user={props.user} onDismiss={this.handleSurveyNoticeDismiss} />}
           <div class={cx('dropdown', style.sidebarFooter, { show: props.showDropDown })} ref={this.dropdownRef}>
-            <a onClick={props.toggleDropDown} class={style.profileButton} data-toggle="dropdown">
+            <a
+              onClick={props.toggleDropDown}
+              class={style.profileButton}
+              data-toggle="dropdown"
+              data-cy="sidebar-profile"
+            >
               <span class="avatar" style={`background-image: url(${props.profilePicture})`} />
               <span class={style.profileName}>
                 <span>{props.user.firstname}</span>
@@ -458,8 +473,17 @@ class Header extends Component {
               <FeedbackLink className="dropdown-item" dataCy="header-feedback-link">
                 <i class="dropdown-icon fe fe-message-circle" /> <Text id="feedback.link" />
               </FeedbackLink>
-              <a class="dropdown-item" href="" onClick={props.logout}>
-                <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />
+              {/* Signing out waits a few seconds for Gladys to revoke the session: the entry
+                  says so, and a second tap does nothing (actions/main.js) */}
+              <a
+                class={cx('dropdown-item', { disabled: props.loggingOut })}
+                href=""
+                onClick={props.logout}
+                aria-disabled={props.loggingOut ? 'true' : 'false'}
+                data-cy="header-sign-out"
+              >
+                <i class="dropdown-icon fe fe-log-out" />{' '}
+                <Text id={props.loggingOut ? 'header.signingOut' : 'header.signOut'} />
               </a>
             </div>
           </div>

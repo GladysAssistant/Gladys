@@ -117,6 +117,7 @@ class DeviceTab extends Component {
                   netatmoDevices.length > 0 &&
                   netatmoDevices.map((device, index) => (
                     <NetatmoDeviceBox
+                      key={device.external_id}
                       editable
                       editButton
                       saveButton

@@ -7,6 +7,7 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { connect } from 'unistore/preact';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
+import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
 
 class MELCloudDeviceBox extends Component {
   componentWillMount() {
@@ -229,9 +230,9 @@ class MELCloudDeviceBox extends Component {
                   )}
 
                   {validModel && deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <DeleteDeviceButton device={device} onDelete={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.melcloud.deleteButton" />
-                    </button>
+                    </DeleteDeviceButton>
                   )}
 
                   {!validModel && (

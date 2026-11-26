@@ -161,4 +161,5 @@ const JobList = ({ children, ...props }) => (
   </div>
 );
 
+export { JobDuration };
 export default JobList;

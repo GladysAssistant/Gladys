@@ -1,12 +1,14 @@
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
+import createActionsStatus from '../commons/actions';
 import getZ2mUrl, { shouldShowZ2mUrlWarning } from '../utils/getZ2mUrl';
 import { stripDeviceStatesForSave } from '../../../../../utils/device';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const houseActions = createActionsHouse(store);
+  const statusActions = createActionsStatus(store);
   const actions = {
     async getZ2mUrl(state) {
       store.setState({ z2mUrl: undefined, showZ2mUrlWarning: false });
@@ -64,20 +66,6 @@ function createActions(store) {
         discoverZigbee2mqttError: null
       });
     },
-    async getPermitJoin(state) {
-      const value = await state.httpClient.get('/api/v1/service/zigbee2mqtt/permit_join');
-      store.setState({
-        permitJoin: value
-      });
-    },
-    async togglePermitJoin(state) {
-      await state.httpClient.post('/api/v1/service/zigbee2mqtt/permit_join');
-    },
-    updatePermitJoin(state, value) {
-      store.setState({
-        permitJoin: value
-      });
-    },
     updateDeviceField(state, index, field, value) {
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
         [index]: {
@@ -106,7 +94,7 @@ function createActions(store) {
     }
   };
 
-  return Object.assign({}, integrationActions, houseActions, actions);
+  return Object.assign({}, integrationActions, houseActions, statusActions, actions);
 }
 
 export default createActions;

@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import RtspCameraPage from './RtspCamera';
+import { withMobileViewport } from '../../../../components/mobile';
 
 class RtspCameraIntegration extends Component {
   componentWillMount() {
@@ -18,4 +19,4 @@ class RtspCameraIntegration extends Component {
 export default connect(
   'user,rtspCameras,housesWithRooms,getRtspCameraStatus,rtspCameraSearch,getRtspCameraOrderDir',
   actions
-)(RtspCameraIntegration);
+)(withMobileViewport(RtspCameraIntegration));

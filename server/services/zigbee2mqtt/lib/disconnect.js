@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { findOwnContainer } = require('../../../utils/dockerContainers');
+const { findOwnZ2mContainer } = require('../utils/findOwnZ2mContainer');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -13,22 +13,28 @@ const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt
  * await removeOwnContainer(gladys.system, mqttContainerDescriptor);
  */
 async function removeOwnContainer(system, descriptor) {
-  const container = await findOwnContainer(system, descriptor);
+  const container = await findOwnZ2mContainer(system, descriptor);
   if (container) {
     await system.stopContainer(container.id);
-    await system.removeContainer(container.id);
+    // With its anonymous volumes (/mosquitto/data and /mosquitto/log of the broker image, unused: the broker persists
+    // in its configuration folder, mounted from the disk of Gladys), left behind at each removal otherwise
+    await system.removeContainer(container.id, { v: true });
   }
 }
 
 /**
- * @description Disconnect service from dependent containers.
+ * @description Disconnect Gladys from the broker, and stop what follows Zigbee2mqtt: its nightly backup, the watch of
+ * its dongle, its health check, the last installation. Shared by disconnect, which then removes the containers, and by
+ * stop, which keeps them.
  * @example
- * disconnect();
+ * disconnectFromBroker.call(this);
  */
-async function disconnect() {
+function disconnectFromBroker() {
   // Stop backup reccurent job
   if (this.backupScheduledJob) {
     this.backupScheduledJob.cancel();
+    // Scheduled again by the next init only when there is none
+    this.backupScheduledJob = null;
   }
 
   // Disconnect from MQTT broker
@@ -42,9 +48,34 @@ async function disconnect() {
   }
   this.gladysConnected = false;
   this.mqttConnectionError = null;
+  // Values of another broker, or of a previous run, are not saved when a device is created
+  this.lastReceivedStates = {};
+  // Gladys no longer hears Zigbee2mqtt: whether joining is allowed, and the devices it saw joining, describe nothing
+  this.updatePermitJoin(false);
+  this.clearPairingDevices();
   clearTimeout(this.healthCheckTimer);
   this.healthCheckTimer = null;
+  // Disabled, Zigbee2mqtt is not started again when its dongle comes back
+  this.stopWatchingDongle();
+  this.resetDongleRestarts();
+  this.dongleMissing = false;
   this.emitStatusEvent();
+
+  // Disabled: the outcome of the last installation no longer describes Zigbee2mqtt
+  this.clearInstallation();
+  // A send left waiting goes at once, with the idle installation: its timer would outlive the integration
+  if (this.installProgressTimer !== null) {
+    this.emitInstallProgress(true);
+  }
+}
+
+/**
+ * @description Disconnect from the broker, then stop and remove both containers, see disconnect.
+ * @example
+ * await disconnectContainers.call(this);
+ */
+async function disconnectContainers() {
+  disconnectFromBroker.call(this);
 
   // Stop & remove MQTT container
   await removeOwnContainer(this.gladys.system, mqttContainerDescriptor);
@@ -62,10 +93,29 @@ async function disconnect() {
   this.startingTimer = null;
   this.zigbee2mqttStarting = false;
   this.coordinatorFirmware = null;
+  this.z2mVersion = null;
+  this.deviceCount = null;
   this.z2mContainerError = null;
   this.emitStatusEvent();
 }
 
+/**
+ * @description Disconnect service from dependent containers. Counted while it runs, from its first line: the routes
+ * and the setup checked before calling it are refused until it ends, as an installation started meanwhile would lose
+ * the containers it creates (see refuseWhileInstalling).
+ * @example
+ * disconnect();
+ */
+async function disconnect() {
+  this.runningOperations += 1;
+  try {
+    await disconnectContainers.call(this);
+  } finally {
+    this.runningOperations -= 1;
+  }
+}
+
 module.exports = {
+  disconnectFromBroker,
   disconnect,
 };

@@ -40,7 +40,8 @@ function getDefaultState() {
   } catch (e) {}
 
   // Left navigation: expanded rail by default, collapsed if the user asked
-  // for the full page width on this device (see components/header)
+  // for the full page width on this device — or, until they choose, on a
+  // touch screen narrower than 1200px (utils/sidebarPreference)
   const sidebarCollapsed = isSidebarCollapsed();
 
   const state = {

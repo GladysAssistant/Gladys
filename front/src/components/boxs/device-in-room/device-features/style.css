@@ -91,3 +91,9 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
      usable on a phone. */
   min-width: 6rem;
 }
+
+/* The text of an announcement (MusicPlayNotificationDeviceFeature): the sheet sizes it, a resize
+   handle would only get in the way */
+.speakText {
+  resize: none;
+}
