@@ -555,6 +555,22 @@ async function getAllTools(userId) {
       cb: async ({ room }) => {
         const { id, name } = this.findBySimilarity(rooms, room);
 
+        // No room matches the name sent by the model (the AI chat does not validate it against
+        // the enum): say so with the room names, so it can ask again, before any camera is asked.
+        // "No room" has `id: null` and is a real choice.
+        if (id === undefined) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `camera.get-image: room "${room}" not found. Available rooms: ${rooms
+                  .map((r) => r.name)
+                  .join(', ')}.`,
+              },
+            ],
+          };
+        }
+
         // A picture taken now by each enabled camera of the room, or its last stored image
         // (less than one hour old) when the camera cannot take one.
         const images = await this.gladys.device.camera.getLiveImagesInRoom(id);

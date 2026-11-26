@@ -2153,6 +2153,24 @@ describe('build schemas', () => {
     ]);
   });
 
+  it('should tell camera.get-image the room names when the room sent by the model matches none', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+
+    const tools = await mcpHandler.getAllTools();
+    const cameraTool = tools.find((tool) => tool.intent === 'camera.get-image');
+
+    // The AI chat does not check the room against the enum: an invented or translated name
+    // must not reach the cameras, and the model gets the names to ask again.
+    const result = await cameraTool.cb({ room: 'Living room' });
+    expect(mcpHandler.gladys.device.camera.getLiveImagesInRoom.called).to.eq(false);
+    expect(result.content).to.deep.equal([
+      {
+        type: 'text',
+        text: 'camera.get-image: room "Living room" not found. Available rooms: Salon, Chambre, Cuisine, No room.',
+      },
+    ]);
+  });
+
   it('should ask camera.get-image for the cameras of no room when the model passes "No room"', async () => {
     const mcpHandler = buildBatteryMcpHandler();
     mcpHandler.gladys.device.camera.getLiveImagesInRoom = stub().resolves(['image/jpg;base64,NOROOM']);

@@ -8,6 +8,8 @@ const StateManager = require('../../../../lib/state');
 const Job = require('../../../../lib/job');
 const ServiceManager = require('../../../../lib/service');
 const db = require('../../../../models');
+const logger = require('../../../../utils/logger');
+const { MAX_LIVE_IMAGES_IN_PARALLEL } = require('../../../../lib/device/camera/camera.getLiveImagesInRoom');
 
 const event = new EventEmitter();
 const job = new Job(event);
@@ -43,6 +45,39 @@ function buildCameraState({ storedImageChanged = new Date(), enabled } = {}) {
     features.push({ category: 'camera', type: 'enabled', last_value: enabled });
   }
   return { service_id: SERVICE_ID, features };
+}
+
+/**
+ * @description Create one more camera in the seeded room, with its camera/image feature.
+ * @param {number} index - Number of the camera, used in its id and selector.
+ * @returns {Promise<string>} Resolve with the selector of the camera.
+ * @example
+ * await createCameraInRoom(2);
+ */
+async function createCameraInRoom(index) {
+  const deviceId = `b6b4c1a2-7f5e-4f3e-9a51-2a8f0c6e1d0${index}`;
+  const selector = `test-camera-${index}`;
+  await db.Device.create({
+    id: deviceId,
+    name: `Test camera ${index}`,
+    selector,
+    external_id: `${selector}-external`,
+    service_id: SERVICE_ID,
+    room_id: ROOM_ID,
+  });
+  await db.DeviceFeature.create({
+    name: `Test camera ${index} image`,
+    selector: `${selector}-image`,
+    external_id: `camera-${index}:image`,
+    category: 'camera',
+    type: 'image',
+    read_only: false,
+    has_feedback: false,
+    min: 0,
+    max: 0,
+    device_id: deviceId,
+  });
+  return selector;
 }
 
 describe('Camera.getLiveImagesInRoom', () => {
@@ -139,26 +174,7 @@ describe('Camera.getLiveImagesInRoom', () => {
   });
 
   it('should ask every camera of the room at the same time, each with its own fallback', async () => {
-    await db.Device.create({
-      id: 'b6b4c1a2-7f5e-4f3e-9a51-2a8f0c6e1d01',
-      name: 'Test camera 2',
-      selector: 'test-camera-2',
-      external_id: 'test-camera-2-external',
-      service_id: SERVICE_ID,
-      room_id: ROOM_ID,
-    });
-    await db.DeviceFeature.create({
-      name: 'Test camera 2 image',
-      selector: 'test-camera-2-image',
-      external_id: 'camera-2:image',
-      category: 'camera',
-      type: 'image',
-      read_only: false,
-      has_feedback: false,
-      min: 0,
-      max: 0,
-      device_id: 'b6b4c1a2-7f5e-4f3e-9a51-2a8f0c6e1d01',
-    });
+    await createCameraInRoom(2);
     stateManager.setState('device', 'test-camera', { ...buildCameraState(), selector: 'test-camera' });
     stateManager.setState('device', 'test-camera-2', { ...buildCameraState(), selector: 'test-camera-2' });
     // Each request only settles once both cameras were asked: asked one after the other,
@@ -179,5 +195,76 @@ describe('Camera.getLiveImagesInRoom', () => {
 
     expect(getImage.callCount).to.equal(2);
     expect([...images].sort()).to.deep.equal([LIVE_IMAGE, STORED_IMAGE].sort());
+  });
+
+  it('should return no image and ask nothing when the room is undefined', async () => {
+    serviceManager.getServiceById = fake.returns(null);
+    stateManager.setState('device', 'test-camera', buildCameraState());
+
+    // Sequelize would drop an undefined condition and select every camera of the house
+    const images = await deviceManager.camera.getLiveImagesInRoom(undefined);
+
+    expect(images).to.deep.equal([]);
+    expect(serviceManager.getServiceById.called).to.equal(false);
+  });
+
+  it('should not return the picture of a camera disabled while it was taken, nor its stored one', async () => {
+    const getImage = fake(async () => {
+      // the user turns on the private mode during the capture
+      stateManager.setState('device', 'test-camera', buildCameraState({ enabled: 0 }));
+      return LIVE_IMAGE;
+    });
+    serviceManager.getServiceById = fake.returns({ device: { getImage } });
+    stateManager.setState('device', 'test-camera', buildCameraState({ enabled: 1 }));
+
+    const images = await deviceManager.camera.getLiveImagesInRoom(ROOM_ID);
+
+    expect(getImage.callCount).to.equal(1);
+    expect(images).to.deep.equal([]);
+  });
+
+  [
+    ['no service', null],
+    ['a service without device', {}],
+    ['a service whose device cannot take a picture', { device: {} }],
+  ].forEach(([label, service]) => {
+    it(`should use the stored image without warning for ${label}`, async () => {
+      const warn = sinon.stub(logger, 'warn');
+      serviceManager.getServiceById = fake.returns(service);
+      stateManager.setState('device', 'test-camera', buildCameraState());
+
+      const images = await deviceManager.camera.getLiveImagesInRoom(ROOM_ID);
+
+      expect(images).to.deep.equal([STORED_IMAGE]);
+      // a camera that publishes its images (MQTT) is not an error on every request
+      expect(warn.called).to.equal(false);
+    });
+  });
+
+  it('should ask a few cameras at a time in a room with many cameras', async () => {
+    const selectors = ['test-camera'];
+    for (let index = 2; index <= MAX_LIVE_IMAGES_IN_PARALLEL + 2; index += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      selectors.push(await createCameraInRoom(index));
+    }
+    selectors.forEach((selector) => stateManager.setState('device', selector, { ...buildCameraState(), selector }));
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const getImage = fake(async (device) => {
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10);
+      });
+      inFlight -= 1;
+      return `image/jpg;base64,${device.selector}`;
+    });
+    serviceManager.getServiceById = fake.returns({ device: { getImage } });
+
+    const images = await deviceManager.camera.getLiveImagesInRoom(ROOM_ID);
+
+    expect(getImage.callCount).to.equal(selectors.length);
+    expect(maxInFlight).to.equal(MAX_LIVE_IMAGES_IN_PARALLEL);
+    expect([...images].sort()).to.deep.equal(selectors.map((selector) => `image/jpg;base64,${selector}`).sort());
   });
 });
