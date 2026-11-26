@@ -57,7 +57,7 @@ class ExternalIntegrationDiscoverPage extends Component {
     // settling after its scan already ended (60s cap or websocket event)
     // cannot report its error on a later scan or on an ended one
     this.scanToken = 0;
-    this.state = { hideExistingDevices: readHideExistingDevices() };
+    this.state = { hideExistingDevices: readHideExistingDevices(), addedThisVisit: new Set() };
   }
 
   searchDevices = e => {
@@ -184,6 +184,9 @@ class ExternalIntegrationDiscoverPage extends Component {
     delete device.created;
     delete device.structure_changed;
     await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
+    // kept listed until the page is loaded again, even with "Hide devices
+    // already added" on: its "Already added" badge confirms the click
+    this.setState(state => ({ addedThisVisit: new Set(state.addedThisVisit).add(externalId) }));
     await this.getDiscoveredDevices();
     return true;
   };
@@ -209,7 +212,13 @@ class ExternalIntegrationDiscoverPage extends Component {
     // nothing leaks into the page of the new one
     this.pageGeneration += 1;
     this.clearScanTimer();
-    this.setState({ integration: null, discoveredDevices: null, scanStatus: null, scanError: null });
+    this.setState({
+      integration: null,
+      discoveredDevices: null,
+      scanStatus: null,
+      scanError: null,
+      addedThisVisit: new Set()
+    });
     // the integration metadata comes first: a communication or weather
     // integration redirects to the configuration screen before any
     // device-specific request is fired

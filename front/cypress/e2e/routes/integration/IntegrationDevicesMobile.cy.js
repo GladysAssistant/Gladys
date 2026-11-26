@@ -609,9 +609,17 @@ describe('Integration devices on a phone', () => {
 
     it('should add a discovered device, and not the one already added', () => {
       stubSave();
-      cy.visit(`/dashboard/integration/device/external/${SELECTOR}/discover`);
+      cy.visit(`/dashboard/integration/device/external/${SELECTOR}/discover`, {
+        onBeforeLoad: win =>
+          win.localStorage.removeItem('gladys_assistant_v1_external_integration_discover_hide_existing')
+      });
       cy.wait('@getDiscovered');
       cy.get('[data-cy=external-discover-mobile]').should('exist');
+      // "Hide devices already added" is on by default: the switch row shows the added one
+      cy.get('[data-cy=external-discovered-row]').should('have.length', 1);
+      cy.get('[data-cy=external-discover-hide-existing]')
+        .should('have.attr', 'aria-checked', 'true')
+        .click();
       cy.get('[data-cy=external-discovered-row]').should('have.length', 2);
       cy.contains('[data-cy=external-discovered-row]', 'Garage plug')
         .i18n('integration.externalIntegration.discover.alreadyCreatedBadge')

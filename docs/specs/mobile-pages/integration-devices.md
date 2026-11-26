@@ -301,7 +301,10 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   devices per transport as pills. The sheet adds one **"keep the history" switch per feature**
   that can be historized (the rows of the card), counted in the unsaved changes.
 - **Discovery.** "Scan" is the button of the page ("Scanning…" with a spinner while it runs, and
-  the notice of the card); the search filters the list as on the card. The error of a device that
+  the notice of the card). "Hide devices already added" is a switch row, the same preference as
+  the switch of the card (on by default, remembered by the browser); the search filters the list
+  as on the card, and the empty states are the card's: everything hidden, a search matching only
+  hidden devices, or nothing matching. The error of a device that
   could not be created is the one of the card, with the rejected fields.
 
 ### Zigbee2MQTT

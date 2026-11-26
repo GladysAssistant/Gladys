@@ -104,4 +104,41 @@ describe('External integration - discovery, hide devices already added', () => {
     cy.contains('integration.externalIntegration.discover.allDevicesHidden').should('exist');
     cy.contains('integration.externalIntegration.discover.noSearchResults').should('not.exist');
   });
+  it('keeps a device added during the visit listed, with its badge, until the page is loaded again', () => {
+    let discovered = [DISCOVERED_DEVICES[0]];
+    cy.intercept('GET', `**/api/v1/external_integration/${SELECTOR}/discovered_device`, req =>
+      req.reply(discovered)
+    ).as('getDiscovered');
+    cy.intercept('POST', '**/api/v1/device', req => {
+      discovered = [{ ...DISCOVERED_DEVICES[0], created: true, structure_changed: false }];
+      req.reply({ ...req.body, id: 'a1b2c3d4-0000-4000-8000-000000000001' });
+    }).as('createDevice');
+    cy.visit(DISCOVER_PAGE_URL, {
+      onBeforeLoad: win => win.localStorage.removeItem(HIDE_EXISTING_KEY)
+    });
+    cy.wait(['@getIntegration', '@getDiscovered']);
+    cy.contains('button', 'integration.externalIntegration.discover.createButton').click();
+    cy.wait(['@createDevice', '@getDiscovered']);
+    // the click is confirmed by the badge, not by a card vanishing
+    cardTitles().should('have.length', 1);
+    cy.contains('integration.externalIntegration.discover.alreadyCreatedBadge').should('exist');
+    // a new visit hides it like any other device already added
+    cy.reload();
+    cy.wait(['@getIntegration', '@getDiscovered']);
+    cardTitles().should('have.length', 0);
+    cy.contains('integration.externalIntegration.discover.allDevicesHidden').should('exist');
+  });
+
+  it('says that the devices a search matches are hidden, rather than that nothing matches', () => {
+    cy.visit(DISCOVER_PAGE_URL, {
+      onBeforeLoad: win => win.localStorage.removeItem(HIDE_EXISTING_KEY)
+    });
+    cy.wait(['@getIntegration', '@getDiscoveredDevices']);
+    cy.get('.card-header input[type=text]').type('Added');
+    cy.contains('integration.externalIntegration.discover.searchMatchesHiddenDevices').should('exist');
+    cy.contains('integration.externalIntegration.discover.noSearchResults').should('not.exist');
+    cy.get('.card-header input[type=text]').clear();
+    cy.get('.card-header input[type=text]').type('nothing like this');
+    cy.contains('integration.externalIntegration.discover.noSearchResults').should('exist');
+  });
 });

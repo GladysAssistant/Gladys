@@ -1474,6 +1474,7 @@
         "noSearchResults": "Aucun appareil découvert ne correspond à votre recherche.",
         "hideExistingDevices": "Masquer les appareils déjà ajoutés",
         "allDevicesHidden": "Tous les appareils découverts sont déjà dans Gladys. Désactivez « Masquer les appareils déjà ajoutés » pour les voir.",
+        "searchMatchesHiddenDevices": "Les appareils correspondant à votre recherche sont déjà dans Gladys. Désactivez « Masquer les appareils déjà ajoutés » pour les voir.",
         "error": {
           "networkError": "Gladys n'a pas répondu à la demande d'ajout. Vérifiez que le serveur Gladys est bien démarré et accessible, puis réessayez.",
           "badRequestError": "Gladys a refusé cet appareil : les données publiées par l'intégration sont incorrectes.",
