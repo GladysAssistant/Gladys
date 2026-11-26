@@ -96,7 +96,7 @@ jobs:
             Track progress: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: ⬇️ Checkout pull request head
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
           # Checkout the PR commit by SHA (immutable), not the branch name.
@@ -116,7 +116,7 @@ jobs:
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
 
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'

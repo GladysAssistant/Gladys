@@ -19,11 +19,11 @@ jobs:
     environment: production
     name: Build and publish demo website
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
