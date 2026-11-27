@@ -154,6 +154,12 @@ cards**, the pattern of the devices list.
   `BottomSheet` of the scene pages (`components/sheet/BottomSheet.jsx`): a bottom sheet on a
   phone, a centered dialog from 576 px, dragged down to close, closed by the system "back",
   stackable. A form sheet shows **OK**, a picker or a menu shows **×**.
+- `size` picks the shape of the sheet. By default it has the height of its content (92 % of the
+  screen at most) and the dialog is 32rem wide. `full` gives it a fixed height: a list whose search
+  must not resize it. `wide` makes the dialog as wide as the screen allows (80rem at most), and
+  `wide-full` as tall too (54rem at most): a chart read closely
+  (`dashboard-flexible-layout-and-widgets.md`, L). On a phone, `wide` is the default sheet and
+  `wide-full` the `full` one.
 - A short form whose button stands under its field takes `aboveKeyboard` (a text to read out loud,
   `external-integrations/capabilities/music.md`, section 6): the keyboard of a phone covers the
   bottom of the page without resizing it, so the sheet goes up by what the visual viewport says is

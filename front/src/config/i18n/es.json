@@ -757,7 +757,20 @@
         "previousPeriod": "Período anterior",
         "nextPeriod": "Período siguiente",
         "currentPeriod": "En vivo",
-        "backToNow": "Volver al presente"
+        "backToNow": "Volver al presente",
+        "expand": "Ampliar el gráfico",
+        "zoomHint": "Arrastra sobre el gráfico para ampliar",
+        "zoomHintTouch": "Pellizca el gráfico para ampliar",
+        "resetZoom": "Restablecer el zoom",
+        "series": "Series",
+        "showSeries": "Mostrar esta serie",
+        "hideSeries": "Ocultar esta serie",
+        "stats": {
+          "min": "Mín",
+          "avg": "Media",
+          "max": "Máx",
+          "last": "Último"
+        }
       },
       "sun": {
         "editHouseLabel": "Seleccione una casa. Usaré su latitud/longitud para calcular la posición del sol.",

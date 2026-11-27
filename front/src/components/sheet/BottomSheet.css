@@ -87,6 +87,42 @@
   }
 }
 
+/* a chart to read closely: the dialog of wider screens takes the width the screen allows.
+   'wide' keeps the height of its content, 'wide-full' takes the height of the screen too. */
+.sheetWideFull {
+  height: 92vh;
+  height: 92dvh;
+}
+
+@media (min-width: 576px) {
+  .sheetWide {
+    max-width: 80rem;
+    max-height: min(54rem, calc(100vh - 3rem));
+    max-height: min(54rem, calc(100dvh - 3rem));
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .sheetWideFull {
+    height: calc(100vh - 3rem);
+    height: calc(100dvh - 3rem);
+  }
+}
+
+@media (min-width: 576px) and (max-height: 500px) {
+  .sheetWide {
+    max-height: calc(100vh - 1rem);
+    max-height: calc(100dvh - 1rem);
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .sheetWideFull {
+    height: calc(100vh - 1rem);
+    height: calc(100dvh - 1rem);
+  }
+}
+
 /* the light surface, which the global inversion would turn pure black: the panels' gray */
 :global(.dark-mode) .sheet {
   background-color: #ced8e6;
