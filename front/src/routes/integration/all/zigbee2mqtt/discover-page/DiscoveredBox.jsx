@@ -289,11 +289,6 @@ class DiscoveredBox extends Component {
                 <div class="form-group">
                   <label class="form-label" for={`name_${deviceIndex}`}>
                     <Text id="integration.zigbee2mqtt.nameLabel" />
-                    {generic && (
-                      <span class="badge badge-warning ml-2" data-cy="z2m-discovered-generic">
-                        <Text id={`${S}.genericBadge`} />
-                      </span>
-                    )}
                   </label>
                   <Localizer>
                     <input
@@ -313,6 +308,9 @@ class DiscoveredBox extends Component {
                   <div>
                     {generic && (
                       <div class="alert alert-warning">
+                        <span class="badge badge-warning mr-2" data-cy="z2m-discovered-generic">
+                          <Text id={`${S}.genericBadge`} />
+                        </span>
                         <Text id={`${S}.genericText`} />
                       </div>
                     )}
