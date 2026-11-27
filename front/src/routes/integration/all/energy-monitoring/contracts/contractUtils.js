@@ -1,5 +1,7 @@
-// Helpers shared by the Contracts tab: 30-minute slot grid <-> tariff time intervals,
-// template labels, currency formatting.
+// Helpers shared by the Contracts tab (and the energy price widget): 30-minute slot grid
+// <-> tariff time intervals, template and tier labels, currency formatting.
+
+import { Text } from 'preact-i18n';
 
 export const SLOTS_PER_DAY = 48;
 
@@ -76,6 +78,30 @@ export const localize = (text, language) => {
     return text;
   }
   return text[language] || text.en || Object.values(text)[0] || '';
+};
+
+// The tiers of the energy contract templates (catalogue, contracts migrated from the
+// former price table, internal Tempo template) store their label as an English key in
+// the tariff, in either case ("red off-peak", "Red off-peak"): it is displayed translated
+// ("Rouge HC"). Any other label, such as one written by an external integration, is
+// displayed as written.
+const TIER_LABEL_KEYS = {
+  peak: 'peak',
+  'off-peak': 'offPeak',
+  'blue peak': 'bluePeak',
+  'blue off-peak': 'blueOffPeak',
+  'white peak': 'whitePeak',
+  'white off-peak': 'whiteOffPeak',
+  'red peak': 'redPeak',
+  'red off-peak': 'redOffPeak'
+};
+
+export const formatTierLabel = label => {
+  const key = typeof label === 'string' ? TIER_LABEL_KEYS[label.trim().toLowerCase()] : undefined;
+  if (!key) {
+    return label || null;
+  }
+  return <Text id={`integration.energyMonitoring.tierLabels.${key}`}>{label}</Text>;
 };
 
 // `locale`: the language the amount is written in (the one of the browser when omitted)
