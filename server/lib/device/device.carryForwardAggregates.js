@@ -34,6 +34,10 @@ const LAST_STATE_BEFORE_QUERY = `
 // period after more than this without any change.
 const LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000;
 
+// How long before the first recorded state the value in force is held. The chart box rounds every point
+// to the second: a shorter offset would land on the same x as the change, and the step could be lost.
+const HOLD_OFFSET_MS = 1000;
+
 /**
  * @description Convert a date coming from the DB or the state manager into a timestamp.
  * @param {Date|string|null|undefined} date - The date.
@@ -84,6 +88,21 @@ function keepsHistory(deviceFeature) {
 }
 
 /**
+ * @description Tell whether an aggregated point draws the same value as the one in force on every
+ * series of the chart: the average, and the min and max lines.
+ * @param {object} point - An aggregated value.
+ * @param {number} value - The value in force.
+ * @returns {boolean} True when the average, the min and the max all equal the value.
+ * @example
+ * drawsOnlyValue({ value: 7, min_value: 0, max_value: 14 }, 7); // false
+ */
+function drawsOnlyValue(point, value) {
+  return [point.value, point.min_value, point.max_value].every(
+    (drawn) => drawn === undefined || drawn === null || drawn === value,
+  );
+}
+
+/**
  * @description Get the value of a feature in force at a given time: the last state recorded at or before it.
  * When the feature has not changed since that time, it is the last value kept in RAM, without any query.
  * Otherwise the last week before that time is read first, and the whole history only when nothing was
@@ -122,7 +141,7 @@ async function getValueInForceAt(deviceFeature, date, dateForQuery) {
  * @description Show a value that is set and does not move (a setpoint, a mode): a value set before the
  * period is still in force during it, until someone changes it.
  * - At the start of the period, a point carries the value in force at that time. When the value changed
- *   during the period, a second point holds it until just before the first recorded state: joined
+ *   during the period, a second point holds it until one second before the first recorded state: joined
  *   straight to that state, it would draw a ramp over hours on a line chart, not a step.
  * - At the end, the last state recorded (not the last bucket average) is carried until the end of the period.
  * Only a feature that is set (read_only false) and keeps its history is carried: a measure (read_only
@@ -156,9 +175,11 @@ async function carryForwardAggregates({
   const valueAtStart = await getValueInForceAt(deviceFeature, startDate, startDateForQuery);
   if (valueAtStart !== null) {
     const firstStateTime = values.length > 0 ? toTimestamp(values[0].created_at) : null;
-    // Held flat up to the change, so that the line steps there.
-    if (firstStateTime !== null && firstStateTime - 1 > startDate.getTime() && values[0].value !== valueAtStart) {
-      result.unshift(buildCarriedForwardPoint(new Date(firstStateTime - 1), valueAtStart));
+    // Held flat up to the change, so that the line steps there — the min and max lines too, which can
+    // move while the average does not.
+    const holdTime = firstStateTime === null ? null : firstStateTime - HOLD_OFFSET_MS;
+    if (holdTime !== null && holdTime > startDate.getTime() && !drawsOnlyValue(values[0], valueAtStart)) {
+      result.unshift(buildCarriedForwardPoint(new Date(holdTime), valueAtStart));
     }
     result.unshift(buildCarriedForwardPoint(startDate, valueAtStart));
   }

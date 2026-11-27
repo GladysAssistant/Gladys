@@ -410,7 +410,7 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
     expect(values[0].value).to.be.closeTo(1000, 1);
     // The value in force is held until just before the first recorded state
     expect(values[1]).to.include({ value: values[0].value, carried_forward: true });
-    expect(new Date(values[1].created_at).getTime()).to.equal(new Date(values[2].created_at).getTime() - 1);
+    expect(new Date(values[1].created_at).getTime()).to.equal(new Date(values[2].created_at).getTime() - 1000);
     expect(values[102]).to.include({ value: 1999, carried_forward: true });
     expect(new Date(values[102].created_at).getTime()).to.equal(Date.now());
   });

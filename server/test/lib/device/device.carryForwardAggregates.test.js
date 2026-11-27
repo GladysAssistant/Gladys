@@ -104,7 +104,7 @@ describe('Device.carryForwardAggregates', () => {
     // Held at 7 until just before the change, so a line chart draws a step, not a ramp over 22 hours
     expect(values.map((value) => [value.created_at.getTime(), value.value, value.carried_forward])).to.deep.equal([
       [period.startDate.getTime(), 7, true],
-      [changeDate.getTime() - 1, 7, true],
+      [changeDate.getTime() - 1000, 7, true],
       [changeDate.getTime(), 19, undefined],
       [period.endDate.getTime(), 19, true],
     ]);
@@ -157,6 +157,53 @@ describe('Device.carryForwardAggregates', () => {
     expect(values.map((value) => [value.created_at.getTime(), value.value])).to.deep.equal([
       [period.startDate.getTime(), 19],
       [repeatedAt.getTime(), 19],
+      [period.endDate.getTime(), 19],
+    ]);
+  });
+
+  it('should hold the value before the first state when only its min and max lines move', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 7, new Date(NOW - 3 * ONE_DAY));
+    const changeDate = new Date(NOW - 2 * ONE_HOUR);
+    const deviceFeature = { id: FEATURE_ID, read_only: false, last_value: 14, last_value_changed: changeDate };
+    const period = buildPeriod();
+    // States 0 and 14 in the first bucket: an average of 7, the value in force, but min and max lines that move
+    const firstBucket = { ...aggregatedValue(changeDate, 7), min_value: 0, max_value: 14 };
+    const values = await carryForwardAggregates({ deviceFeature, values: [firstBucket], ...period });
+    expect(values.map((value) => [value.created_at.getTime(), value.value, value.carried_forward])).to.deep.equal([
+      [period.startDate.getTime(), 7, true],
+      [changeDate.getTime() - 1000, 7, true],
+      [changeDate.getTime(), 7, undefined],
+      [period.endDate.getTime(), 14, true],
+    ]);
+  });
+
+  it('should hold the value one second before the first state, so that the chart keeps it apart', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 7, new Date(NOW - 3 * ONE_DAY));
+    // On a whole second, as DuckDB usually returns it: the chart box rounds every point to the second
+    const changeDate = new Date(NOW - 2 * ONE_HOUR);
+    const deviceFeature = { id: FEATURE_ID, read_only: false, last_value: 19, last_value_changed: changeDate };
+    const values = await carryForwardAggregates({
+      deviceFeature,
+      values: [aggregatedValue(changeDate, 19)],
+      ...buildPeriod(),
+    });
+    const roundToSecond = (date) => Math.round(date.getTime() / 1000) * 1000;
+    expect(roundToSecond(values[1].created_at)).to.be.below(roundToSecond(values[2].created_at));
+  });
+
+  it('should not hold the value when the first state is less than a second after the start', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 7, new Date(NOW - 3 * ONE_DAY));
+    const period = buildPeriod();
+    const changeDate = new Date(period.startDate.getTime() + 500);
+    const deviceFeature = { id: FEATURE_ID, read_only: false, last_value: 19, last_value_changed: changeDate };
+    const values = await carryForwardAggregates({
+      deviceFeature,
+      values: [aggregatedValue(changeDate, 19)],
+      ...period,
+    });
+    expect(values.map((value) => [value.created_at.getTime(), value.value])).to.deep.equal([
+      [period.startDate.getTime(), 7],
+      [changeDate.getTime(), 19],
       [period.endDate.getTime(), 19],
     ]);
   });
