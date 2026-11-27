@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import { getZ2mDeviceUrl } from '../utils/getZ2mUrl';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
@@ -120,7 +121,7 @@ class DiscoveredBox extends Component {
       >
         {supportedDevice && z2mUrl && ieeeAddress && (
           <a
-            href={`${z2mUrl}/#/device/0/${ieeeAddress}/info`}
+            href={getZ2mDeviceUrl(z2mUrl, ieeeAddress)}
             target="_blank"
             rel="noopener noreferrer"
             class={kitStyle.linkButton}
@@ -252,7 +253,7 @@ class DiscoveredBox extends Component {
                         <input type="text" class="form-control" value={ieee_address} disabled />
                         {z2mUrl && (
                           <a
-                            href={`${z2mUrl}/#/device/0/${ieee_address}/info`}
+                            href={getZ2mDeviceUrl(z2mUrl, ieee_address)}
                             target="_blank"
                             rel="noopener noreferrer"
                             class={`${style.z2mDeviceLink} mt-2 text-muted`}

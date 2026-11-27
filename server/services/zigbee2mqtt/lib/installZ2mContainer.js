@@ -2,7 +2,7 @@ const cloneDeep = require('lodash.clonedeep');
 
 const logger = require('../../../utils/logger');
 const { findManagedContainer } = require('../../../utils/dockerContainers');
-const { ADAPTER_MODE, INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
+const { ADAPTER_MODE, CONFIGURATION, INSTALLATION_PHASE, INSTALLATION_PHASE_STATE } = require('./constants');
 const { formatDuration } = require('../utils/formatDuration');
 const { isSameDevice } = require('../utils/donglePorts');
 
@@ -179,6 +179,16 @@ async function installZ2mContainer(config, setupMode = false) {
     logger.error('Zigbee2mqtt: failed to write its configuration file:', e);
     this.emitStatusEvent();
     throw e;
+  }
+  // The password of the interface the file now asks for, saved before Zigbee2mqtt restarts with it: a failure after
+  // would leave Gladys without it (null for a reference to another file, unknown to Gladys). Its own failure does not
+  // stop the installation, which restarts Zigbee2mqtt with the file written: the next start takes it from the file.
+  if (config.z2mFrontendAuthToken !== undefined) {
+    try {
+      await this.saveOrDestroyVariable(CONFIGURATION.Z2M_FRONTEND_AUTH_TOKEN, config.z2mFrontendAuthToken);
+    } catch (e) {
+      logger.error('Zigbee2mqtt: failed to save the password of its interface:', e);
+    }
   }
 
   try {

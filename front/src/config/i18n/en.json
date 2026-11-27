@@ -2390,6 +2390,7 @@
             "restart": "Restart",
             "stop": "Stop",
             "interface": "Zigbee2MQTT interface",
+            "interfaceHint": "The interface asks for a password? Reload the page, or copy it from the advanced settings.",
             "changeKey": "Change",
             "disconnect": "Disconnect",
             "connect": "Connect",
@@ -2424,7 +2425,10 @@
               "title": "Zigbee2MQTT interface",
               "port": "Port",
               "help": "Changing the port restarts Zigbee2MQTT; its data is kept.",
-              "open": "Open the interface"
+              "open": "Open the interface",
+              "password": "Interface password",
+              "passwordHelp": "Gladys opens the interface without asking you for this password. If the interface asks for it anyway (the first time in this browser), reload the page. From a bookmark or another device, paste this password.",
+              "passwordHelpNoLink": "The Zigbee2MQTT interface asks for this password when it is opened from the local network: paste it there."
             },
             "broker": {
               "title": "Connection to the MQTT broker"

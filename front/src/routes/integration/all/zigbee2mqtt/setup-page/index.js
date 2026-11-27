@@ -28,7 +28,8 @@ const VARIABLE_MAP = {
   Z2M_MQTT_URL: 'mqttUrl',
   GLADYS_MQTT_USERNAME: 'mqttUsername',
   GLADYS_MQTT_PASSWORD: 'mqttPassword',
-  Z2M_FRONTEND_URL: 'z2mFrontendUrl'
+  Z2M_FRONTEND_URL: 'z2mFrontendUrl',
+  Z2M_FRONTEND_AUTH_TOKEN: 'z2mFrontendAuthToken'
 };
 
 // Until the status and the configuration are loaded, or when they cannot be
@@ -183,7 +184,10 @@ class Zigbee2mqttSetupPage extends Component {
     });
     try {
       const mapping = {};
-      Object.keys(VARIABLE_MAP).forEach(key => (mapping[key] = nextConfiguration[VARIABLE_MAP[key]]));
+      // The password of the interface is read only: never sent back
+      Object.keys(VARIABLE_MAP)
+        .filter(key => key !== 'Z2M_FRONTEND_AUTH_TOKEN')
+        .forEach(key => (mapping[key] = nextConfiguration[VARIABLE_MAP[key]]));
       const { configRequests } = this;
       const savedConfig = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', mapping);
       // Changed by the server while it answered (an ezsp fallback, the end of the installation): loaded again below

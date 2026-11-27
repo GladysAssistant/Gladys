@@ -283,6 +283,9 @@ class Dashboard extends Component {
       serviceNotStarted: status.serviceStarted === false,
       primaryAction: getPrimaryAction(dashboardState, configuration),
       tiles: getTiles(dashboardState, configuration, z2mUrl, status),
+      // The link of Gladys gives its password to the interface, which still asks for it the first time it opens in a
+      // browser: said next to the link
+      interfaceAsksPassword: !isExternal(configuration) && Boolean(configuration.z2mFrontendAuthToken),
       canChangeKey: !isExternal(configuration),
       ezspDriver: !isExternal(configuration) && getDriver(configuration, savedAdapter) === 'ezsp',
       // Nothing is installed with an external broker: its state tells that Gladys is connected

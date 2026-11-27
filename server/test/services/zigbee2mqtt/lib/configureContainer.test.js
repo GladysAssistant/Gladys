@@ -608,6 +608,115 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(fs.readFileSync(configFilePath, 'utf8')).to.include('frontend:\n  enabled: true\n  port: 9999\n');
   });
 
+  it('it should write the password of the interface kept by Gladys', async () => {
+    // PREPARE
+    // Installed before the interface had a password
+    fs.copyFileSync(defaultConfigFilePath, configFilePath);
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'gladys-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    // Restarted once to ask for it
+    expect(changed.configChanged).to.equal(true);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include(
+      'frontend:\n  enabled: true\n  port: 12000\n  auth_token: gladys-password\n',
+    );
+    expect(config.z2mFrontendAuthToken).to.equal('gladys-password');
+  });
+
+  it('it should not change the file for the password of the interface it already holds', async () => {
+    // PREPARE
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'gladys-password',
+    };
+    await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
+  });
+
+  it('it should keep the password of the interface written by hand, give it to Gladys, and restart for it', async () => {
+    // PREPARE
+    // Changed by hand while Zigbee2mqtt runs with the one Gladys saved: the comment tells the file is not written again
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    const handWritten = `# written by hand\n${content.replace(
+      '  port: 12000\n',
+      '  port: 12000\n  auth_token: my-password\n',
+    )}`;
+    fs.writeFileSync(configFilePath, handWritten);
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'gladys-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    // Restarted: Zigbee2mqtt may still ask for the previous one, not the one Gladys now shows and links
+    expect(changed.configChanged).to.equal(true);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.equal(handWritten);
+    expect(config.z2mFrontendAuthToken).to.equal('my-password');
+  });
+
+  it('it should not restart for the password of the interface written by hand that Gladys already knows', async () => {
+    // PREPARE
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(configFilePath, content.replace('  port: 12000\n', '  port: 12000\n  auth_token: my-password\n'));
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'my-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
+    expect(config.z2mFrontendAuthToken).to.equal('my-password');
+  });
+
+  it('it should keep a password of the interface read from another file, unknown to Gladys', async () => {
+    // PREPARE
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(
+      configFilePath,
+      content.replace('  port: 12000\n', "  port: 12000\n  auth_token: '!secret.yaml auth_token'\n"),
+    );
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'gladys-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    expect(changed.configChanged).to.equal(false);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include("  auth_token: '!secret.yaml auth_token'\n");
+    expect(config.z2mFrontendAuthToken).to.equal(null);
+  });
+
+  it('it should keep a password of the interface written by hand that starts with "!", as Zigbee2mqtt reads it', async () => {
+    // PREPARE
+    // No space after the "!": not a reference to another file for Zigbee2mqtt, the password itself
+    const content = fs.readFileSync(defaultConfigFilePath, 'utf8');
+    fs.writeFileSync(
+      configFilePath,
+      content.replace('  port: 12000\n', "  port: 12000\n  auth_token: '!MyPassw0rd'\n"),
+    );
+    const config = {
+      z2mTcpPort: '12000',
+      z2mFrontendAuthToken: 'gladys-password',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, false);
+    // ASSERT
+    // Another password than the one Gladys saved: restarted for it, as a password and not as a reference
+    expect(changed.configChanged).to.equal(true);
+    expect(fs.readFileSync(configFilePath, 'utf8')).to.include("  auth_token: '!MyPassw0rd'\n");
+    expect(config.z2mFrontendAuthToken).to.equal('!MyPassw0rd');
+  });
+
   it('it should only add mqtt credentials', async () => {
     // PREPARE
     const config = {

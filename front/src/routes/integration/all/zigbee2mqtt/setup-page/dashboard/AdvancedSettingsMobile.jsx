@@ -26,6 +26,7 @@ import {
 import BottomSheet from '../../../../../../components/sheet/BottomSheet';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { RequestStatus } from '../../../../../../utils/consts';
+import copyText from '../../utils/copyText';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
@@ -157,6 +158,79 @@ class MqttAccess extends Component {
   }
 }
 
+// The password of the interface of Zigbee2mqtt, for an interface opened outside Gladys: revealed for 5 s, copied in one
+// tap (also on the plain-HTTP local address); revealed until tapped again when the browser refuses to copy it
+class InterfacePasswordMobile extends Component {
+  copy = async () => {
+    const copied = await copyText(this.props.password);
+    if (!copied) {
+      // Shown for the user to select it, without hiding it while they do
+      clearTimeout(this.revealTimer);
+      this.setState({ revealed: true });
+      return;
+    }
+    this.setState(prevState => ({ copiedKey: (prevState.copiedKey || 0) + 1 }));
+  };
+
+  toggleReveal = () => {
+    clearTimeout(this.revealTimer);
+    const revealed = !this.state.revealed;
+    this.setState({ revealed });
+    if (revealed) {
+      this.revealTimer = setTimeout(() => this.setState({ revealed: false }), 5000);
+    }
+  };
+
+  closeToast = () => this.setState({ copiedKey: null });
+
+  componentWillUnmount() {
+    clearTimeout(this.revealTimer);
+  }
+
+  render({ password, linked, dictionary }, { revealed, copiedKey }) {
+    return (
+      <div class={style.mobileInterfacePassword} data-cy="z2m-dashboard-interface-password">
+        <MobileGroup>
+          <MobileRow
+            title={<Text id={`${T}.advanced.interface.password`} />}
+            subtitle={
+              <code class={style.mobileCode} data-cy="z2m-dashboard-interface-password-value">
+                {revealed ? password : '••••••••••••'}
+              </code>
+            }
+            trailing={
+              <span class={style.mobileRowButtons}>
+                <MobileRowButton
+                  icon={revealed ? 'eye-off' : 'eye'}
+                  label={get(dictionary, 'mobileKit.togglePassword')}
+                  aria-pressed={revealed ? 'true' : 'false'}
+                  onClick={this.toggleReveal}
+                  data-cy="z2m-dashboard-interface-password-reveal"
+                />
+                <MobileRowButton
+                  icon="copy"
+                  label={get(dictionary, `${T}.mobile.copy`)}
+                  onClick={this.copy}
+                  data-cy="z2m-dashboard-interface-password-copy"
+                />
+              </span>
+            }
+          />
+        </MobileGroup>
+        <p class={kitStyle.footnote}>
+          <Text id={linked ? `${T}.advanced.interface.passwordHelp` : `${T}.advanced.interface.passwordHelpNoLink`} />
+        </p>
+        <MobileToast
+          message={copiedKey ? get(dictionary, `${MQTT_T}.copied`) : null}
+          toastKey={copiedKey}
+          onClose={this.closeToast}
+          dataCy="z2m-dashboard-interface-password-copied"
+        />
+      </div>
+    );
+  }
+}
+
 /**
  * @description The advanced settings on a phone (docs/specs/zigbee2mqtt-installation.md, N.5): a focus page, the port
  * of the interface or the broker of an external Zigbee2mqtt saved from the bottom bar, the state of each component, the
@@ -196,6 +270,13 @@ const AdvancedSettingsMobile = ({ view, actions, form, intl }) => {
                   data-cy="z2m-dashboard-port-input"
                 />
               </MobileField>
+              {configuration.z2mFrontendAuthToken && (
+                <InterfacePasswordMobile
+                  password={configuration.z2mFrontendAuthToken}
+                  linked={Boolean(z2mUrl)}
+                  dictionary={dictionary}
+                />
+              )}
               {z2mUrl && (
                 <MobileGroup>
                   <a

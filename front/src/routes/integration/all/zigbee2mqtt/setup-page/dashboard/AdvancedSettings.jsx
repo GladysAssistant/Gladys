@@ -7,6 +7,7 @@ import { MQTT_MODE } from '../constants';
 import MqttExternalCredentials from '../local/MqttExternalCredentials';
 import { isExternal } from './dashboardState';
 import AdvancedSettingsMobile from './AdvancedSettingsMobile';
+import InterfacePassword from './InterfacePassword';
 import style from './dashboard.css';
 
 const T = 'integration.zigbee2mqtt.setup.dashboard';
@@ -375,6 +376,9 @@ class AdvancedSettings extends Component {
                 <small class="form-text text-muted">
                   <Text id={`${T}.advanced.interface.help`} />
                 </small>
+                {configuration.z2mFrontendAuthToken && (
+                  <InterfacePassword password={configuration.z2mFrontendAuthToken} linked={Boolean(z2mUrl)} />
+                )}
                 {z2mUrl && (
                   <a href={z2mUrl} target="_blank" rel="noopener noreferrer" data-cy="z2m-dashboard-open-interface">
                     <Text id={`${T}.advanced.interface.open`} />

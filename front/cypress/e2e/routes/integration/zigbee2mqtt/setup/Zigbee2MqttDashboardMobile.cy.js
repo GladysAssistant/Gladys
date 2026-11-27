@@ -136,6 +136,41 @@ describe('Zigbee2mqtt dashboard on a phone', () => {
       cy.get('[data-cy=z2m-dashboard]').should('exist');
     });
 
+    it('should show the password of the interface, revealed in one tap', () => {
+      visitDashboard({ setup: { ...localSetup, Z2M_FRONTEND_AUTH_TOKEN: 'interface-password' } });
+      // The first time in a browser, the interface still asks for it: said on its row
+      cy.get('[data-cy=z2m-dashboard-interface] [data-cy=z2m-dashboard-interface-hint]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('not.contain', 'interface-password');
+      cy.get('[data-cy=z2m-dashboard-interface-password-reveal]').click();
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('have.text', 'interface-password');
+      cy.get('[data-cy=z2m-dashboard-open-interface]')
+        .should('have.attr', 'href')
+        .and('match', /:12000\/\?token=interface-password$/);
+      fitsTheScreen();
+    });
+
+    it('should copy the password of the interface without the clipboard API, or reveal it when the browser refuses', () => {
+      visitDashboard({ setup: { ...localSetup, Z2M_FRONTEND_AUTH_TOKEN: 'interface-password' } });
+      cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
+      cy.window().then(win => {
+        // navigator.clipboard only exists in a secure context: the legacy copy of the plain-HTTP local address
+        cy.stub(win.navigator.clipboard, 'writeText').rejects(new Error('not allowed'));
+        cy.stub(win.document, 'execCommand')
+          .returns(true)
+          .as('execCommand');
+      });
+      cy.get('[data-cy=z2m-dashboard-interface-password-copy]').click();
+      cy.get('@execCommand').should('have.been.calledWith', 'copy');
+      cy.get('[data-cy=z2m-dashboard-interface-password-copied]').should('exist');
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('not.contain', 'interface-password');
+
+      // Refused: shown for the user to select it
+      cy.get('@execCommand').invoke('returns', false);
+      cy.get('[data-cy=z2m-dashboard-interface-password-copy]').click();
+      cy.get('[data-cy=z2m-dashboard-interface-password-value]').should('have.text', 'interface-password');
+    });
+
     it('should save another port from the bottom bar, and only it', () => {
       visitDashboard();
       cy.get('[data-cy=z2m-dashboard-advanced-link]').click();
