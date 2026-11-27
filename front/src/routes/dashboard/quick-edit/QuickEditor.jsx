@@ -344,16 +344,20 @@ class QuickEditor extends Component {
     return run;
   };
 
-  save = (change, expected, message, flashPosition, flashSelectors) =>
-    this.enqueueSave(() => this.runSave(change, expected, message, flashPosition, flashSelectors));
-
-  runSave = async (change, expected, message, flashPosition, flashSelectors) => {
+  // The dashboard is the one shown when the change is made, not the one shown when its turn comes
+  // in the queue: the user may have switched to another dashboard meanwhile
+  save = (change, expected, message, flashPosition, flashSelectors) => {
     const selector = this.props.currentDashboard.selector;
+    return this.enqueueSave(() => this.runSave(selector, change, expected, message, flashPosition, flashSelectors));
+  };
+
+  runSave = async (selector, change, expected, message, flashPosition, flashSelectors) => {
     try {
       const { before, after } = await updateDashboardWidgets(this.props.httpClient, selector, change, expected);
       this.props.onDashboardSaved(after);
       this.showToast(message, { selector, boxes: before.boxes, savedBoxes: after.boxes });
-      if (flashPosition) {
+      // the position is one of the saved dashboard: nothing to mark on another one
+      if (flashPosition && get(this.props, 'currentDashboard.selector') === selector) {
         this.flashWidget(flashPosition, flashSelectors);
       }
     } catch (e) {

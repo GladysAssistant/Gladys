@@ -110,7 +110,9 @@ describe('Dashboard in-place editing', () => {
                   name: 'Temperatures',
                   device_features: [probe(1)],
                   device_feature_names: [rooms[0].name]
-                }
+                },
+                // an older widget: its rows have no stored name
+                { type: 'devices', name: 'Unnamed', device_features: [probe(2)] }
               ]
             ]
           }
@@ -179,6 +181,29 @@ describe('Dashboard in-place editing', () => {
       expect(box.device_feature_names).to.deep.equal(['Quick lamp', 'Quick lamp']);
     });
     cy.get('[data-box-slot][data-x="0"][data-y="0"]').should('have.attr', 'data-box-type', 'devices');
+  });
+
+  it('Should add a device to a widget whose rows have no stored name', () => {
+    cy.intercept('PATCH', `${serverUrl}/api/v1/dashboard/quick`).as('saveDashboard');
+    cy.visit('/dashboard/quick');
+
+    cy.get('[data-cy="dashboard-add-button"]').click();
+    cy.get('[data-cy="dashboard-add-device"]').click();
+    cy.get('[data-cy="picker-search"]').type('quick lamp');
+    cy.get('[data-cy="picker-light-quick-lamp"]').click();
+    cy.get('[data-cy="picker-validate"]').click();
+
+    cy.get('[data-cy="add-to-dashboard-widget-0-2"]').click();
+    // the unnamed row is saved with the label it shows: the server only takes strings
+    cy.wait('@saveDashboard').then(({ request, response }) => {
+      expect(response.statusCode).to.equal(200);
+      const box = request.body.boxes[0].columns[0][2];
+      expect(box.device_features).to.deep.equal([probe(2), 'quick-lamp-binary', 'quick-lamp-brightness']);
+      expect(box.device_feature_names).to.have.length(3);
+      expect(box.device_feature_names[0]).to.contain('Quick sensor');
+      expect(box.device_feature_names.slice(1)).to.deep.equal(['Quick lamp', 'Quick lamp']);
+    });
+    cy.get('[data-cy="quick-edit-toast"]').should('be.visible');
   });
 
   it('Should open the editor on the widget from its long-press menu', () => {

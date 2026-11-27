@@ -8,8 +8,11 @@ import BottomSheet from '../sheet/BottomSheet';
 import { MobileGroup, MobileRow, MobileSectionHeader, MobileNotice } from '../mobile/MobileList';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import { nameAddedItems } from '../../utils/deviceWidgetNames';
+import { getDeviceFeatureName } from '../../utils/device';
+import { buildDeviceRows } from '../boxs/device-in-room/device-features/light/lightFeatures';
 import {
   findBoxesInSections,
+  getBoxInSections,
   getEdgePosition,
   insertBoxInSections,
   replaceBoxInSections
@@ -106,12 +109,18 @@ class AddToDashboardSheet extends Component {
     // one name per selector, whatever the stored array holds: the new names land at the index of
     // their own selector
     const storedNames = get(box, 'device_feature_names') || [];
-    const names = selectors.map((selector, index) => storedNames[index]);
-    const existing = selectors.map((selector, index) => ({
-      selector,
-      entry: featuresBySelector[selector],
-      name: names[index]
-    }));
+    const existing = selectors.map((selector, index) => {
+      const entry = featuresBySelector[selector];
+      return {
+        selector,
+        entry,
+        name: storedNames[index],
+        defaultName: entry ? getDeviceFeatureName(this.props.intl.dictionary, entry.device, entry.feature) : selector
+      };
+    });
+    // a row without a stored name (older widgets) gets the generated label it shows today, as the
+    // devices form does: the server only takes strings in device_feature_names
+    const names = existing.map(item => item.name || item.defaultName);
     const added = this.props.selectors
       .filter(selector => !selectors.includes(selector) && featuresBySelector[selector])
       .map(selector => ({ selector, entry: featuresBySelector[selector] }));
@@ -123,6 +132,27 @@ class AddToDashboardSheet extends Component {
         device_features: [...selectors, ...added.map(item => item.selector)],
         device_feature_names: [...names, ...added.map(item => item.name)]
       }
+    };
+  };
+
+  // What the widget shows, the way it shows it: a light is one row (buildDeviceRows), named once
+  describeWidget = (box, featuresBySelector) => {
+    const selectors = box.device_features || [];
+    const names = box.device_feature_names || [];
+    const rows = buildDeviceRows(
+      selectors.map(selector => {
+        const entry = featuresBySelector[selector];
+        // a feature whose device is gone keeps a row of its own
+        return entry ? { ...entry.feature, device: entry.device } : { selector };
+      })
+    );
+    return {
+      count: rows.length,
+      names: rows
+        .map(row => names[row.index])
+        .filter(name => name)
+        .slice(0, 3)
+        .join(', ')
     };
   };
 
@@ -213,7 +243,10 @@ class AddToDashboardSheet extends Component {
     const widgets = findBoxesInSections(dashboard.boxes, 'devices');
     const allBoxes = getAllBoxes(dashboard.boxes);
     const first = allBoxes[0];
-    const last = allBoxes[allBoxes.length - 1];
+    // the widget a new one "at the bottom" lands after (getEdgePosition), the last one otherwise
+    const bottom = getEdgePosition(dashboard.boxes, 'bottom');
+    const last = getBoxInSections(dashboard.boxes, bottom.x, bottom.y - 1) || allBoxes[allBoxes.length - 1];
+    const featuresBySelector = this.getFeaturesBySelector();
     return (
       <div>
         {widgets.length > 0 && <MobileSectionHeader title={<Text id="addToDashboard.existingWidgets" />} />}
@@ -221,7 +254,7 @@ class AddToDashboardSheet extends Component {
           <MobileGroup>
             {widgets.map(({ x, y, box }) => {
               const selectors = box.device_features || [];
-              const names = (box.device_feature_names || []).slice(0, 3).join(', ');
+              const { count, names } = this.describeWidget(box, featuresBySelector);
               const already = this.props.selectors.every(selector => selectors.includes(selector));
               return (
                 <MobileRow
@@ -233,11 +266,7 @@ class AddToDashboardSheet extends Component {
                       <Text id="addToDashboard.alreadyThere" />
                     ) : (
                       <span>
-                        <Text
-                          id="addToDashboard.devicesCount"
-                          plural={selectors.length}
-                          fields={{ count: selectors.length }}
-                        />
+                        <Text id="addToDashboard.devicesCount" plural={count} fields={{ count }} />
                         {names && ` · ${names}`}
                       </span>
                     )

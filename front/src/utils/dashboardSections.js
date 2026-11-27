@@ -213,8 +213,10 @@ export const insertBoxInSections = (sections, x, y, box) => {
   });
 };
 
-// Where a new widget goes "at the top" (first column, first place) or "at the bottom" (last column
-// of the last section, after its widgets) of a dashboard
+// Where a new widget goes "at the top" (first column, first place) or "at the bottom" of a
+// dashboard: after the widgets of the last column of the last section — or, when that section
+// shows its widgets row by row on a phone (mobile_order: rows), after the widgets of its longest
+// column (the last one of them), which is where the last widget displayed on a phone is
 export const getEdgePosition = (sections, edge) => {
   const columnCount = (sections || []).reduce((count, section) => count + section.columns.length, 0);
   if (columnCount === 0) {
@@ -223,9 +225,19 @@ export const getEdgePosition = (sections, edge) => {
   if (edge === 'top') {
     return { x: 0, y: 0 };
   }
-  const x = columnCount - 1;
-  const location = locateColumn(sections, x);
-  return { x, y: sections[location.sectionIndex].columns[location.columnIndex].length };
+  const lastSection = sections[sections.length - 1];
+  let columnIndex = lastSection.columns.length - 1;
+  if (getSectionMobileOrder(lastSection) === DASHBOARD_SECTION_MOBILE_ORDER.ROWS) {
+    lastSection.columns.forEach((column, index) => {
+      if (column.length > lastSection.columns[columnIndex].length) {
+        columnIndex = index;
+      }
+    });
+  }
+  return {
+    x: columnCount - lastSection.columns.length + columnIndex,
+    y: lastSection.columns[columnIndex].length
+  };
 };
 
 // Every widget of a type, in reading order: { x, y, box }

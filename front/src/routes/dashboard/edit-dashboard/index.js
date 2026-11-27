@@ -117,7 +117,11 @@ class EditDashboard extends Component {
     if (intent === 'add-top') {
       if (currentDashboard.boxes.length > 0) {
         this.addBoxAtPositionAndEdit(0, -1);
+        return;
       }
+      // a dashboard whose last column was removed: the new widget needs a section and its column
+      this.addSection();
+      this.setState({}, () => this.addBoxAtPositionAndEdit(0, -1));
       return;
     }
     if (!currentDashboard.boxes[x] || !currentDashboard.boxes[x][y]) {
