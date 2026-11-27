@@ -25,6 +25,7 @@ import {
   kitStyle
 } from '../mobile';
 import FeatureHistorySize from './FeatureHistorySize';
+import AddDeviceToDashboard from '../dashboard/AddDeviceToDashboard';
 import MobileFeatureSheet from './MobileFeatureSheet';
 import style from './mobileUpdateDevice.css';
 
@@ -139,6 +140,17 @@ class MobileUpdateDevice extends Component {
   onSystemBack = () => {
     this.leaveHref = null;
     this.setState({ leaveOpen: true });
+  };
+
+  // leaving to another page from a control of this one (the "See" of "Add to a dashboard"):
+  // the same guard as the page's links
+  navigateTo = href => {
+    this.leaveHref = href;
+    if (this.isDirty()) {
+      this.setState({ leaveOpen: true });
+    } else {
+      this.leave();
+    }
   };
 
   onBack = () => {
@@ -310,6 +322,11 @@ class MobileUpdateDevice extends Component {
                     </select>
                   </MobileField>
                 )}
+
+                {/* the device goes to a dashboard from here: no picker to search it in */}
+                <div class="mt-3">
+                  <AddDeviceToDashboard device={device} onNavigate={this.navigateTo} />
+                </div>
 
                 <MobileSectionHeader
                   title={

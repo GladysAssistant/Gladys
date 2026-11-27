@@ -27,7 +27,7 @@ const EditActions = props => {
               className={cx('btn btn-outline-secondary btn-sm', style.editActionsCancel)}
               data-cy="edit-cancel-button"
             >
-              <Text id="dashboard.editDashboardCancelButton" />
+              <Text id="dashboard.editDashboardDiscardButton" />
             </button>
           )}
           {/* saving keeps the user in the editor (chain editing): the

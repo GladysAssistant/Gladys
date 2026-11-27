@@ -6,6 +6,7 @@ import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import UpdateDeviceFeature from './UpdateDeviceFeature';
 import UpdateDeviceForm from './UpdateDeviceForm';
 import MobileUpdateDevice from './MobileUpdateDevice';
+import AddDeviceToDashboard from '../dashboard/AddDeviceToDashboard';
 import { withMobileViewport } from '../mobile';
 import cx from 'classnames';
 import get from 'get-value';
@@ -106,6 +107,8 @@ const UpdateDeviceDesktop = ({ children, ...props }) => (
                   <Text id="editDeviceForm.saveButton" />
                 </button>
               </div>
+              {/* the device goes to a dashboard from here: no picker to search it in */}
+              <AddDeviceToDashboard device={props.device} variant="button" />
             </div>
           )}
         </div>

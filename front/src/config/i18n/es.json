@@ -438,6 +438,7 @@
     "editDashboardTitle": "Editar panel",
     "editDashboardDeleteButton": "Eliminar",
     "editDashboardCancelButton": "Cancelar",
+    "editDashboardDiscardButton": "Descartar",
     "editDashboardDeleteText": "¿Está seguro de que desea eliminar este panel?",
     "toggleDefineTabletMode": "Modo tableta",
     "closeDefineTabletMode": "Cerrar",
@@ -474,7 +475,7 @@
     "editDashboardAddSectionButton": "Agregar una sección",
     "editDashboardBoxNotEmpty": "No puede eliminar esta columna porque contiene widgets.",
     "editDashboardMyDashboards": "Mis paneles",
-    "editDashboardExplanation": "Este es tu panel real: toca un widget para editarlo y usa los botones + para agregar widgets, columnas o secciones. Arrastra los widgets para moverlos; en el teléfono, usa las flechas, «Mover a…» o el modo Reorganizar.",
+    "editDashboardExplanation": "Este es tu panel real: toca un widget para editarlo; en el teléfono, el primer toque lo selecciona y muestra sus botones (flechas, «Mover a…», ajustes, + para añadir un widget al lado). Los botones + también añaden columnas y secciones; en el ordenador, arrastra los widgets para moverlos.",
     "editorDashboardSettingsButton": "Configuración del panel",
     "editorDashboardSettings": "Configuración del panel",
     "editorMoveSectionUp": "Mover la sección hacia arriba",
@@ -8734,7 +8735,10 @@
     },
     "validate": "Listo",
     "title": "Elegir",
-    "sameKindHint": "Solo se muestran los dispositivos del mismo tipo: comparten una única condición."
+    "sameKindHint": "Solo se muestran los dispositivos del mismo tipo: comparten una única condición.",
+    "suggestions": "Sugerencias",
+    "lightRow": "Luz",
+    "lightDetails": "Elegir los controles de {{name}} uno a uno"
   },
   "devicePickerField": {
     "title": "Elegir dispositivos",
@@ -8746,5 +8750,60 @@
     "empty": "Ningún dispositivo seleccionado.",
     "remove": "Quitar {{name}}",
     "notFound": "Dispositivo no encontrado"
+  },
+  "quickEdit": {
+    "addMenuTitle": "Añadir al panel",
+    "addDevice": "Añadir un dispositivo",
+    "addDeviceHint": "En un widget existente o en uno nuevo",
+    "addWidget": "Añadir un widget",
+    "addWidgetHint": "Tiempo, escenas, cámara, gráfico…",
+    "editLayout": "Editar el diseño",
+    "editLayoutHint": "Secciones, columnas, orden de los widgets",
+    "addDevices": "Añadir dispositivos",
+    "addDevicesTo": "Añadir a «{{name}}»",
+    "editDevices": "Renombrar, reordenar",
+    "editDevicesHint": "Los dispositivos de este widget",
+    "widgetSettings": "Editar el widget",
+    "moveWidget": "Mover",
+    "removeWidget": "Quitar del panel",
+    "add": "Añadir",
+    "next": "Siguiente",
+    "undo": "Deshacer",
+    "addedOne": "{{name}} añadido a «{{widget}}»",
+    "addedMany": {
+      "one": "1 dispositivo añadido a «{{widget}}»",
+      "other": "{{count}} dispositivos añadidos a «{{widget}}»"
+    },
+    "addedNewWidget": {
+      "one": "{{name}} añadido al panel",
+      "other": "{{count}} dispositivos añadidos al panel"
+    },
+    "widgetUpdated": "«{{name}}» actualizado",
+    "widgetRemoved": "«{{name}}» quitado del panel",
+    "changedError": "Este panel se ha modificado en otro lugar mientras tanto: recarga la página y vuelve a intentarlo.",
+    "saveError": "No se pudo guardar. Comprueba la conexión con Gladys y vuelve a intentarlo.",
+    "loadError": "No se pudieron cargar los dispositivos. Comprueba la conexión con Gladys."
+  },
+  "addToDashboard": {
+    "title": "¿Dónde añadirlo?",
+    "button": "Añadir a un panel",
+    "existingWidgets": "En un widget existente",
+    "newWidget": "En un widget nuevo",
+    "top": "Arriba del panel",
+    "topHint": "Antes de «{{name}}»",
+    "bottom": "Abajo del panel",
+    "bottomHint": "Después de «{{name}}»",
+    "emptyDashboard": "El panel está vacío",
+    "devicesCount": {
+      "one": "1 dispositivo",
+      "other": "{{count}} dispositivos"
+    },
+    "alreadyThere": "Ya está en este widget",
+    "noDashboard": "Todavía no hay ningún panel: crea uno desde el inicio.",
+    "loadError": "No se pudieron cargar los paneles. Comprueba la conexión con Gladys.",
+    "saveError": "No se pudo guardar. Comprueba la conexión con Gladys y vuelve a intentarlo.",
+    "changedError": "Este panel se ha modificado en otro lugar mientras tanto: recarga la página y vuelve a intentarlo.",
+    "addedTo": "Añadido a «{{name}}»",
+    "see": "Ver"
   }
 }

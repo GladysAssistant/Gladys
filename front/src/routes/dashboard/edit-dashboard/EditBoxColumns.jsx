@@ -22,6 +22,25 @@ const getTotalColumns = props => {
   return props.homeDashboard.boxes.length;
 };
 
+// Phone (.selectionCanvas): the "+" around the selected widget only — the slot after the widget
+// above it, and its own
+const isSlotNearSelection = (props, x, y) => {
+  const selected = props.selectedBoxPosition;
+  return Boolean(selected) && selected.x === x && (selected.y === y || selected.y === y + 1);
+};
+
+// A tap on the canvas around the widgets (not on a widget, a control or the panel) ends the
+// selection
+const onCanvasClick = (event, props) => {
+  if (
+    props.clearSelection &&
+    event.target.closest &&
+    !event.target.closest('[data-widget-wrapper], button, a, input, select, [data-cy="edit-panel"]')
+  ) {
+    props.clearSelection();
+  }
+};
+
 // Editor v2: the canvas IS the dashboard — real widgets with edit
 // affordances, settings in a side panel / bottom sheet (EditPanel).
 // Widget reordering runs on the pointer-events engine (utils/pointerDrag.js).
@@ -29,7 +48,11 @@ const getTotalColumns = props => {
 // row — the canvas becomes a short list to reorder and move widgets on a
 // phone, instead of the full-size dashboard (CSS: .compactCanvas).
 const EditBoxColumns = ({ children, ...props }) => (
-  <div class={cx('pb-6', { [style.compactCanvas]: props.reorganizing })} data-cy="editor-canvas">
+  <div
+    class={cx('pb-6', style.selectionCanvas, { [style.compactCanvas]: props.reorganizing })}
+    data-cy="editor-canvas"
+    onClick={event => onCanvasClick(event, props)}
+  >
     <div class={style.editorTopBar}>
       <h3 class="mb-0">{props.homeDashboard.name}</h3>
       <div class={style.editorTopBarActions}>
@@ -258,6 +281,28 @@ const EditBoxColumns = ({ children, ...props }) => (
                         data-drop-x={x}
                         data-drop-active-class={style.columnDropActive}
                       >
+                        {/* the first place of a column: adding a widget at the top no longer
+                            takes a "+" below the first widget and a ↑ */}
+                        {column.length > 0 && (
+                          <div
+                            class={cx('d-flex justify-content-center mb-2', style.addBetweenSlot, {
+                              [style.addSlotNearSelection]: isSlotNearSelection(props, x, -1)
+                            })}
+                          >
+                            <Localizer>
+                              <button
+                                type="button"
+                                class={cx('btn btn-sm px-4 py-0', style.btnAddNewBoxAtPosition)}
+                                onClick={() => props.addBoxAtPositionAndEdit(x, -1)}
+                                aria-label={<Text id="dashboard.editorAddWidgetHere" />}
+                                title={<Text id="dashboard.editorAddWidgetHere" />}
+                                data-cy={`add-box-first-${x}`}
+                              >
+                                <i class="fe fe-plus" aria-hidden="true" />
+                              </button>
+                            </Localizer>
+                          </div>
+                        )}
                         {column.length > 0 &&
                           column.map((box, y) => {
                             // preview the viewer's vertical stretch (see
@@ -279,7 +324,11 @@ const EditBoxColumns = ({ children, ...props }) => (
                                 })}
                               >
                                 <EditableBoxPreview {...props} box={box} x={x} y={y} columnLength={column.length} />
-                                <div class={cx('d-flex justify-content-center mb-2', style.addBetweenSlot)}>
+                                <div
+                                  class={cx('d-flex justify-content-center mb-2', style.addBetweenSlot, {
+                                    [style.addSlotNearSelection]: isSlotNearSelection(props, x, y)
+                                  })}
+                                >
                                   <Localizer>
                                     <button
                                       type="button"

@@ -68,25 +68,37 @@ const BoxColumns = ({ children, ...props }) => {
                   >
                     {column.map((box, y) =>
                       withMobileOrder(
-                        canBoxStretchInColumn(box, column, y === column.length - 1) ? (
-                          <div
-                            key={`${props.homeDashboard.id}-${x}-${y}`}
-                            class={cx(style.stretchableBox, {
-                              [style.stretchableTile]: isTileStretchBox(box),
-                              [style.adaptiveTile]: isValueTileBox(box),
-                              // global markers so widgets can adapt their content to
-                              // the stretched card from their own stylesheet: media
-                              // widgets make their image fill it, tile widgets (the
-                              // house view) fit their illustration inside its cap
-                              'dashboard-stretched-media': !isTileStretchBox(box),
-                              'dashboard-stretched-tile': isTileStretchBox(box)
-                            })}
-                          >
+                        // A slot naming the widget's position, for what acts on a widget from the
+                        // dashboard itself (the long press of in-place editing, the anchor kept
+                        // between the dashboard and its editor). display: contents — it has no
+                        // box: the flex chain and the stretch rules see the widget as before.
+                        <div
+                          key={`slot-${props.homeDashboard.id}-${x}-${y}`}
+                          class={style.boxSlot}
+                          data-box-slot
+                          data-x={x}
+                          data-y={y}
+                          data-box-type={box.type}
+                        >
+                          {canBoxStretchInColumn(box, column, y === column.length - 1) ? (
+                            <div
+                              class={cx(style.stretchableBox, {
+                                [style.stretchableTile]: isTileStretchBox(box),
+                                [style.adaptiveTile]: isValueTileBox(box),
+                                // global markers so widgets can adapt their content to
+                                // the stretched card from their own stylesheet: media
+                                // widgets make their image fill it, tile widgets (the
+                                // house view) fit their illustration inside its cap
+                                'dashboard-stretched-media': !isTileStretchBox(box),
+                                'dashboard-stretched-tile': isTileStretchBox(box)
+                              })}
+                            >
+                              <Box box={box} x={x} y={y} />
+                            </div>
+                          ) : (
                             <Box box={box} x={x} y={y} />
-                          </div>
-                        ) : (
-                          <Box key={`${props.homeDashboard.id}-${x}-${y}`} box={box} x={x} y={y} />
-                        ),
+                          )}
+                        </div>,
                         rowsOrder,
                         y * filledColumns.length + filledIndex,
                         `order-${props.homeDashboard.id}-${x}-${y}`

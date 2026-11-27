@@ -1933,3 +1933,38 @@
     width: 100%;
   }
 }
+
+/* The slot around each widget of the dashboard (BoxColumns): it only names the widget's position
+   for in-place editing and the editor anchor — it must not exist for the layout */
+.boxSlot {
+  display: contents;
+}
+
+/* In-place editing: a long press on a widget opens its menu. On touch screens the dashboard is
+   a control surface, not a text: no text selection nor iOS callout under a finger kept down */
+@media (pointer: coarse) {
+  .boxSlot,
+  .boxSlot > * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* The widget being pressed sinks a little, then the one the menu is about stays marked */
+:global(.gladys-widget-pressing) {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: scale(0.97);
+}
+
+:global(.gladys-widget-menu-target) {
+  outline: 2px solid var(--gl-accent, #3d6df0);
+  outline-offset: 3px;
+  border-radius: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.gladys-widget-pressing) {
+    transition: none;
+  }
+}

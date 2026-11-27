@@ -192,12 +192,14 @@
 /* Pinned to the bottom of the panel's scrolling body, like the picker's
    footer. The body has padding (EditPanel .editPanelBody: 1.25rem 1.375rem
    1.5rem): the negative margins stretch the bar over it */
+/* bleeds to the edges of its host's scrolling body: the edit panel's padding by default, the
+   host sets its own through the same variables as the picker (--picker-bleed-x / -bottom) */
 .stickyFooter {
   position: sticky;
-  bottom: -1.5rem;
+  bottom: calc(-1 * var(--picker-bleed-bottom, 1.5rem));
   z-index: 2;
-  margin: 1rem -1.375rem -1.5rem;
-  padding: 0.75rem 1.375rem 1rem;
+  margin: 1rem calc(-1 * var(--picker-bleed-x, 1.375rem)) calc(-1 * var(--picker-bleed-bottom, 1.5rem));
+  padding: 0.75rem var(--picker-bleed-x, 1.375rem) 1rem;
   border-top: 1px solid var(--gl-row-border, rgba(44, 62, 118, 0.07));
   background: var(--gl-surface-strong, rgba(255, 255, 255, 0.94));
   backdrop-filter: blur(20px);

@@ -6,6 +6,13 @@ import get from 'get-value';
 import DeviceFeatureValueText from './DeviceFeatureValueText';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import { getDeviceFeatureDescription } from '../../utils/device';
+import {
+  getLightCssColor,
+  getLightFeature,
+  isLightPanelFeature,
+  valueToPercent
+} from '../boxs/device-in-room/device-features/light/lightFeatures';
+import { DEVICE_FEATURE_TYPES } from '../../../../server/utils/constants';
 import normalizeSearchText from '../../utils/normalizeSearchText';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './deviceFeaturePicker.css';
@@ -22,13 +29,56 @@ const getFeatureIcon = (feature, defaultIcon) =>
 
 const hasValue = feature => Boolean(feature) && feature.last_value !== null && feature.last_value !== undefined;
 
+// How many suggestion rows are shown above the list
+const MAX_SUGGESTION_ROWS = 6;
+
+// groupLights: the controllable light features of a same device (on/off, brightness, color...)
+// make ONE row, like the devices widget shows them (buildDeviceRows): ticking it takes the whole
+// light. Same rule as the widget — something to dose besides on/off, and no type twice (two bulbs
+// on one device keep their per-feature rows). The row can be opened to pick its features one by one.
+const getLightEntries = entries => {
+  const lightEntries = entries.filter(entry => isLightPanelFeature(entry.feature));
+  const types = lightEntries.map(entry => entry.feature.type);
+  const dosable = types.some(type => type !== DEVICE_FEATURE_TYPES.LIGHT.BINARY);
+  if (lightEntries.length < 2 || !dosable || new Set(types).size !== types.length) {
+    return null;
+  }
+  return lightEntries;
+};
+
+// The rows of a device: its features, a light being one row standing where its first feature was
+const buildRows = (device, entries, roomName, groupLights) => {
+  const lightEntries = groupLights ? getLightEntries(entries) : null;
+  if (!lightEntries) {
+    return entries.map(entry => ({ ...entry, kind: 'feature', key: entry.selector }));
+  }
+  const rows = [];
+  entries.forEach(entry => {
+    if (!lightEntries.includes(entry)) {
+      rows.push({ ...entry, kind: 'feature', key: entry.selector });
+    } else if (entry === lightEntries[0]) {
+      rows.push({
+        kind: 'light',
+        key: `light:${device.selector}`,
+        device,
+        features: lightEntries,
+        selectors: lightEntries.map(lightEntry => lightEntry.selector),
+        searchText: normalizeSearchText(
+          `${roomName} ${device.name} ${lightEntries.map(lightEntry => lightEntry.description).join(' ')}`
+        )
+      });
+    }
+  });
+  return rows;
+};
+
 // Rooms (by name, devices without a room last) > devices (by name) >
 // features (in the device's own order), each feature carrying the text the
 // search matches against: room + device + feature description, and the
 // selector it stands for in the selection. With pickDevices a device is one
 // row, selected as a whole: its selector is the device's, its icon and value
 // those of its first accepted feature.
-const buildGroups = (devices, dictionary, filterFeature, pickDevices) => {
+const buildGroups = (devices, dictionary, filterFeature, pickDevices, groupLights) => {
   // a Map, not an object: a room selector such as "constructor" must not
   // hit an inherited property
   const rooms = new Map();
@@ -62,7 +112,7 @@ const buildGroups = (devices, dictionary, filterFeature, pickDevices) => {
         pickDevices ? `${room.name} ${device.name}` : `${room.name} ${device.name} ${entry.description}`
       );
     });
-    room.devices.push({ device, features });
+    room.devices.push({ device, features, rows: buildRows(device, features, room.name, groupLights && !pickDevices) });
   });
   return Array.from(rooms.values())
     .sort((a, b) => {
@@ -98,23 +148,50 @@ class DeviceFeaturePicker extends Component {
       selected: [...(props.selected || [])],
       search: '',
       room: ALL_ROOMS,
-      selectedSnapshot: null
+      selectedSnapshot: null,
+      expandedLights: []
     };
-    this.groups = buildGroups(props.devices, get(props, 'intl.dictionary'), props.filterFeature, props.pickDevices);
+    this.setGroups(props);
   }
+
+  // The rows by room, and where each selector stands: its row (a light is one row for several
+  // selectors), its device and its room — the counts and the suggestions read them
+  setGroups(props) {
+    this.groups = buildGroups(
+      props.devices,
+      get(props, 'intl.dictionary'),
+      props.filterFeature,
+      props.pickDevices,
+      props.groupLights
+    );
+    this.rowBySelector = new Map();
+    this.groups.forEach(group =>
+      group.devices.forEach(({ device, rows }) =>
+        rows.forEach(row => {
+          const located = { row, device, room: group };
+          (row.kind === 'light' ? row.selectors : [row.selector]).forEach(selector =>
+            this.rowBySelector.set(selector, located)
+          );
+        })
+      )
+    );
+  }
+
+  getRowKey = selector => {
+    const located = this.rowBySelector.get(selector);
+    return located ? located.row.key : selector;
+  };
+
+  countRows = selectors => new Set(selectors.map(this.getRowKey)).size;
 
   componentWillReceiveProps(nextProps) {
     if (
       nextProps.devices !== this.props.devices ||
       nextProps.filterFeature !== this.props.filterFeature ||
-      nextProps.pickDevices !== this.props.pickDevices
+      nextProps.pickDevices !== this.props.pickDevices ||
+      nextProps.groupLights !== this.props.groupLights
     ) {
-      this.groups = buildGroups(
-        nextProps.devices,
-        get(nextProps, 'intl.dictionary'),
-        nextProps.filterFeature,
-        nextProps.pickDevices
-      );
+      this.setGroups(nextProps);
     }
   }
 
@@ -174,6 +251,27 @@ class DeviceFeaturePicker extends Component {
     );
   };
 
+  // A light row takes or leaves the whole light: every feature it groups is ticked unless they
+  // all are already
+  toggleSelectors = selectors => {
+    this.setState(prevState => {
+      const all = selectors.every(selector => prevState.selected.includes(selector));
+      return {
+        selected: all
+          ? prevState.selected.filter(selector => !selectors.includes(selector))
+          : [...prevState.selected, ...selectors.filter(selector => !prevState.selected.includes(selector))]
+      };
+    });
+  };
+
+  toggleExpanded = key => {
+    this.setState(prevState => ({
+      expandedLights: prevState.expandedLights.includes(key)
+        ? prevState.expandedLights.filter(other => other !== key)
+        : [...prevState.expandedLights, key]
+    }));
+  };
+
   validate = () => {
     const initial = this.props.selected || [];
     const { selected } = this.state;
@@ -188,6 +286,18 @@ class DeviceFeaturePicker extends Component {
     const words = normalizeSearchText(search)
       .split(/\s+/)
       .filter(Boolean);
+    const featureVisible = ({ feature, searchText, selector }) =>
+      (room !== SELECTED_ONLY || selectedSnapshot.includes(selector)) &&
+      (!reference ||
+        selected.includes(selector) ||
+        (feature.category === reference.category && feature.type === reference.type)) &&
+      words.every(word => searchText.includes(word));
+    const rowVisible = row =>
+      row.kind === 'light'
+        ? (room !== SELECTED_ONLY || row.selectors.some(selector => selectedSnapshot.includes(selector))) &&
+          !reference &&
+          words.every(word => row.searchText.includes(word))
+        : featureVisible(row);
     return this.groups
       .filter(group => room === ALL_ROOMS || room === SELECTED_ONLY || group.key === room)
       .map(group => ({
@@ -195,18 +305,32 @@ class DeviceFeaturePicker extends Component {
         devices: group.devices
           .map(entry => ({
             ...entry,
-            features: entry.features.filter(
-              ({ feature, searchText, selector }) =>
-                (room !== SELECTED_ONLY || selectedSnapshot.includes(selector)) &&
-                (!reference ||
-                  selected.includes(selector) ||
-                  (feature.category === reference.category && feature.type === reference.type)) &&
-                words.every(word => searchText.includes(word))
-            )
+            features: entry.features.filter(featureVisible),
+            rows: entry.rows.filter(rowVisible)
           }))
-          .filter(entry => entry.features.length > 0)
+          .filter(entry => entry.rows.length > 0)
       }))
       .filter(group => group.devices.length > 0);
+  }
+
+  // Suggestions (props.suggestions, selectors): rows above the list, shown on the full list only —
+  // a search or a room filter is the user looking for something else
+  getSuggestionRows() {
+    const { search, room } = this.state;
+    if (!this.props.suggestions || this.props.single || search || room !== ALL_ROOMS) {
+      return [];
+    }
+    const rows = [];
+    const seen = new Set();
+    this.props.suggestions.forEach(selector => {
+      const located = this.rowBySelector.get(selector);
+      if (!located || seen.has(located.row.key) || rows.length >= MAX_SUGGESTION_ROWS) {
+        return;
+      }
+      seen.add(located.row.key);
+      rows.push(located);
+    });
+    return rows;
   }
 
   renderRoomChip(key, label, count) {
@@ -224,21 +348,171 @@ class DeviceFeaturePicker extends Component {
     );
   }
 
+  // "On · 72%": what a light is doing, under its name
+  getLightSummary(features) {
+    const dictionary = get(this.props, 'intl.dictionary');
+    const lightFeatures = features.map(entry => entry.feature);
+    const binary = getLightFeature(lightFeatures, DEVICE_FEATURE_TYPES.LIGHT.BINARY);
+    const brightness = getLightFeature(lightFeatures, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
+    const parts = [];
+    if (hasValue(binary)) {
+      parts.push(get(dictionary, binary.last_value ? 'deviceFeatureValueText.on' : 'deviceFeatureValueText.off'));
+    }
+    if (hasValue(brightness) && (!binary || binary.last_value)) {
+      parts.push(`${valueToPercent(brightness, brightness.last_value)} %`);
+    }
+    return parts.filter(Boolean).join(' · ');
+  }
+
+  renderFeatureRow(props, { feature, description, selector }, options = {}) {
+    const { selected } = this.state;
+    return (
+      <label
+        class={cx(style.feature, {
+          [style.featureAlone]: props.pickDevices,
+          [style.featureNested]: options.nested
+        })}
+        key={`${options.prefix || ''}${selector}`}
+        data-cy={`${options.prefix || 'picker-feature-'}${selector}`}
+      >
+        <input
+          type={props.single ? 'radio' : 'checkbox'}
+          class={style.checkbox}
+          checked={selected.includes(selector)}
+          onClick={props.single ? event => this.toggleFeature(selector, event) : undefined}
+          onChange={props.single ? undefined : event => this.toggleFeature(selector, event)}
+        />
+        <span class={cx(style.tick, { [style.tickRadio]: props.single })} aria-hidden="true">
+          <i class="fe fe-check" />
+        </span>
+        <span class={style.featureIcon} aria-hidden="true">
+          <i class={`fe fe-${getFeatureIcon(feature, props.defaultIcon)}`} />
+        </span>
+        <span class={style.featureName}>
+          {options.name || description}
+          {options.sub && <small class={style.featureSub}>{options.sub}</small>}
+        </span>
+        {/* a device row only shows a value it has: "No value" on every camera or
+            speaker is noise */}
+        {(!props.pickDevices || hasValue(feature)) && (
+          <span class={style.featureValue}>
+            <DeviceFeatureValueText feature={feature} />
+          </span>
+        )}
+      </label>
+    );
+  }
+
+  // One row for a whole light, which opens on its features
+  renderLightRow(props, row, options = {}) {
+    const { selected, expandedLights } = this.state;
+    const count = row.selectors.filter(selector => selected.includes(selector)).length;
+    const all = count === row.selectors.length;
+    const partial = count > 0 && !all;
+    const expanded = !options.suggestion && expandedLights.includes(row.key);
+    const color = getLightCssColor(row.features.map(entry => entry.feature));
+    const summary = this.getLightSummary(row.features);
+    const name = options.name || row.device.name;
+    return (
+      <div key={`${options.prefix || ''}${row.key}`}>
+        <div class={cx(style.lightRow, { [style.lightRowAlone]: options.alone })}>
+          <label
+            class={cx(style.feature, style.lightLabel)}
+            data-cy={`${options.prefix || 'picker-light-'}${row.device.selector}`}
+          >
+            <input
+              type="checkbox"
+              class={style.checkbox}
+              checked={all}
+              ref={element => {
+                // a light partly in the widget: neither ticked nor empty
+                if (element) {
+                  element.indeterminate = partial;
+                }
+              }}
+              onChange={() => this.toggleSelectors(row.selectors)}
+            />
+            <span class={cx(style.tick, { [style.tickPartial]: partial })} aria-hidden="true">
+              <i class={cx('fe', partial ? 'fe-minus' : 'fe-check')} />
+            </span>
+            <span class={style.featureIcon} aria-hidden="true">
+              <i class="fe fe-sun" />
+            </span>
+            <span class={style.featureName}>
+              {name}
+              <small class={style.featureSub}>
+                {/* the color the lamp shows, as a dot: a warm white tinting the icon was invisible */}
+                {color && <span class={style.lightColorDot} style={{ backgroundColor: color }} aria-hidden="true" />}
+                {[options.sub, summary].filter(Boolean).join(' · ')}
+              </small>
+            </span>
+          </label>
+          {!options.suggestion && (
+            <Localizer>
+              <button
+                type="button"
+                class={style.expandButton}
+                aria-expanded={expanded ? 'true' : 'false'}
+                aria-label={<Text id="deviceFeaturePicker.lightDetails" fields={{ name: row.device.name }} />}
+                onClick={() => this.toggleExpanded(row.key)}
+                data-cy={`picker-light-expand-${row.device.selector}`}
+              >
+                <span>{row.selectors.length}</span>
+                <i class={cx('fe', expanded ? 'fe-chevron-up' : 'fe-chevron-down')} aria-hidden="true" />
+              </button>
+            </Localizer>
+          )}
+        </div>
+        {expanded && row.features.map(entry => this.renderFeatureRow(props, entry, { nested: true }))}
+      </div>
+    );
+  }
+
+  renderSuggestions(props, suggestionRows) {
+    if (suggestionRows.length === 0) {
+      return null;
+    }
+    return (
+      <div class={style.suggestions} data-cy="picker-suggestions">
+        <div class={style.roomHeading}>
+          <Text id="deviceFeaturePicker.suggestions" />
+        </div>
+        <div class={style.device}>
+          {suggestionRows.map(({ row, device, room }) =>
+            row.kind === 'light'
+              ? this.renderLightRow(props, row, {
+                  suggestion: true,
+                  prefix: 'picker-suggestion-light-',
+                  sub: room.name
+                })
+              : this.renderFeatureRow(props, row, {
+                  prefix: 'picker-suggestion-',
+                  name: device.name,
+                  sub: [room.name, row.description].filter(Boolean).join(' · ')
+                })
+          )}
+        </div>
+      </div>
+    );
+  }
+
   render(props, { selected, search, room }) {
     const initial = props.selected || [];
-    const addedCount = selected.filter(selector => !initial.includes(selector)).length;
-    const removedCount = initial.filter(selector => !selected.includes(selector)).length;
+    // counted in rows, as the widget shows them: a light is one, whatever number of features it
+    // groups
+    const addedCount = this.countRows(selected.filter(selector => !initial.includes(selector)));
+    const removedCount = this.countRows(initial.filter(selector => !selected.includes(selector)));
     const visibleGroups = this.getVisibleGroups();
-    const selectedCountByRoom = {};
+    const suggestionRows = this.getSuggestionRows();
+    const selectedRowsByRoom = {};
     this.groups.forEach(group => {
-      selectedCountByRoom[group.key] = 0;
-      group.devices.forEach(entry =>
-        entry.features.forEach(({ selector }) => {
-          if (selected.includes(selector)) {
-            selectedCountByRoom[group.key] += 1;
-          }
-        })
-      );
+      selectedRowsByRoom[group.key] = new Set();
+    });
+    selected.forEach(selector => {
+      const located = this.rowBySelector.get(selector);
+      if (located) {
+        selectedRowsByRoom[located.room.key].add(located.row.key);
+      }
     });
 
     return (
@@ -285,8 +559,12 @@ class DeviceFeaturePicker extends Component {
           <div class={style.roomChips} role="group" aria-label={<Text id="deviceFeaturePicker.roomsLabel" />}>
             {this.renderRoomChip(ALL_ROOMS, <Text id="deviceFeaturePicker.allRooms" />, 0)}
             {!props.single &&
-              this.renderRoomChip(SELECTED_ONLY, <Text id="deviceFeaturePicker.selectedFilter" />, selected.length)}
-            {this.groups.map(group => this.renderRoomChip(group.key, group.name, selectedCountByRoom[group.key]))}
+              this.renderRoomChip(
+                SELECTED_ONLY,
+                <Text id="deviceFeaturePicker.selectedFilter" />,
+                this.countRows(selected)
+              )}
+            {this.groups.map(group => this.renderRoomChip(group.key, group.name, selectedRowsByRoom[group.key].size))}
           </div>
         </Localizer>
 
@@ -297,43 +575,27 @@ class DeviceFeaturePicker extends Component {
         )}
 
         <div class={style.list}>
+          {this.renderSuggestions(props, suggestionRows)}
           {visibleGroups.map(group => (
             <div key={group.key}>
               <div class={style.roomHeading}>{group.name}</div>
-              {group.devices.map(({ device, features }) => (
-                <div class={style.device} key={device.selector}>
-                  {!props.pickDevices && <div class={style.deviceName}>{device.name}</div>}
-                  {features.map(({ feature, description, selector }) => (
-                    <label
-                      class={cx(style.feature, { [style.featureAlone]: props.pickDevices })}
-                      key={selector}
-                      data-cy={`picker-feature-${selector}`}
-                    >
-                      <input
-                        type={props.single ? 'radio' : 'checkbox'}
-                        class={style.checkbox}
-                        checked={selected.includes(selector)}
-                        onClick={props.single ? event => this.toggleFeature(selector, event) : undefined}
-                        onChange={props.single ? undefined : event => this.toggleFeature(selector, event)}
-                      />
-                      <span class={cx(style.tick, { [style.tickRadio]: props.single })} aria-hidden="true">
-                        <i class="fe fe-check" />
-                      </span>
-                      <span class={style.featureIcon} aria-hidden="true">
-                        <i class={`fe fe-${getFeatureIcon(feature, props.defaultIcon)}`} />
-                      </span>
-                      <span class={style.featureName}>{description}</span>
-                      {/* a device row only shows a value it has: "No value" on every camera or
-                          speaker is noise */}
-                      {(!props.pickDevices || hasValue(feature)) && (
-                        <span class={style.featureValue}>
-                          <DeviceFeatureValueText feature={feature} />
-                        </span>
-                      )}
-                    </label>
-                  ))}
-                </div>
-              ))}
+              {group.devices.map(({ device, rows }) => {
+                // a device that is only a light is that light's row: no name above it
+                const alone = rows.length === 1 && rows[0].kind === 'light';
+                return (
+                  <div class={style.device} key={device.selector}>
+                    {!props.pickDevices && !alone && <div class={style.deviceName}>{device.name}</div>}
+                    {rows.map(row =>
+                      row.kind === 'light'
+                        ? this.renderLightRow(props, row, {
+                            alone,
+                            name: alone ? device.name : <Text id="deviceFeaturePicker.lightRow" />
+                          })
+                        : this.renderFeatureRow(props, row)
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ))}
           {visibleGroups.length === 0 && (
@@ -347,12 +609,12 @@ class DeviceFeaturePicker extends Component {
           )}
         </div>
 
-        {!props.single && this.renderFooter(props, selected, addedCount, removedCount)}
+        {!props.single && this.renderFooter(props, this.countRows(selected), addedCount, removedCount)}
       </div>
     );
   }
 
-  renderFooter(props, selected, addedCount, removedCount) {
+  renderFooter(props, selectedCount, addedCount, removedCount) {
     return (
       <div class={style.footer}>
         <span class={style.diff} data-cy="picker-diff">
@@ -360,11 +622,11 @@ class DeviceFeaturePicker extends Component {
           {addedCount > 0 && removedCount > 0 && ' · '}
           {removedCount > 0 && <span class={style.diffRemoved}>−{removedCount}</span>}
           {addedCount === 0 && removedCount === 0 && (
-            <Text id="deviceFeaturePicker.selectedCount" plural={selected.length} fields={{ count: selected.length }} />
+            <Text id="deviceFeaturePicker.selectedCount" plural={selectedCount} fields={{ count: selectedCount }} />
           )}
         </span>
         <button type="button" class={style.validateButton} onClick={this.validate} data-cy="picker-validate">
-          <Text id="deviceFeaturePicker.validate" />
+          {props.validateLabel || <Text id="deviceFeaturePicker.validate" />}
         </button>
       </div>
     );

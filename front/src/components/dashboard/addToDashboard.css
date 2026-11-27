@@ -1,0 +1,71 @@
+/* "Where to add it?" sheet (AddToDashboardSheet) */
+.body {
+  padding: 0 1rem 1rem;
+}
+
+.summary {
+  margin: 0.25rem 0 0.75rem;
+  color: var(--gl-muted, #7c8396);
+  font-size: 0.9375rem;
+}
+
+/* the dashboards, when the user is on none of them (a device page): one tap pills */
+.dashboards {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin: 0 -1rem 0.5rem;
+  padding: 0.25rem 1rem 0.5rem;
+  scrollbar-width: none;
+}
+
+.dashboards::-webkit-scrollbar {
+  display: none;
+}
+
+.dashboardPill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--gl-border, rgba(44, 62, 118, 0.12));
+  background: var(--gl-surface-strong, #fff);
+  color: var(--gl-ink, #1c2334);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dashboardPill[aria-pressed='true'] {
+  background: var(--gl-ink, #1c2334);
+  border-color: var(--gl-ink, #1c2334);
+  color: #fff;
+}
+
+.loading {
+  min-height: 12rem;
+}
+
+.loader {
+  width: 2rem;
+  height: 2rem;
+  margin: 3rem auto;
+  border-radius: 50%;
+  border: 3px solid rgba(44, 62, 118, 0.15);
+  border-top-color: var(--gl-accent, #3d6df0);
+  animation: addToDashboardSpin 0.8s linear infinite;
+}
+
+@keyframes addToDashboardSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    animation: none;
+  }
+}

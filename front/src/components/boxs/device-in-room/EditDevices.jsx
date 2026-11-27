@@ -9,6 +9,8 @@ import DeviceFeaturePicker from '../../device/DeviceFeaturePicker';
 import DeviceFeatureValueText from '../../device/DeviceFeatureValueText';
 import { DeviceFeatureCategoriesIcon } from '../../../utils/consts';
 import { getDeviceFeatureName, getDeviceFeatureDescription } from '../../../utils/device';
+import { nameAddedItems } from '../../../utils/deviceWidgetNames';
+import { getWidgetSuggestions } from '../../../utils/deviceWidgetSuggestions';
 import { startPointerDrag } from '../../../utils/pointerDrag';
 import { computeInsertionIndex, insertionLineRect } from '../../../routes/dashboard/edit-dashboard/widgetDropPlacement';
 import { revealAbovePanel } from '../../../utils/revealAbovePanel';
@@ -97,7 +99,8 @@ class EditDevices extends Component {
     devices: null,
     loading: true,
     loadError: false,
-    view: VIEW_LIST,
+    // the viewer's quick add opens the form straight on the picker
+    view: this.props.initialView === VIEW_PICKER ? VIEW_PICKER : VIEW_LIST,
     detailSelector: null,
     draftName: '',
     undo: null
@@ -276,15 +279,28 @@ class EditDevices extends Component {
       .filter(selector => !keptSelectors.includes(selector))
       .map(selector => ({
         selector,
+        entry: featuresBySelector[selector],
         name: null,
         defaultName: this.getDefaultName(selector, featuresBySelector[selector])
       }));
+    // a new row is named like the rows already there (the room in a widget of rooms, the device
+    // for a light...), one after the other so two new rows never get the same name
+    nameAddedItems(this.props.intl.dictionary, kept, added);
     const removedCount = items.length - kept.length;
-    this.backToList();
-    if (added.length === 0 && removedCount === 0) {
+    const changed = added.length > 0 || removedCount > 0;
+    if (changed) {
+      this.writeItems([...kept, ...added]);
+    }
+    // in-place editing (the viewer's quick add): the sheet closes on validation, and the viewer
+    // saves and shows its own undo
+    if (this.props.onPickerDone) {
+      this.props.onPickerDone(changed);
       return;
     }
-    this.writeItems([...kept, ...added]);
+    this.backToList();
+    if (!changed) {
+      return;
+    }
     this.showUndo(
       <span>
         {added.length > 0 && (
@@ -297,6 +313,15 @@ class EditDevices extends Component {
       </span>,
       previous
     );
+  };
+
+  // The picker opened straight from the viewer (quick add) has no list to go back to
+  cancelPicker = () => {
+    if (this.props.onPickerDone) {
+      this.props.onPickerDone(false);
+      return;
+    }
+    this.backToList();
   };
 
   // ------------------------------------------------------------ drag to reorder
@@ -665,13 +690,20 @@ class EditDevices extends Component {
     const items = this.getItems();
     let content;
     if (view === VIEW_PICKER && devices) {
+      const featuresBySelector = this.state.featuresBySelector || {};
       content = (
         <DeviceFeaturePicker
           devices={devices}
           selected={items.map(item => item.selector)}
           onValidate={this.validatePicker}
-          onCancel={this.backToList}
-          hideBackButton={Boolean(props.setPanelHeader)}
+          onCancel={this.cancelPicker}
+          hideBackButton={Boolean(props.setPanelHeader || props.onPickerDone)}
+          groupLights
+          suggestions={getWidgetSuggestions(
+            devices,
+            items.map(item => featuresBySelector[item.selector]).filter(Boolean)
+          )}
+          validateLabel={props.pickerValidateLabel}
         />
       );
     } else if (view === VIEW_DETAIL) {

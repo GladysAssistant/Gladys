@@ -71,6 +71,10 @@ const EditableBoxPreview = ({ children, ...props }) => {
   // (revealAbovePanel, the devices widget's row highlight); data-x / data-y
   // let the editor find a widget again after it moved
   const isEditing = props.editingBoxPosition && props.editingBoxPosition.x === x && props.editingBoxPosition.y === y;
+  // phone: only the selected widget shows its toolbar (EditBoxColumns .selectionCanvas)
+  const isSelected =
+    props.selectedBoxPosition && props.selectedBoxPosition.x === x && props.selectedBoxPosition.y === y;
+  const onTap = () => (props.onWidgetTap ? props.onWidgetTap(x, y) : props.openBoxSettings(x, y));
   // What tells this widget apart from another of the same type: its name,
   // its title, or the room it shows. In reorganize mode the content is
   // hidden and this is all that is left to recognise it.
@@ -83,13 +87,20 @@ const EditableBoxPreview = ({ children, ...props }) => {
       data-x={x}
       data-y={y}
       data-editing={isEditing ? 'true' : undefined}
+      data-selected={isSelected ? 'true' : undefined}
       class={cx(style.previewWrapper, {
-        [style.previewWrapperEditing]: isEditing
+        [style.previewWrapperEditing]: isEditing,
+        [style.previewWrapperSelected]: isSelected
       })}
     >
       {/* the toolbar is a group named after the widget: VoiceOver reads
           "Weather, group — Move up, button…" instead of four nameless buttons */}
-      <div class={style.previewToolbar} role="group" aria-labelledby={titleId}>
+      <div
+        class={style.previewToolbar}
+        role="group"
+        aria-labelledby={titleId}
+        onFocusIn={() => !isSelected && props.selectBox && props.selectBox(x, y)}
+      >
         <span class={style.previewTitle} data-preview-title id={titleId}>
           <span class={style.previewType}>
             {box.type ? <Text id={`dashboard.boxTitle.${box.type}`} /> : <Text id="dashboard.editorNewWidget" />}
@@ -176,7 +187,7 @@ const EditableBoxPreview = ({ children, ...props }) => {
           </Localizer>
         </div>
       </div>
-      <div class={style.previewContent}>
+      <div class={style.previewContent} data-preview-content>
         {box.type ? (
           <Box box={box} x={x} y={y} />
         ) : (
@@ -186,8 +197,9 @@ const EditableBoxPreview = ({ children, ...props }) => {
           </div>
         )}
         {/* the overlay blocks the widget's own interactions; a tap opens its
-            settings — a pointer convenience, the ⚙ button is the accessible way */}
-        <div class={style.previewOverlay} onClick={() => props.openBoxSettings(x, y)} aria-hidden="true" />
+            settings (on a phone: selects it first) — a pointer convenience, the
+            ⚙ button is the accessible way */}
+        <div class={style.previewOverlay} onClick={onTap} aria-hidden="true" data-cy={`widget-tap-${x}-${y}`} />
       </div>
     </div>
   );
