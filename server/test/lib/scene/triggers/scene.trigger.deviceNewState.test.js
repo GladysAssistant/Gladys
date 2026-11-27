@@ -1004,4 +1004,182 @@ describe('scene.triggers.deviceNewState', () => {
       });
     });
   });
+
+  describe('trigger event handed to the actions', () => {
+    let message;
+
+    // One scene watching two doors, telling in a message which one started it
+    const addSceneNamingItsTrigger = () =>
+      sceneManager.addScene({
+        selector: 'my-scene',
+        active: true,
+        actions: [
+          [
+            {
+              type: ACTIONS.MESSAGE.SEND,
+              user: 'pepper',
+              text:
+                '{{triggerEvent.device.name}} ({{triggerEvent.deviceFeature.name}}): ' +
+                '{{triggerEvent.previous_value}} -> {{triggerEvent.last_value}}',
+            },
+          ],
+        ],
+        triggers: [
+          {
+            type: EVENTS.DEVICE.NEW_STATE,
+            device_features: ['front-door-opening', 'garage-door-opening'],
+            value: 0,
+            operator: '=',
+          },
+        ],
+      });
+
+    beforeEach(() => {
+      message = { sendToUser: fake.resolves(null) };
+      sceneManager.message = message;
+      sceneManager.stateManager.setState('deviceById', 'front-door-id', {
+        id: 'front-door-id',
+        name: 'Front door',
+        selector: 'front-door',
+      });
+      sceneManager.stateManager.setState('deviceFeature', 'front-door-opening', {
+        name: 'Opening',
+        selector: 'front-door-opening',
+        device_id: 'front-door-id',
+        last_value: 0,
+      });
+      sceneManager.stateManager.setState('deviceById', 'garage-door-id', {
+        id: 'garage-door-id',
+        name: 'Garage door',
+        selector: 'garage-door',
+      });
+      sceneManager.stateManager.setState('deviceFeature', 'garage-door-opening', {
+        name: 'Opening',
+        selector: 'garage-door-opening',
+        device_id: 'garage-door-id',
+        last_value: 0,
+      });
+    });
+
+    it('should name the device and the feature that fired the trigger', async () => {
+      const execute = sinon.spy(sceneManager, 'execute');
+      await addSceneNamingItsTrigger();
+      const newStateEvent = {
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'garage-door-opening',
+        previous_value: 1,
+        last_value: 0,
+      };
+      sceneManager.checkTrigger(newStateEvent);
+      await waitUntil(() => message.sendToUser.called, { message: 'the message to be sent' });
+      assert.calledOnce(execute);
+      expect(execute.firstCall.args[1].triggerEvent).to.deep.equal({
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'garage-door-opening',
+        previous_value: 1,
+        last_value: 0,
+        device: { name: 'Garage door', selector: 'garage-door' },
+        deviceFeature: { name: 'Opening', selector: 'garage-door-opening' },
+      });
+      // the event every scene is checked against is left as it was emitted
+      expect(newStateEvent).to.deep.equal({
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'garage-door-opening',
+        previous_value: 1,
+        last_value: 0,
+      });
+      assert.calledOnceWithExactly(message.sendToUser, 'pepper', 'Garage door (Opening): 1 -> 0', null, {
+        service: undefined,
+      });
+    });
+
+    it('should name the other device when the other feature of the trigger fires', async () => {
+      await addSceneNamingItsTrigger();
+      sceneManager.checkTrigger({
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'front-door-opening',
+        previous_value: 1,
+        last_value: 0,
+      });
+      await waitUntil(() => message.sendToUser.called, { message: 'the message to be sent' });
+      expect(message.sendToUser.firstCall.args[1]).to.equal('Front door (Opening): 1 -> 0');
+    });
+
+    it('should name the device once a "for_duration" timer has finished', async () => {
+      const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      try {
+        const execute = sinon.spy(sceneManager, 'execute');
+        await sceneManager.addScene({
+          selector: 'my-scene',
+          active: true,
+          actions: [[{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }]],
+          triggers: [
+            {
+              type: EVENTS.DEVICE.NEW_STATE,
+              device_feature: 'garage-door-opening',
+              value: 0,
+              operator: '=',
+              for_duration: 10 * 60 * 1000,
+            },
+          ],
+        });
+        sceneManager.checkTrigger({
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'garage-door-opening',
+          previous_value: 1,
+          last_value: 0,
+        });
+        // the scene only starts once the door has stayed open for the whole duration: the
+        // timer emits the event again, and the scene manager listens to it
+        assert.notCalled(execute);
+        clock.tick(10 * 60 * 1000);
+        assert.calledOnce(execute);
+        expect(execute.firstCall.args[1].triggerEvent).to.include({ previous_value: 0, last_value: 0 });
+        expect(execute.firstCall.args[1].triggerEvent.device).to.deep.equal({
+          name: 'Garage door',
+          selector: 'garage-door',
+        });
+      } finally {
+        clock.restore();
+      }
+    });
+
+    it('should leave the device empty when the state does not hold it', async () => {
+      sceneManager.stateManager.deleteState('deviceById', 'garage-door-id');
+      const execute = sinon.spy(sceneManager, 'execute');
+      await addSceneNamingItsTrigger();
+      sceneManager.checkTrigger({
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'garage-door-opening',
+        previous_value: 1,
+        last_value: 0,
+      });
+      await waitUntil(() => message.sendToUser.called, { message: 'the message to be sent' });
+      expect(execute.firstCall.args[1].triggerEvent).to.deep.equal({
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'garage-door-opening',
+        previous_value: 1,
+        last_value: 0,
+        device: { name: undefined, selector: undefined },
+        deviceFeature: { name: 'Opening', selector: 'garage-door-opening' },
+      });
+      expect(message.sendToUser.firstCall.args[1]).to.equal(' (Opening): 1 -> 0');
+    });
+
+    it('should hand over the event as it is when the state does not hold the feature', async () => {
+      sceneManager.stateManager.deleteState('deviceFeature', 'garage-door-opening');
+      const execute = sinon.spy(sceneManager, 'execute');
+      await addSceneNamingItsTrigger();
+      const newStateEvent = {
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'garage-door-opening',
+        previous_value: 1,
+        last_value: 0,
+      };
+      sceneManager.checkTrigger(newStateEvent);
+      await waitUntil(() => message.sendToUser.called, { message: 'the message to be sent' });
+      expect(execute.firstCall.args[1].triggerEvent).to.equal(newStateEvent);
+      expect(message.sendToUser.firstCall.args[1]).to.equal(' (): 1 -> 0');
+    });
+  });
 });

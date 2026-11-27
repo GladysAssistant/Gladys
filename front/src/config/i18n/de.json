@@ -5161,6 +5161,12 @@
       "device": {
         "get-value": {
           "last_value": "Letzter Gerätewert"
+        },
+        "newState": {
+          "deviceName": "Name des auslösenden Geräts",
+          "deviceFeatureName": "Name der auslösenden Funktion",
+          "lastValue": "Neuer Wert des Auslösers",
+          "previousValue": "Vorheriger Wert des Auslösers"
         }
       },
       "calendar": {

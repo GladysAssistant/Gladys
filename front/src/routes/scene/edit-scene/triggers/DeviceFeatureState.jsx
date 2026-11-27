@@ -1,13 +1,16 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
+import get from 'get-value';
 
 import {
   ANY_CHANGE_OPERATOR,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES
+  DEVICE_FEATURE_TYPES,
+  EVENTS
 } from '../../../../../../server/utils/constants';
 
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
 import BinaryDeviceState from './device-states/BinaryDeviceState';
 import PresenceSensorDeviceState from './device-states/PresenceSensorDeviceState';
@@ -40,7 +43,36 @@ const isEventLikeFeature = feature =>
     (feature.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR &&
       feature.type === DEVICE_FEATURE_TYPES.SENSOR.PUSH));
 
+// What the trigger hands to the actions of the scene ({{triggerEvent.<name>}}): the event that
+// fired it, which the server completes with the device and the feature it comes from
+// (buildDeviceNewStateTriggerEvent, server/lib/scene/scene.triggers.js). A scene watching
+// several features reads there which one started it. The labels name the trigger: they are
+// all the user sees of a variable, in the list of a text field and in the summary of a step.
+const TRIGGER_VARIABLES = [
+  { name: 'device.name', label: 'deviceName' },
+  { name: 'deviceFeature.name', label: 'deviceFeatureName' },
+  { name: 'last_value', label: 'lastValue' },
+  { name: 'previous_value', label: 'previousValue' }
+];
+
 class TurnOnLight extends Component {
+  setVariables = () => {
+    this.props.setVariablesTrigger(
+      this.props.index,
+      TRIGGER_VARIABLES.map(({ name, label }) => ({
+        name,
+        type: EVENTS.DEVICE.NEW_STATE,
+        ready: true,
+        label: get(this.props.intl.dictionary, `editScene.variables.device.newState.${label}`),
+        data: {}
+      }))
+    );
+  };
+
+  componentDidMount() {
+    this.setVariables();
+  }
+
   // The trigger stores its features in `device_features`; triggers saved before
   // multi-select stored a single selector in `device_feature`
   getSelectedSelectors = () => {
@@ -384,4 +416,4 @@ class TurnOnLight extends Component {
   }
 }
 
-export default connect('httpClient', {})(TurnOnLight);
+export default connect('httpClient', {})(withIntlAsProp(TurnOnLight));

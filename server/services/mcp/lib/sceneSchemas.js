@@ -735,7 +735,7 @@ function createSceneCreateInputSchema(
       .array(z.array(sceneActionSchema))
       .min(1)
       .describe(
-        'Top-level array of action groups run sequentially after a trigger fires. Each inner array runs in parallel. Example: [[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}]]. Never put device.new-state, time.changed or other trigger types here.',
+        'Top-level array of action groups run sequentially after a trigger fires. Each inner array runs in parallel. Example: [[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}]]. Never put device.new-state, time.changed or other trigger types here. When the scene is started by a device.new-state trigger, the texts of the actions can tell what fired it with Handlebars variables: {{triggerEvent.device.name}} (name of the device), {{triggerEvent.deviceFeature.name}} (name of its feature), {{triggerEvent.last_value}} (new value) and {{triggerEvent.previous_value}} (value before the change).',
       ),
     description: z
       .string()

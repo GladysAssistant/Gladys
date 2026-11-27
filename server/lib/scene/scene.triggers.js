@@ -78,101 +78,120 @@ const matchExternalIntegrationSceneEvent = (self, sceneSelector, event, trigger)
   };
 };
 
-const triggersFunc = {
-  [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
-    // Multi-select triggers store their features in `device_features`, legacy triggers
-    // a single one in `device_feature`. The trigger matches as soon as the event concerns
-    // one of the selected features (OR logic), so the rest of the check — including the
-    // `for_duration` timer key — is scoped to the event's feature, keeping one independent
-    // timer per selected feature. An empty array (rejected by validation but possible in
-    // hand-edited data) falls back to the legacy field instead of never matching.
-    const triggerDeviceFeatures =
-      trigger.device_features && trigger.device_features.length > 0
-        ? trigger.device_features
-        : [trigger.device_feature];
-    if (!triggerDeviceFeatures.includes(event.device_feature)) {
-      return false;
-    }
-
-    // "any change" trigger: no value is configured, the trigger fires as soon as the feature
-    // reports a value different from the previous one (a device re-sending the same value
-    // is not a state change). A change is instantaneous, so `threshold_only` (which only
-    // exists to de-duplicate a condition staying true) and `for_duration` (which waits for a
-    // condition to hold) have nothing to hold on to: they are ignored, and no timer is
-    // scheduled. The UI hides both options in that mode.
-    if (trigger.operator === ANY_CHANGE_OPERATOR) {
-      return compare(trigger.operator, event.last_value, event.previous_value);
-    }
-
-    // We verify if both old value and new value validate the rule
-    const newValueValidateRule = compare(trigger.operator, event.last_value, trigger.value);
-    const previousValueValidateRule = compare(trigger.operator, event.previous_value, trigger.value);
-
-    const triggerDurationKey = `device.new-state.${sceneSelector}.${event.device_feature}:${trigger.operator}:${trigger.value}`;
-
-    // If the previous value was validating the rule, and the new value is not
-    // We clear any timeout for this trigger
-    if (previousValueValidateRule && !newValueValidateRule && self.checkTriggersDurationTimer.get(triggerDurationKey)) {
-      logger.info(
-        `Cancelling timer on trigger for device_feature ${event.device_feature}, because condition is no longer valid`,
-      );
-      clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
-      self.checkTriggersDurationTimer.delete(triggerDurationKey);
-    }
-
-    if (trigger.for_duration === undefined) {
-      // If the trigger is only a threshold_only, we only validate the trigger is the rule has been validated
-      // and was not validated with the previous value
-      if (trigger.threshold_only === true && !Number.isNaN(event.previous_value)) {
-        return newValueValidateRule && !previousValueValidateRule;
-      }
-
-      return newValueValidateRule;
-    }
-
-    // If the "for_duration_finished" is here, it means we are
-    // checking the state after the timeout
-    if (event.for_duration_finished && triggerDurationKey === event.trigger_duration_key) {
-      logger.info(`Scene trigger device.new-state: Timer for sensor ${event.device_feature} has finished.`);
-      clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
-      self.checkTriggersDurationTimer.delete(triggerDurationKey);
-      return newValueValidateRule;
-    }
-
-    const isValidatedIfThresholdOnly =
-      trigger.threshold_only && !Number.isNaN(event.previous_value)
-        ? newValueValidateRule && !previousValueValidateRule
-        : true;
-
-    if (newValueValidateRule && isValidatedIfThresholdOnly) {
-      // If the timeout already exist, don't re-create it
-      const timeoutAlreadyExist = self.checkTriggersDurationTimer.get(triggerDurationKey);
-      if (timeoutAlreadyExist) {
-        logger.info(`Timer for "${event.device_feature}" already exist, not re-creating.`);
-        return false;
-      }
-      logger.info(
-        `Scheduling timer to check for device_feature "${event.device_feature}" state in ${trigger.for_duration}ms`,
-      );
-      // Create a timeout
-      const timeoutId = setTimeout(() => {
-        const lastValue = self.stateManager.get('deviceFeature', event.device_feature).last_value;
-        self.event.emit(EVENTS.TRIGGERS.CHECK, {
-          ...cloneDeep(event),
-          previous_value: event.last_value,
-          last_value: lastValue,
-          for_duration_finished: true,
-          trigger_duration_key: triggerDurationKey,
-        });
-      }, trigger.for_duration);
-      // Save the timeoutId in case we need to cancel it later
-      self.checkTriggersDurationTimer.set(triggerDurationKey, timeoutId);
-      // Return false, as we'll check this only in the future
-      return false;
-    }
-
+const matchDeviceNewState = (self, sceneSelector, event, trigger) => {
+  // Multi-select triggers store their features in `device_features`, legacy triggers
+  // a single one in `device_feature`. The trigger matches as soon as the event concerns
+  // one of the selected features (OR logic), so the rest of the check — including the
+  // `for_duration` timer key — is scoped to the event's feature, keeping one independent
+  // timer per selected feature. An empty array (rejected by validation but possible in
+  // hand-edited data) falls back to the legacy field instead of never matching.
+  const triggerDeviceFeatures =
+    trigger.device_features && trigger.device_features.length > 0 ? trigger.device_features : [trigger.device_feature];
+  if (!triggerDeviceFeatures.includes(event.device_feature)) {
     return false;
-  },
+  }
+
+  // "any change" trigger: no value is configured, the trigger fires as soon as the feature
+  // reports a value different from the previous one (a device re-sending the same value
+  // is not a state change). A change is instantaneous, so `threshold_only` (which only
+  // exists to de-duplicate a condition staying true) and `for_duration` (which waits for a
+  // condition to hold) have nothing to hold on to: they are ignored, and no timer is
+  // scheduled. The UI hides both options in that mode.
+  if (trigger.operator === ANY_CHANGE_OPERATOR) {
+    return compare(trigger.operator, event.last_value, event.previous_value);
+  }
+
+  // We verify if both old value and new value validate the rule
+  const newValueValidateRule = compare(trigger.operator, event.last_value, trigger.value);
+  const previousValueValidateRule = compare(trigger.operator, event.previous_value, trigger.value);
+
+  const triggerDurationKey = `device.new-state.${sceneSelector}.${event.device_feature}:${trigger.operator}:${trigger.value}`;
+
+  // If the previous value was validating the rule, and the new value is not
+  // We clear any timeout for this trigger
+  if (previousValueValidateRule && !newValueValidateRule && self.checkTriggersDurationTimer.get(triggerDurationKey)) {
+    logger.info(
+      `Cancelling timer on trigger for device_feature ${event.device_feature}, because condition is no longer valid`,
+    );
+    clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
+    self.checkTriggersDurationTimer.delete(triggerDurationKey);
+  }
+
+  if (trigger.for_duration === undefined) {
+    // If the trigger is only a threshold_only, we only validate the trigger is the rule has been validated
+    // and was not validated with the previous value
+    if (trigger.threshold_only === true && !Number.isNaN(event.previous_value)) {
+      return newValueValidateRule && !previousValueValidateRule;
+    }
+
+    return newValueValidateRule;
+  }
+
+  // If the "for_duration_finished" is here, it means we are
+  // checking the state after the timeout
+  if (event.for_duration_finished && triggerDurationKey === event.trigger_duration_key) {
+    logger.info(`Scene trigger device.new-state: Timer for sensor ${event.device_feature} has finished.`);
+    clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
+    self.checkTriggersDurationTimer.delete(triggerDurationKey);
+    return newValueValidateRule;
+  }
+
+  const isValidatedIfThresholdOnly =
+    trigger.threshold_only && !Number.isNaN(event.previous_value)
+      ? newValueValidateRule && !previousValueValidateRule
+      : true;
+
+  if (newValueValidateRule && isValidatedIfThresholdOnly) {
+    // If the timeout already exist, don't re-create it
+    const timeoutAlreadyExist = self.checkTriggersDurationTimer.get(triggerDurationKey);
+    if (timeoutAlreadyExist) {
+      logger.info(`Timer for "${event.device_feature}" already exist, not re-creating.`);
+      return false;
+    }
+    logger.info(
+      `Scheduling timer to check for device_feature "${event.device_feature}" state in ${trigger.for_duration}ms`,
+    );
+    // Create a timeout
+    const timeoutId = setTimeout(() => {
+      const lastValue = self.stateManager.get('deviceFeature', event.device_feature).last_value;
+      self.event.emit(EVENTS.TRIGGERS.CHECK, {
+        ...cloneDeep(event),
+        previous_value: event.last_value,
+        last_value: lastValue,
+        for_duration_finished: true,
+        trigger_duration_key: triggerDurationKey,
+      });
+    }, trigger.for_duration);
+    // Save the timeoutId in case we need to cancel it later
+    self.checkTriggersDurationTimer.set(triggerDurationKey, timeoutId);
+    // Return false, as we'll check this only in the future
+    return false;
+  }
+
+  return false;
+};
+
+// What a device state trigger hands to the actions: the event that fired it, completed with
+// the device and the feature it comes from ({{triggerEvent.device.name}},
+// {{triggerEvent.deviceFeature.name}}), so that one scene watching several features can tell
+// which one started it. Both are read in RAM. An event about a feature the state does not
+// hold is handed over as it is.
+const buildDeviceNewStateTriggerEvent = (self, event) => {
+  const deviceFeature = self.stateManager.get('deviceFeature', event.device_feature);
+  if (!deviceFeature) {
+    return event;
+  }
+  const device = self.stateManager.get('deviceById', deviceFeature.device_id) || {};
+  return {
+    ...event,
+    device: { name: device.name, selector: device.selector },
+    deviceFeature: { name: deviceFeature.name, selector: event.device_feature },
+  };
+};
+
+const triggersFunc = {
+  [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) =>
+    matchDeviceNewState(self, sceneSelector, event, trigger) && buildDeviceNewStateTriggerEvent(self, event),
   [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => {
     if (event.key !== trigger.key) {
       return false;
