@@ -4638,7 +4638,7 @@
         "hours": "Stunden",
         "valueTypeSimple": "Einfach",
         "valueTypeComputed": "Berechnet",
-        "computedExplanationText": "Stattdessen können Sie hier eine Berechnung basierend auf einer Szenario-Variable eingeben. Um eine Variable in den Text einzufügen, drücken Sie '{{'. Um einen Variablenwert festzulegen, müssen Sie das Feld 'Eine Variable definieren' oder 'Gerätewert abrufen' verwenden."
+        "computedExplanationText": "Stattdessen können Sie hier eine Berechnung basierend auf einer Szenario-Variable eingeben. Um eine Variable in den Text einzufügen, drücken Sie '{{'. Eine Variable stammt aus einem vorherigen Block, zum Beispiel 'Eine Variable definieren' oder 'Gerätewert abrufen', oder vom Auslöser der Szene, wenn dieser Informationen übermittelt."
       },
       "messageSend": {
         "userLabel": "Benutzer",
@@ -4651,14 +4651,14 @@
         "serviceIntegrationInternal": "native Integration",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
-        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt."
       },
       "messageCameraSend": {
         "userLabel": "Benutzer",
         "cameraLabel": "Kamera",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
-        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt."
       },
       "askAi": {
         "description": "Diese Aktion sendet eine Nachricht an die KI über Gladys Plus und antwortet Ihnen mit einer Nachricht. Wenn Sie ein Kamerabild anhängen, kann die KI sehen, was auf dem Bild ist, und sogar entsprechend handeln.",
@@ -4667,13 +4667,13 @@
         "cameraLabel": "Ein Kamerabild anhängen (optional)",
         "textLabel": "Meine Frage an die KI",
         "textPlaceholder": "Nachrichtentext",
-        "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Achten Sie darauf, dass Sie zuvor eine Variable in einer Aktion 'Letzten Zustand abrufen' definiert haben, die vor diesem Nachrichtenblock platziert wurde."
+        "explanationText": "Um eine Variable einzufügen, geben Sie '{{' ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel 'Eine Variable definieren' oder 'Gerätewert abrufen', oder vom Auslöser der Szene, wenn dieser Informationen übermittelt."
       },
       "smsSend": {
         "deprecatedTitle": "Aktion bald veraltet",
         "deprecatedDescription": "Diese Aktion nutzt die native Free-Mobile-Integration, die in einer künftigen Gladys-Version entfernt wird. Installiere die Community-Integration <b>Free Mobile SMS</b>, hinterlege deine Free-Mobile-Zugangsdaten im Bereich <b>Mein Konto</b> im Tab <b>Konfiguration</b> dieser Integration und ersetze diese Aktion anschließend durch eine Aktion <b>Nachricht senden</b>, die den Kanal Free Mobile SMS und den Gladys-Benutzer anspricht, dessen Konto konfiguriert ist.",
         "textLabel": "Nachricht",
-        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt.",
         "messagePlaceholder": "Meine Message"
       },
       "turnOnLights": {
@@ -4720,9 +4720,9 @@
         "namePlaceholder": "Z.B.: Wartezeit",
         "valueTypeText": "Text",
         "valueTypeComputed": "Berechnet",
-        "textExplanationText": "Gib hier den Wert der Variable ein. Um eine andere Variable in den Text einzufügen, drücke '{{'.",
+        "textExplanationText": "Gib hier den Wert der Variable ein. Um eine andere Variable in den Text einzufügen, drücke '{{'. Die Variable kann aus einem vorherigen Block stammen oder vom Auslöser der Szene, wenn dieser Informationen übermittelt.",
         "textPlaceholder": "Wert der Variable",
-        "computedExplanationText": "Gib hier eine Berechnung ein, ihr Ergebnis wird in der Variable gespeichert. Um eine Variable in die Berechnung einzufügen, drücke '{{'.",
+        "computedExplanationText": "Gib hier eine Berechnung ein, ihr Ergebnis wird in der Variable gespeichert. Um eine Variable in die Berechnung einzufügen, drücke '{{'. Die Variable kann aus einem vorherigen Block stammen oder vom Auslöser der Szene, wenn dieser Informationen übermittelt.",
         "computedPlaceholder": "Z.B.: 2 * 3"
       },
       "getDate": {
@@ -4742,8 +4742,8 @@
         "useCustomValue": "Eigenen Wert eingeben",
         "useValueList": "Aus der Werteliste auswählen",
         "valueTypeComputed": "Berechnet",
-        "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
-        "textExplanationText": "Gib hier den Text ein, der an dein Gerät gesendet werden soll. Um eine Szenenvariable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
+        "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt.",
+        "textExplanationText": "Gib hier den Text ein, der an dein Gerät gesendet werden soll. Um eine Szenenvariable in den Text einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt."
       },
       "onlyContinueIf": {
         "variableLabel": "Gerät oder Variable",
@@ -4757,7 +4757,7 @@
         "useCustomValue": "Eigenen Wert eingeben",
         "useValueList": "Aus der Werteliste auswählen",
         "logicExplanationText": "Die Bedingungen in diesem Block sind mit ODER verknüpft: Der Block ist erfüllt, sobald eine davon zutrifft. Für ein UND fügst du mehrere Blöcke \"Nur fortsetzen, wenn\" hinzu: Dann müssen alle erfüllt sein.",
-        "explanationText": "Wähle, was verglichen wird: den aktuellen Zustand eines Geräts, der gelesen wird, sobald die Szene diesen Block erreicht, oder eine Variable, die zuvor mit dem Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" festgelegt wurde. Als Wert gibst du einen festen Wert oder eine Berechnung auf Basis einer Szenenvariable ein: Um eine Variable einzufügen, gib \"{{\" ein."
+        "explanationText": "Wähle, was verglichen wird: den aktuellen Zustand eines Geräts, der gelesen wird, sobald die Szene diesen Block erreicht, oder eine Variable, die zuvor mit dem Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" festgelegt wurde. Als Wert gibst du einen festen Wert oder eine Berechnung auf Basis einer Szenenvariable ein: Um eine Variable einzufügen, gib \"{{\" ein, egal ob sie aus einem vorherigen Block oder vom Auslöser der Szene stammt."
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",
@@ -4829,7 +4829,7 @@
         "headersValuePlaceholder": "Value",
         "responseData": "Response",
         "tryButton": "Try request",
-        "variablesExplanation": "Um eine Variable einzufügen, die in einer \"Eine Variable definieren\"- oder \"Gerätewert abrufen\"-Aktion definiert wurde, gib \"{{\" ein. Diese Variable wird nur während der Ausführung der Szene injiziert, nicht beim Klicken auf \"Anfrage versuchen\".",
+        "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt. Variablen werden nur während der Ausführung der Szene injiziert, nicht beim Klicken auf \"Anfrage versuchen\".",
         "requestError": "Beim Erstellen der Anfrage ist ein Fehler aufgetreten. Bist du sicher, dass die Parameter richtig sind?"
       },
       "scene": {
@@ -4906,7 +4906,7 @@
         "topic": "Topic",
         "topicPlaceholder": "gladys/mein-topic",
         "messageLabel": "Message",
-        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
+        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt.",
         "messagePlaceholder": "Meine Message"
       },
       "zigbee2mqttMessage": {
@@ -4914,7 +4914,7 @@
         "topicPlaceholder": "zigbee2mqtt/mein-geraet/set",
         "topicExplanation": "Das Topic wird unverändert veröffentlicht: Du musst das vollständige MQTT-Topic angeben, einschließlich des Präfixes \"zigbee2mqtt/\" (zum Beispiel \"zigbee2mqtt/mein-geraet/set\").",
         "messageLabel": "Message",
-        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
+        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt.",
         "messagePlaceholder": "Meine Message"
       },
       "playMedia": {
@@ -4937,9 +4937,9 @@
         "volumeLabel": "Volumen",
         "valueTypeSimple": "Einfach",
         "valueTypeComputed": "Berechnet",
-        "computedExplanationText": "Anstelle einer festen Lautstärke kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben, zum Beispiel um nachts leiser zu sprechen. Um eine Variable einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Block das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
+        "computedExplanationText": "Anstelle einer festen Lautstärke kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben, zum Beispiel um nachts leiser zu sprechen. Um eine Variable einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt.",
         "textLabel": "Nachricht zum Sprechen auf dem Lautsprecher",
-        "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
+        "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Eine Variable stammt aus einem vorherigen Block, zum Beispiel \"Eine Variable definieren\" oder \"Gerätewert abrufen\", oder vom Auslöser der Szene, wenn dieser Informationen übermittelt."
       },
       "energyCurrentPrice": {
         "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle kWh-Preis des auf dem ausgewählten Zähler aktiven Vertrags die folgende Bedingung erfüllt. Ohne aktiven Vertrag wird die Szene angehalten.",

@@ -4638,7 +4638,7 @@
         "hours": "horas",
         "valueTypeSimple": "Simple",
         "valueTypeComputed": "Calculado",
-        "computedExplanationText": "En lugar de un valor fijo, puede introducir aquí un cálculo basado en una variable de la escena. Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe definir una variable antes de esta acción."
+        "computedExplanationText": "En lugar de un valor fijo, puede introducir aquí un cálculo basado en una variable de la escena. Para insertar una variable en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información."
       },
       "messageSend": {
         "userLabel": "Usuario",
@@ -4651,14 +4651,14 @@
         "serviceIntegrationInternal": "integración incorporada",
         "textLabel": "Mensaje",
         "textPlaceholder": "Texto del mensaje",
-        "explanationText": "Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "explanationText": "Para insertar una variable en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información."
       },
       "messageCameraSend": {
         "userLabel": "Usuario",
         "cameraLabel": "Cámara",
         "textLabel": "Mensaje",
         "textPlaceholder": "Texto del mensaje",
-        "explanationText": "Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "explanationText": "Para insertar una variable en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información."
       },
       "askAi": {
         "description": "Esta acción enviará un mensaje a la IA a través de Gladys Plus y le responderá con un mensaje. Si adjunta una imagen de cámara, la IA podrá ver lo que aparece en la imagen e incluso actuar en consecuencia.",
@@ -4667,13 +4667,13 @@
         "cameraLabel": "Adjuntar una imagen de cámara (opcional)",
         "textLabel": "Mi pregunta para la IA",
         "textPlaceholder": "Texto del mensaje",
-        "explanationText": "Para insertar una variable, escriba \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "explanationText": "Para insertar una variable, escriba \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información."
       },
       "smsSend": {
         "deprecatedTitle": "Acción próximamente obsoleta",
         "deprecatedDescription": "Esta acción utiliza la integración incorporada de Free Mobile, que se eliminará en una futura versión de Gladys. Instale la integración de la comunidad <b>Free Mobile SMS</b>, introduzca sus credenciales de Free Mobile en la sección <b>Mi cuenta</b> de la pestaña <b>Configuración</b> de esa integración, y luego sustituya esta acción por una acción <b>Enviar mensaje</b> dirigida al canal Free Mobile SMS y al usuario de Gladys cuya cuenta esté configurada.",
         "textLabel": "Mensaje",
-        "explanationText": "Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta.",
+        "explanationText": "Para insertar una variable en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información.",
         "messagePlaceholder": "Mi mensaje"
       },
       "turnOnLights": {
@@ -4720,9 +4720,9 @@
         "namePlaceholder": "Ej.: tiempo de espera",
         "valueTypeText": "Texto",
         "valueTypeComputed": "Calculado",
-        "textExplanationText": "Introduzca aquí el valor de la variable. Para insertar otra variable en el texto, pulse \"{{\".",
+        "textExplanationText": "Introduzca aquí el valor de la variable. Para insertar otra variable en el texto, pulse \"{{\": puede proceder de una casilla situada antes de esta, o del activador de la escena cuando este transmite información.",
         "textPlaceholder": "Valor de la variable",
-        "computedExplanationText": "Introduzca aquí un cálculo; su resultado se guardará en la variable. Para insertar una variable en el cálculo, pulse \"{{\".",
+        "computedExplanationText": "Introduzca aquí un cálculo; su resultado se guardará en la variable. Para insertar una variable en el cálculo, pulse \"{{\": puede proceder de una casilla situada antes de esta, o del activador de la escena cuando este transmite información.",
         "computedPlaceholder": "Ej.: 2 * 3"
       },
       "getDate": {
@@ -4742,8 +4742,8 @@
         "useCustomValue": "Introducir un valor personalizado",
         "useValueList": "Elegir de la lista de valores",
         "valueTypeComputed": "Calculado",
-        "computedExplanationText": "En lugar de un valor fijo, puede introducir aquí un cálculo basado en una variable de la escena. Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta.",
-        "textExplanationText": "Introduzca aquí el texto que se enviará a su dispositivo. Para insertar una variable de la escena en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "computedExplanationText": "En lugar de un valor fijo, puede introducir aquí un cálculo basado en una variable de la escena. Para insertar una variable en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información.",
+        "textExplanationText": "Introduzca aquí el texto que se enviará a su dispositivo. Para insertar una variable de la escena en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información."
       },
       "onlyContinueIf": {
         "variableLabel": "Dispositivo o variable",
@@ -4757,7 +4757,7 @@
         "useCustomValue": "Introducir un valor personalizado",
         "useValueList": "Elegir de la lista de valores",
         "logicExplanationText": "Las condiciones de este bloque se combinan con un O: el bloque se cumple en cuanto se cumple una de ellas. Para hacer un Y, añada varios bloques \"Condición sobre variables\": entonces todos deberán cumplirse.",
-        "explanationText": "Elija qué comparar: el estado actual de un dispositivo, leído cuando la escena llega a este bloque, o una variable establecida por una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" situada antes de esta. Como valor, introduzca un valor fijo o un cálculo basado en una variable de la escena: para insertar una variable, pulse \"{{\"."
+        "explanationText": "Elija qué comparar: el estado actual de un dispositivo, leído cuando la escena llega a este bloque, o una variable establecida por una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" situada antes de esta. Como valor, introduzca un valor fijo o un cálculo basado en una variable de la escena: para insertar una variable, pulse \"{{\", tanto si procede de una casilla situada antes de esta como del activador de la escena."
       },
       "conditionIfThenElse": {
         "conditions": "Condiciones",
@@ -4829,7 +4829,7 @@
         "headersValuePlaceholder": "Valor",
         "responseData": "Respuesta",
         "tryButton": "Probar solicitud",
-        "variablesExplanation": "Para insertar una variable definida en una acción \"Establecer una variable\" u \"Obtener valor del dispositivo\", escriba \"{{\". Esta variable solo se insertará durante la ejecución de la escena, no al hacer clic en \"Probar solicitud\" a continuación.",
+        "variablesExplanation": "Para insertar una variable, escriba \"{{\". Una variable procede de una acción situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información. Las variables solo se insertan durante la ejecución de la escena, no al hacer clic en \"Probar solicitud\" a continuación.",
         "requestError": "Se produjo un error al realizar la solicitud. ¿Está seguro de que los parámetros son correctos?"
       },
       "scene": {
@@ -4906,7 +4906,7 @@
         "topic": "Tema",
         "topicPlaceholder": "gladys/mi-tema",
         "messageLabel": "Mensaje",
-        "variablesExplanation": "Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta.",
+        "variablesExplanation": "Para insertar una variable en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información.",
         "messagePlaceholder": "Mi mensaje"
       },
       "zigbee2mqttMessage": {
@@ -4914,7 +4914,7 @@
         "topicPlaceholder": "zigbee2mqtt/mi-dispositivo/set",
         "topicExplanation": "El tema se publica tal cual: debe escribir el tema MQTT completo, incluido el prefijo \"zigbee2mqtt/\" (por ejemplo, \"zigbee2mqtt/mi-dispositivo/set\").",
         "messageLabel": "Mensaje",
-        "variablesExplanation": "Para insertar una variable en el texto, pulse \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta.",
+        "variablesExplanation": "Para insertar una variable en el texto, pulse \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información.",
         "messagePlaceholder": "Mi mensaje"
       },
       "playMedia": {
@@ -4937,9 +4937,9 @@
         "volumeLabel": "Volumen",
         "valueTypeSimple": "Simple",
         "valueTypeComputed": "Calculado",
-        "computedExplanationText": "En lugar de un volumen fijo, puede introducir aquí un cálculo basado en una variable de la escena, por ejemplo para hablar más bajo por la noche. Para insertar una variable, escriba \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta.",
+        "computedExplanationText": "En lugar de un volumen fijo, puede introducir aquí un cálculo basado en una variable de la escena, por ejemplo para hablar más bajo por la noche. Para insertar una variable, escriba \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información.",
         "textLabel": "Mensaje que se dirá en el altavoz",
-        "variablesExplanation": "Para insertar una variable, escriba \"{{\". Para establecer el valor de una variable, debe utilizar una casilla \"Establecer una variable\" u \"Obtener valor del dispositivo\" antes de esta."
+        "variablesExplanation": "Para insertar una variable, escriba \"{{\". Una variable procede de una casilla situada antes de esta, como \"Establecer una variable\" u \"Obtener valor del dispositivo\", o del activador de la escena cuando este transmite información."
       },
       "energyCurrentPrice": {
         "description": "La escena solo continuará si el precio actual del kWh del contrato activo en el contador seleccionado cumple la condición siguiente. Sin contrato activo, la escena se detiene.",
