@@ -146,9 +146,10 @@ describe('Dashboard Devices Box mode select', () => {
     modeSelect().should('have.value', `${COMFORT}`);
 
     modeSelect().select(`${ECO}`);
+    // the mode, whatever its type: this widget sends the string of the DOM, the fan ones a number
     cy.wait('@setValue')
       .its('request.body.value')
-      .should('eq', `${ECO}`);
+      .should(value => expect(Number(value)).to.eq(ECO));
     modeSelect().should('have.value', `${ECO}`);
   });
 });
