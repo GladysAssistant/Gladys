@@ -225,19 +225,20 @@ export const getEdgePosition = (sections, edge) => {
   if (edge === 'top') {
     return { x: 0, y: 0 };
   }
-  const lastSection = sections[sections.length - 1];
-  let columnIndex = lastSection.columns.length - 1;
-  if (getSectionMobileOrder(lastSection) === DASHBOARD_SECTION_MOBILE_ORDER.ROWS) {
-    lastSection.columns.forEach((column, index) => {
-      if (column.length > lastSection.columns[columnIndex].length) {
+  // the last section that has a column: a stored section may hold none
+  const sectionIndex = sections.reduce((last, section, index) => (section.columns.length > 0 ? index : last), 0);
+  const section = sections[sectionIndex];
+  let columnIndex = section.columns.length - 1;
+  if (getSectionMobileOrder(section) === DASHBOARD_SECTION_MOBILE_ORDER.ROWS) {
+    // the longest column, the last of them when several are as long
+    section.columns.forEach((column, index) => {
+      if (column.length >= section.columns[columnIndex].length) {
         columnIndex = index;
       }
     });
   }
-  return {
-    x: columnCount - lastSection.columns.length + columnIndex,
-    y: lastSection.columns[columnIndex].length
-  };
+  const columnsBefore = sections.slice(0, sectionIndex).reduce((count, item) => count + item.columns.length, 0);
+  return { x: columnsBefore + columnIndex, y: section.columns[columnIndex].length };
 };
 
 // Every widget of a type, in reading order: { x, y, box }
