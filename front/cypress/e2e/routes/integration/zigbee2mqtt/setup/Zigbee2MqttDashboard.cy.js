@@ -70,6 +70,19 @@ describe('Zigbee2mqtt dashboard', () => {
       cy.get('[data-cy=z2m-dashboard-new-devices]').should('not.exist');
     });
 
+    it('should not count the devices Zigbee2mqtt does not support', () => {
+      // docs/specs/zigbee2mqtt-pairing.md, E.5: they wait in a section of their own of the Discover tab
+      visitDashboard({
+        discovered: [
+          { name: 'Lamp', external_id: 'zigbee2mqtt:lamp', zigbee2mqtt_support: 'native' },
+          { name: 'Switch', external_id: 'zigbee2mqtt:switch', zigbee2mqtt_support: 'generic' },
+          { name: 'Valve', external_id: 'zigbee2mqtt:valve', zigbee2mqtt_support: 'unsupported' },
+          { name: 'Remote', external_id: 'zigbee2mqtt:remote', zigbee2mqtt_support: 'interview_failed' }
+        ]
+      });
+      cy.get('[data-cy=z2m-dashboard-new-devices]').should('contain', i18nText(`${T}.newDevices.one`));
+    });
+
     it('should open the pairing window from the status card, and come back to the dashboard', () => {
       visitDashboard();
       answerPairing();

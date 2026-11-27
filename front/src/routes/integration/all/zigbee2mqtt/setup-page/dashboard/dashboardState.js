@@ -1,6 +1,7 @@
 import get from 'get-value';
 
 import { MQTT_MODE, ADAPTER_MODE } from '../constants';
+import { ZIGBEE2MQTT_SUPPORT, getSupport } from '../../utils/support';
 
 // What the status card of the dashboard tells, from the status of the server (docs/specs/zigbee2mqtt-installation.md, N)
 export const DASHBOARD_STATE = {
@@ -166,6 +167,9 @@ export const getStopKeys = configuration =>
     ? { label: 'actions.disconnect', confirm: 'confirmStopExternal' }
     : { label: 'actions.stop', confirm: 'confirmStop' };
 
-// Devices of the network not added to Gladys yet (as the Discover tab tells them)
+// Devices of the network not added to Gladys yet (as the Discover tab tells them), the ones Zigbee2mqtt supports
+// only: the others wait in a section of their own of the Discover tab (docs/specs/zigbee2mqtt-pairing.md, E.5)
 export const countNewDevices = discoveredDevices =>
-  (discoveredDevices || []).filter(device => device.id === undefined).length;
+  (discoveredDevices || []).filter(
+    device => device.id === undefined && getSupport(device) === ZIGBEE2MQTT_SUPPORT.NATIVE
+  ).length;

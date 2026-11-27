@@ -1,6 +1,6 @@
 import { sendStatus } from './wizardFixtures';
 import { onlineStatus, notAnsweringStatus, visitDashboard } from './dashboardFixtures';
-import { readyBulb, atStep, answerPairing, sendPermitJoin, sendPairing } from './pairingFixtures';
+import { readyBulb, genericSwitch, atStep, answerPairing, sendPermitJoin, sendPairing } from './pairingFixtures';
 
 const T = 'integration.zigbee2mqtt.pairing';
 
@@ -436,7 +436,7 @@ describe('Zigbee2mqtt pairing window', () => {
           cy.root()
             .should('contain', 'Tuya TS0601_unknown')
             .and('not.contain', 'Automatically generated definition');
-          cy.get('[data-cy=z2m-pairing-unsupported]').i18n(`${T}.unsupportedText`);
+          cy.get('[data-cy=z2m-pairing-unsupported]').i18n('integration.zigbee2mqtt.support.unsupportedText');
           cy.get('[data-cy=z2m-pairing-add]').should('not.exist');
           // The last step says it in words, not by its colour only
           cy.get('[data-cy=z2m-pairing-timeline] li')
@@ -465,6 +465,70 @@ describe('Zigbee2mqtt pairing window', () => {
       // The failed device left the network
       sendPairing([inGladys, unsupported, left]);
       cy.get('[data-cy=z2m-pairing-row]').should('have.length', 3);
+    });
+
+    it('should add a device Zigbee2mqtt does not know with its generic features once the user confirmed it', () => {
+      // docs/specs/zigbee2mqtt-pairing.md, E.3
+      const serverUrl = Cypress.env('serverUrl');
+      openPairing();
+      sendPairing([genericSwitch]);
+      cy.get('[data-cy=z2m-pairing-row]')
+        .should('have.attr', 'data-status', 'generic')
+        .within(() => {
+          cy.get('[data-cy=z2m-pairing-timeline] li')
+            .eq(2)
+            .i18n(`${T}.steps.generic`);
+          cy.get('[data-cy=z2m-pairing-generic]').i18n('integration.zigbee2mqtt.support.genericText');
+          cy.get('[data-cy=z2m-support-ask-z2m-link]').should('exist');
+          // A raw Tuya manufacturer name says nothing: the category alone
+          cy.get('[data-cy=z2m-pairing-name]')
+            .invoke('val')
+            .should('not.contain', '_TZ3000');
+        });
+      cy.get('[data-cy=z2m-pairing-to-add]').should('contain', '1');
+
+      cy.intercept(
+        { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` },
+        { body: [genericSwitch] }
+      ).as('readAgain');
+      cy.intercept(
+        { method: 'POST', url: `${serverUrl}/api/v1/device` },
+        { body: { name: 'Switch', selector: 'switch' } }
+      ).as('addDevice');
+      cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.get('[data-cy=z2m-pairing-generic-confirm]').should(
+        'contain',
+        Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.support.confirmText')
+      );
+      cy.get('[data-cy=confirm-sheet-cancel]').click();
+      cy.get('[data-cy=z2m-pairing-generic-confirm]').should('not.exist');
+      cy.get('[data-cy=z2m-pairing-card]').should('exist');
+
+      cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.get('[data-cy=confirm-sheet-confirm]').click();
+      cy.wait('@readAgain');
+      cy.wait('@addDevice')
+        .its('request.body')
+        .should(body => {
+          expect(body.external_id).to.equal('zigbee2mqtt:0xa4c138000000f00d');
+          expect(body).to.not.have.property('zigbee2mqtt_support');
+          expect(body).to.not.have.property('zigbee2mqtt_info');
+        });
+      cy.get('[data-cy=z2m-pairing-generic-confirm]').should('not.exist');
+      cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
+    });
+
+    it('should offer to copy the information of a device not supported, once Gladys knows it', () => {
+      openPairing();
+      sendPairing([{ ...genericSwitch, status: 'unsupported', device: { ...genericSwitch.device, features: [] } }]);
+      cy.get('[data-cy=z2m-pairing-unsupported]').within(() => {
+        cy.get('[data-cy=z2m-support-ask-z2m-link]').should('exist');
+        cy.get('[data-cy=z2m-support-copy]').should('exist');
+      });
+      // Not known by Gladys yet: the link only
+      sendPairing([{ ...genericSwitch, status: 'unsupported', device: null }]);
+      cy.get('[data-cy=z2m-pairing-unsupported] [data-cy=z2m-support-ask-z2m-link]').should('exist');
+      cy.get('[data-cy=z2m-pairing-unsupported] [data-cy=z2m-support-copy]').should('not.exist');
     });
 
     it('should show the icon of the device when its photo cannot be loaded', () => {

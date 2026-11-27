@@ -414,7 +414,8 @@ describe('Zigbee2MQTT tabs on a phone', () => {
       cy.get('[data-cy=z2m-discovered-suggest]')
         .should('have.attr', 'target', '_blank')
         .and('have.attr', 'href')
-        .and('include', 'github.com/GladysAssistant/Gladys/issues/new');
+        .and('include', 'community.gladysassistant.com/new-topic?')
+        .and('include', 'category=feature-requests');
     });
 
     it('should open the pairing window from the button of the page, and come back to the list', () => {

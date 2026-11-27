@@ -125,6 +125,9 @@ From top to bottom:
    - **the action of a discovered device** ("Add to Gladys", "Update", "Connect in Gladys"…): a
      success closes the sheet and shows "Device added to Gladys" / "Device updated". A device
      that cannot be added says why on a disabled button ("Already created", "Managed by … service").
+     An action that needs a confirmation (`primaryAction.confirm`: a Zigbee2MQTT device added with
+     generic features) asks first in a sheet over this one; Cancel leaves the sheet as it was, a
+     failure shows in it once the confirmation closed.
    - **Edit**, when the integration has an edit page for the device (Bluetooth, MQTT,
      Thermostat).
    - **another request of the card** ("Update" a meter, "Test connection" of a camera). A success

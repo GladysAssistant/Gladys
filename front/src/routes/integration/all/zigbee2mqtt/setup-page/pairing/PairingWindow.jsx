@@ -8,10 +8,20 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../../server/utils/co
 import config from '../../../../../../config';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { stripDeviceStatesForSave } from '../../../../../../utils/device';
-import { MobileGroup, MobileRow, MobileNotice, MobilePill, BigButton } from '../../../../../../components/mobile';
+import {
+  MobileGroup,
+  MobileRow,
+  MobileNotice,
+  MobilePill,
+  BigButton,
+  ConfirmSheet
+} from '../../../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../../../components/integration/mobile';
 import { PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS } from '../constants';
 import { PAIRING_STATUS, getDevicePhotoUrl, getPairingIcon, suggestName, formatCountdown } from './pairingUtils';
+import { withoutSupportFields } from '../../utils/support';
+import AskZigbee2mqtt from '../../commons/AskZigbee2mqtt';
+import { getGenericConfirm } from '../../discover-page/DiscoveredBox';
 import style from './pairing.css';
 
 const T = 'integration.zigbee2mqtt.pairing';
@@ -19,6 +29,10 @@ const TIPS = ['approach', 'mode', 'add'];
 const EDIT_URL = '/dashboard/integration/device/zigbee2mqtt/edit';
 const REQUEST = { ALLOW: 'allow', STOP: 'stop' };
 const STEPS = ['joined', 'interview', 'ready'];
+const S = 'integration.zigbee2mqtt.support';
+
+// A device to add once its interview ended: supported, or with the generic features Zigbee2mqtt deduced (E.3)
+const isAddable = status => status === PAIRING_STATUS.READY || status === PAIRING_STATUS.GENERIC;
 
 // The photo of a device model; the icon of its category without Internet or without known photo (D58)
 class DevicePhoto extends Component {
@@ -46,6 +60,7 @@ const getSteps = status => {
     case PAIRING_STATUS.INTERVIEWING:
       return ['done', 'running', 'todo'];
     case PAIRING_STATUS.READY:
+    case PAIRING_STATUS.GENERIC:
       return ['done', 'done', 'done'];
     case PAIRING_STATUS.UNSUPPORTED:
       return ['done', 'done', 'warning'];
@@ -55,8 +70,13 @@ const getSteps = status => {
   }
 };
 
-// The label of a step: the last one says "Not supported" in words, not only by its colour
-const getStepLabel = (step, index) => (index === 2 && step === 'warning' ? 'unsupported' : STEPS[index]);
+// The label of a step: the last one says "Not supported" or "Generic features" in words, not only by its colour
+const getStepLabel = (step, index, status) => {
+  if (index === 2 && step === 'warning') {
+    return 'unsupported';
+  }
+  return index === 2 && status === PAIRING_STATUS.GENERIC ? 'generic' : STEPS[index];
+};
 
 // `inline` on a phone: in the row, a button or a link, which holds no list. A live region: a step that changes is told
 // to a screen reader (the countdown is not in it)
@@ -68,7 +88,7 @@ const Timeline = ({ status, inline }) => {
       {getSteps(status).map((step, index) => (
         <Step key={index} class={cx(style.timelineStep, style[`timeline-${step}`])}>
           <span class={style.timelineDot} aria-hidden="true" />
-          <Text id={`${T}.steps.${getStepLabel(step, index)}`} />
+          <Text id={`${T}.steps.${getStepLabel(step, index, status)}`} />
           {/* What the dot and the colours tell, for a screen reader */}
           <span class="sr-only">
             {' '}
@@ -186,7 +206,7 @@ class PairingWindow extends Component {
     const names = [...this.takenNames];
     entries.forEach(entry => {
       const previous = previousCards[entry.ieee_address];
-      const toAdd = entry.status === PAIRING_STATUS.READY && entry.device && entry.device.id === undefined;
+      const toAdd = isAddable(entry.status) && entry.device && entry.device.id === undefined;
       if (observed && previous && previous.added && toAdd) {
         cards[entry.ieee_address] = { ...previous, added: false, existing: false, selector: null, edited: true };
         names.push(previous.name);
@@ -266,7 +286,11 @@ class PairingWindow extends Component {
           return featureName ? { ...feature, name: featureName } : feature;
         })
       };
-      const saved = await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(device));
+      // What GET /pairing adds for the page is not saved with the device (docs/specs/zigbee2mqtt-pairing.md, E.2)
+      const saved = await this.props.httpClient.post(
+        '/api/v1/device',
+        stripDeviceStatesForSave(withoutSupportFields(device))
+      );
       if (!this.unmounted) {
         this.takenNames.push(saved.name);
         this.updateCard(ieeeAddress, { saving: false, added: true, name: saved.name, selector: saved.selector });
@@ -278,6 +302,24 @@ class PairingWindow extends Component {
         this.updateCard(ieeeAddress, { saving: false, error: true });
       }
       return false;
+    }
+  };
+
+  // A generic device is added once the user confirmed it (E.3)
+  askGenericConfirm = entry => this.setState({ confirmEntry: entry });
+
+  cancelGenericConfirm = () => {
+    const { confirmEntry, cards } = this.state;
+    const card = confirmEntry && cards[confirmEntry.ieee_address];
+    if (!(card && card.saving)) {
+      this.setState({ confirmEntry: null });
+    }
+  };
+
+  confirmGeneric = async () => {
+    await this.add(this.state.confirmEntry);
+    if (!this.unmounted) {
+      this.setState({ confirmEntry: null });
     }
   };
 
@@ -349,7 +391,9 @@ class PairingWindow extends Component {
       // By IEEE address: { name, edited, roomId, saving, error, added, existing, selector }; existing: found already in
       // Gladys when added (added meanwhile elsewhere), not saved over
       cards: {},
-      houses: []
+      houses: [],
+      // The generic entry whose Add waits for the confirmation (desktop; the phone sheet asks itself)
+      confirmEntry: null
     };
     // Number the requests: only the answer of the last one counts, and a message is more recent than any of them
     this.permitJoinRequests = 0;
@@ -577,12 +621,15 @@ class PairingWindow extends Component {
     }
     if (status === PAIRING_STATUS.UNSUPPORTED) {
       return (
-        <p class={style.advice} data-cy="z2m-pairing-unsupported">
-          <Text id={`${T}.unsupportedText`} />
-        </p>
+        <div data-cy="z2m-pairing-unsupported">
+          <p class={style.advice}>
+            <Text id={`${S}.unsupportedText`} />
+          </p>
+          <AskZigbee2mqtt device={device} />
+        </div>
       );
     }
-    if (status !== PAIRING_STATUS.READY) {
+    if (!isAddable(status)) {
       return null;
     }
     if (!device) {
@@ -608,8 +655,17 @@ class PairingWindow extends Component {
       );
     }
     const id = entry.ieee_address;
+    const generic = status === PAIRING_STATUS.GENERIC;
     return (
       <div class={style.card} data-cy="z2m-pairing-card">
+        {generic && (
+          <p class={style.advice} data-cy="z2m-pairing-generic">
+            <span class="badge badge-warning mr-2">
+              <Text id={`${S}.genericBadge`} />
+            </span>
+            <Text id={`${S}.genericText`} />
+          </p>
+        )}
         <div class={style.cardFields}>
           <div class="form-group mb-0">
             <label class="form-label" for={`z2m-pairing-name-${id}`}>
@@ -656,7 +712,7 @@ class PairingWindow extends Component {
           <button
             type="button"
             class={cx('btn btn-success', { 'btn-loading': card.saving })}
-            onClick={() => this.add(entry)}
+            onClick={() => (generic ? this.askGenericConfirm(entry) : this.add(entry))}
             disabled={card.saving}
             data-cy="z2m-pairing-add"
           >
@@ -668,6 +724,11 @@ class PairingWindow extends Component {
             <Text id={`${T}.addError`} />
           </div>
         )}
+        {generic && (
+          <div class="mt-3">
+            <AskZigbee2mqtt device={device} />
+          </div>
+        )}
       </div>
     );
   }
@@ -675,11 +736,13 @@ class PairingWindow extends Component {
   // The name of a device in its row: its card name once ready, the name Zigbee2mqtt gave it otherwise
   getTitle = (entry, card) => (card && card.name) || get(entry, 'device.name') || entry.friendly_name;
 
-  // Not supported, its description is the one Zigbee2mqtt generates ("Automatically generated definition"): its model
+  // Not supported or generic, its description is the one Zigbee2mqtt generates ("Automatically generated definition"): its model
   // tells more
   getSubtitle = entry => {
     const model = [entry.vendor, entry.model].filter(Boolean).join(' ') || null;
-    return entry.status === PAIRING_STATUS.UNSUPPORTED ? model : entry.description || model;
+    return entry.status === PAIRING_STATUS.UNSUPPORTED || entry.status === PAIRING_STATUS.GENERIC
+      ? model
+      : entry.description || model;
   };
 
   renderDesktopRow = entry => {
@@ -705,7 +768,8 @@ class PairingWindow extends Component {
     const card = this.state.cards[entry.ieee_address];
     const { device, status } = entry;
     const timeline = <Timeline status={status} inline />;
-    if (status === PAIRING_STATUS.READY && device && device.id === undefined && card && !card.added) {
+    const generic = status === PAIRING_STATUS.GENERIC;
+    if (isAddable(status) && device && device.id === undefined && card && !card.added) {
       return (
         <MobileDeviceItem
           key={entry.ieee_address}
@@ -714,11 +778,16 @@ class PairingWindow extends Component {
           houses={this.state.houses}
           subtitle={this.getSubtitle(entry)}
           pills={timeline}
-          notices={
-            <div class={style.sheetPhoto}>
+          notices={[
+            <div key="photo" class={style.sheetPhoto}>
               <DevicePhoto model={entry.model} device={device} />
-            </div>
-          }
+            </div>,
+            generic && (
+              <MobileNotice key="generic" tone="warning" icon="alert-triangle" data-cy="z2m-pairing-generic">
+                <Text id={`${S}.genericText`} />
+              </MobileNotice>
+            )
+          ]}
           onNameChange={this.updateName(entry.ieee_address)}
           onRoomChange={this.updateRoom(entry.ieee_address)}
           namePlaceholderId="integration.zigbee2mqtt.namePlaceholder"
@@ -729,10 +798,35 @@ class PairingWindow extends Component {
             label: <Text id={`${T}.add`} />,
             onClick: () => this.add(entry),
             toast: <Text id="mobileDeviceList.added" />,
-            dataCy: 'z2m-pairing-add'
+            dataCy: 'z2m-pairing-add',
+            confirm: generic ? getGenericConfirm(get(this.props, 'intl.dictionary')) : undefined
           }}
           dataCy="z2m-pairing-row"
-        />
+        >
+          {generic && <AskZigbee2mqtt device={device} isMobile />}
+        </MobileDeviceItem>
+      );
+    }
+    // Not supported, known by Gladys: its sheet holds what to do about it (E.4)
+    if (status === PAIRING_STATUS.UNSUPPORTED && device) {
+      return (
+        <MobileDeviceItem
+          key={entry.ieee_address}
+          device={device}
+          icon={getPairingIcon(device)}
+          title={this.getTitle(entry, card)}
+          subtitle={this.renderMobileOutcome(entry, card)}
+          pills={timeline}
+          notices={
+            <MobileNotice tone="warning" icon="alert-triangle">
+              <Text id={`${S}.unsupportedText`} />
+            </MobileNotice>
+          }
+          guard={false}
+          dataCy="z2m-pairing-row"
+        >
+          <AskZigbee2mqtt device={device} isMobile />
+        </MobileDeviceItem>
       );
     }
     const selector = card && card.added ? card.selector : device && device.id !== undefined && device.selector;
@@ -764,11 +858,11 @@ class PairingWindow extends Component {
       return (
         <span data-cy="z2m-pairing-unsupported">
           {model && <span class="d-block">{model}</span>}
-          <Text id={`${T}.unsupportedText`} />
+          <Text id={`${S}.unsupportedText`} />
         </span>
       );
     }
-    if (status !== PAIRING_STATUS.READY) {
+    if (!isAddable(status)) {
       return this.getSubtitle(entry);
     }
     if (!device) {
@@ -785,12 +879,10 @@ class PairingWindow extends Component {
   countToAdd = () =>
     this.state.entries.filter(entry => {
       const card = this.state.cards[entry.ieee_address];
-      return (
-        entry.status === PAIRING_STATUS.READY && entry.device && entry.device.id === undefined && card && !card.added
-      );
+      return isAddable(entry.status) && entry.device && entry.device.id === undefined && card && !card.added;
     }).length;
 
-  render({ isMobile, online }, { entries, loadError, allowed }) {
+  render({ isMobile, online }, { entries, loadError, allowed, confirmEntry, cards }) {
     const empty = entries.length === 0;
     const toAdd = this.countToAdd();
     return (
@@ -824,6 +916,16 @@ class PairingWindow extends Component {
               <Text id={`${T}.toAdd`} plural={toAdd} fields={{ count: toAdd }} />
             </div>
           ))}
+        {!isMobile && (
+          <ConfirmSheet
+            open={Boolean(confirmEntry)}
+            {...getGenericConfirm(get(this.props, 'intl.dictionary'))}
+            loading={Boolean(confirmEntry && get(cards, `${confirmEntry.ieee_address}.saving`))}
+            onConfirm={this.confirmGeneric}
+            onCancel={this.cancelGenericConfirm}
+            dataCy="z2m-pairing-generic-confirm"
+          />
+        )}
       </div>
     );
   }

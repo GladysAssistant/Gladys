@@ -2478,8 +2478,8 @@
         "noNewDevice": "No new device found.",
         "serverNoResponse": "Gladys server is not available.",
         "serverNoResponseWebSocker": "Gladys server is not available. Please refresh the page.",
-        "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
-        "createGithubIssue": "Suggest this device",
+        "deviceNotHandled": "Zigbee2MQTT knows this device, but Gladys cannot use any of its features yet. Suggest it on the forum!",
+        "suggestDevice": "Suggest this device",
         "addToGladys": "Add to Gladys"
       },
       "noDeviceFound": "No Zigbee2MQTT device found.",
@@ -2528,7 +2528,8 @@
           "joined": "Joined",
           "interview": "Identification",
           "ready": "Ready",
-          "unsupported": "Not supported"
+          "unsupported": "Not supported",
+          "generic": "Generic features"
         },
         "stepStates": {
           "done": "(done)",
@@ -2538,7 +2539,6 @@
           "todo": "(to come)"
         },
         "preparing": "Getting the device ready…",
-        "unsupportedText": "Zigbee2MQTT does not support this model: Gladys cannot add it.",
         "failedText": "The identification failed. Bring the device closer to the dongle or to a mains-powered device, then put it in pairing mode again.",
         "leftText": "The device left the network before its identification ended. Put it in pairing mode again.",
         "add": "Add to Gladys",
@@ -2551,6 +2551,23 @@
           "one": "1 ready device is not added yet: it stays here until you add it.",
           "other": "{{count}} ready devices are not added yet: they stay here until you add them."
         }
+      },
+      "support": {
+        "genericBadge": "Generic features",
+        "genericText": "Zigbee2MQTT does not know this model: these features are deduced from what the device declares. Some may be missing or not work.",
+        "confirmTitle": "Add with generic features?",
+        "confirmText": "Zigbee2MQTT does not know this model. Gladys will create the features Zigbee2MQTT deduced from what the device declares: some may be missing or not work. Add it anyway?",
+        "confirmAdd": "Add",
+        "unsupportedText": "Zigbee2MQTT does not know this model and found nothing Gladys can control on it.",
+        "askZigbee2mqtt": "Ask Zigbee2MQTT to support it",
+        "copyInformation": "Copy the information",
+        "copied": "Copied",
+        "copyRefused": "The browser refused the copy: select the text below and copy it.",
+        "interviewFailed": "Identification failed",
+        "sectionTitle": "Not supported by Zigbee2MQTT ({{count}})",
+        "sectionText": "Models Zigbee2MQTT does not know: some can be added with generic features, the others can be reported.",
+        "forumTitle": "Zigbee2MQTT: support for {{model}}",
+        "forumCut": "(cut: the exposes are too long for a link)"
       }
     },
     "nodeRed": {

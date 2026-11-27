@@ -2478,8 +2478,8 @@
         "noNewDevice": "No se encontró ningún dispositivo nuevo.",
         "serverNoResponse": "El servidor Gladys no está disponible.",
         "serverNoResponseWebSocker": "El servidor Gladys no está disponible. Actualice la página.",
-        "deviceNotHandled": "Este dispositivo aún no es compatible; póngase en contacto con nosotros para ayudarnos a conectarlo en Gladys.",
-        "createGithubIssue": "Sugerir este dispositivo",
+        "deviceNotHandled": "Zigbee2MQTT conoce este dispositivo, pero Gladys aún no puede usar ninguna de sus funciones. ¡Propónlo en el foro!",
+        "suggestDevice": "Proponer este dispositivo",
         "addToGladys": "Añadir a Gladys"
       },
       "noDeviceFound": "No se encontró ningún dispositivo Zigbee2MQTT.",
@@ -2528,7 +2528,8 @@
           "joined": "Unido",
           "interview": "Identificación",
           "ready": "Listo",
-          "unsupported": "No compatible"
+          "unsupported": "No compatible",
+          "generic": "Funciones genéricas"
         },
         "stepStates": {
           "done": "(completado)",
@@ -2538,7 +2539,6 @@
           "todo": "(pendiente)"
         },
         "preparing": "Preparando el dispositivo…",
-        "unsupportedText": "Zigbee2MQTT no admite este modelo: Gladys no puede añadirlo.",
         "failedText": "La identificación ha fallado. Acerca el dispositivo a la llave o a un dispositivo conectado a la red eléctrica y vuelve a ponerlo en modo emparejamiento.",
         "leftText": "El dispositivo ha salido de la red antes de terminar su identificación. Vuelve a ponerlo en modo emparejamiento.",
         "add": "Añadir a Gladys",
@@ -2551,6 +2551,23 @@
           "one": "1 dispositivo listo aún no se ha añadido: se queda aquí hasta que lo añadas.",
           "other": "{{count}} dispositivos listos aún no se han añadido: se quedan aquí hasta que los añadas."
         }
+      },
+      "support": {
+        "genericBadge": "Funciones genéricas",
+        "genericText": "Zigbee2MQTT no conoce este modelo: estas funciones se deducen de lo que declara el dispositivo. Algunas pueden faltar o no funcionar.",
+        "confirmTitle": "¿Añadir con funciones genéricas?",
+        "confirmText": "Zigbee2MQTT no conoce este modelo. Gladys creará las funciones que Zigbee2MQTT dedujo de lo que declara el dispositivo: algunas pueden faltar o no funcionar. ¿Añadirlo de todos modos?",
+        "confirmAdd": "Añadir",
+        "unsupportedText": "Zigbee2MQTT no conoce este modelo y no encontró nada que Gladys pueda controlar.",
+        "askZigbee2mqtt": "Pedir a Zigbee2MQTT que lo soporte",
+        "copyInformation": "Copiar la información",
+        "copied": "Copiado",
+        "copyRefused": "El navegador rechazó la copia: selecciona el texto de abajo y cópialo.",
+        "interviewFailed": "Identificación fallida",
+        "sectionTitle": "No soportados por Zigbee2MQTT ({{count}})",
+        "sectionText": "Modelos que Zigbee2MQTT no conoce: algunos se pueden añadir con funciones genéricas, los demás se pueden notificar.",
+        "forumTitle": "Zigbee2MQTT: soporte para {{model}}",
+        "forumCut": "(cortado: los exposes son demasiado largos para un enlace)"
       }
     },
     "nodeRed": {
