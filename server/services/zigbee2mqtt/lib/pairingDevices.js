@@ -100,7 +100,8 @@ function emitPairingDevices(entries = this.getPairingDevices()) {
 
 /**
  * @description Forget the devices seen joining (joining opens again, Gladys disconnects), and tell it. A new window
- * keeps the ready devices not in Gladys yet: the user may not have added them before it opened (C.2).
+ * keeps the ready devices not in Gladys yet: the user may not have added them before it opened (C.2). Not the generic
+ * ones: their confirmation says features may be missing, declining it is an answer; the Discover tab keeps them (E.5).
  * @param {boolean} [keepDevicesToAdd] - Whether the ready devices not in Gladys are kept.
  * @example
  * clearPairingDevices(true);
@@ -109,11 +110,7 @@ function clearPairingDevices(keepDevicesToAdd = false) {
   const kept = new Set(
     keepDevicesToAdd
       ? this.getPairingDevices()
-          .filter(
-            (entry) =>
-              [PAIRING_STATUS.READY, PAIRING_STATUS.GENERIC].includes(entry.status) &&
-              !(entry.device && entry.device.id !== undefined),
-          )
+          .filter((entry) => entry.status === PAIRING_STATUS.READY && !(entry.device && entry.device.id !== undefined))
           .map((entry) => entry.ieee_address)
       : [],
   );

@@ -136,6 +136,9 @@ From top to bottom:
    - A button shows a spinner while its request runs, and the other ones are disabled meanwhile
      — **and so are the fields of the sheet** (name, room, switches): what would be typed after
      "Save" is not in the request, and would be taken for saved the next time the sheet opens.
+7. **What the integration offers besides the action** (`footer`: reporting a Zigbee2MQTT device to
+   Zigbee2MQTT or to the Gladys forum), after the buttons: the action the sheet is opened for comes
+   first, its secondary links do not push it below the fold.
 
 **A failure stays where the thumb is**: the sheet stays open and the error shows right above the
 buttons — the sentence of the desktop card when it has one (with its technical detail for Matter
@@ -332,10 +335,13 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   prefilled topic of the Gladys forum, in a new tab). With nothing but a battery, it is "Not supported":
   no Add, the same link. The devices
   Zigbee2MQTT does not support are in a row "Not supported by Zigbee2MQTT (n)" after the list, which
-  opens and closes their section: a device with generic features is added with "Add to Gladys" after
-  a confirmation sheet, the others hold "Ask Zigbee2MQTT to support it" and "Copy the information",
-  or the advice of a failed identification (`zigbee2mqtt-pairing.md`, E). The empty list says "No new
-  device found." — the button above it is the next step.
+  opens and closes their section (open when it holds a device that can be added, which it counts): a device
+  with generic features is added with "Add to Gladys" after a confirmation sheet, the others hold "Ask
+  Zigbee2MQTT to support it" and "Copy the information", or the advice of a failed identification
+  (`zigbee2mqtt-pairing.md`, E). These reports, and "Suggest this device", are after the buttons
+  (D.7). A device that cannot be added has no name field: its model ID, manufacturer and IEEE address are
+  its details. The empty list says "No new device found." — the button above it is the next step; with only
+  devices of the section, it says "No new device supported by Zigbee2MQTT.".
 
 ## F. What does not change
 

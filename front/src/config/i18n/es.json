@@ -2476,6 +2476,7 @@
         "hideExistingDevices": "Ocultar dispositivos ya añadidos",
         "noDeviceDiscovered": "Ningún dispositivo nuevo en la red. Para añadir uno, haz clic en «Emparejar un dispositivo».",
         "noNewDevice": "No se encontró ningún dispositivo nuevo.",
+        "noNewSupportedDevice": "Ningún dispositivo nuevo compatible con Zigbee2MQTT.",
         "serverNoResponse": "El servidor Gladys no está disponible.",
         "serverNoResponseWebSocker": "El servidor Gladys no está disponible. Actualice la página.",
         "deviceNotHandled": "Zigbee2MQTT conoce este dispositivo, pero Gladys aún no puede usar ninguna de sus funciones. ¡Propónlo en el foro!",
@@ -2536,6 +2537,7 @@
           "running": "(en curso)",
           "failed": "(fallido)",
           "warning": "(no compatible)",
+          "partial": "(compatibilidad parcial)",
           "todo": "(pendiente)"
         },
         "preparing": "Preparando el dispositivo…",
@@ -2555,6 +2557,8 @@
       "support": {
         "genericBadge": "Funciones genéricas",
         "genericText": "Zigbee2MQTT no conoce este modelo: estas funciones se deducen de lo que declara el dispositivo. Algunas pueden faltar o no funcionar.",
+        "modelIdLabel": "ID del modelo",
+        "manufacturerLabel": "Fabricante",
         "confirmTitle": "¿Añadir con funciones genéricas?",
         "confirmText": "Zigbee2MQTT no conoce este modelo. Gladys creará las funciones que Zigbee2MQTT dedujo de lo que declara el dispositivo: algunas pueden faltar o no funcionar. ¿Añadirlo de todos modos?",
         "confirmAdd": "Añadir",
@@ -2564,8 +2568,13 @@
         "copied": "Copiado",
         "copyRefused": "El navegador rechazó la copia: selecciona el texto de abajo y cópialo.",
         "interviewFailed": "Identificación fallida",
+        "unknownModel": "Desconocido para Zigbee2MQTT",
         "sectionTitle": "No soportados por Zigbee2MQTT ({{count}})",
         "sectionText": "Dispositivos que Zigbee2MQTT no soporta o no pudo identificar: algunos se pueden añadir con funciones genéricas, otros se pueden notificar o deben emparejarse de nuevo.",
+        "sectionAddable": {
+          "one": "1 se puede añadir con funciones genéricas.",
+          "other": "{{count}} se pueden añadir con funciones genéricas."
+        },
         "forumTitle": "Zigbee2MQTT: soporte para {{model}}",
         "forumCut": "(cortado: los exposes son demasiado largos para un enlace)",
         "onlySecondary": "Gladys solo usa la batería o la señal de este dispositivo. ¡Propónlo en el foro para que tenga sus funciones!"

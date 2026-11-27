@@ -42,6 +42,8 @@ const getSignature = (device, extraSignature) =>
  *   ("Edit");
  *   with `keepOpen` a success leaves the sheet open (its result shows in it: a connection test);
  * - onDelete: "Delete", confirmed in a sheet.
+ * `footer`, after the buttons: what the integration offers besides the action of the sheet (reporting a device to
+ * its maker or to the Gladys forum), so that the action comes first.
  * onSave, primaryAction.onClick and onDelete return a promise of `false` when they failed: the
  * sheet then stays open with `saveError` / `deleteError` (or a default sentence).
  * `deleteScheduled`: the deletion was not refused, Gladys does it in the background (a device
@@ -335,7 +337,8 @@ class MobileDeviceItem extends Component {
       saveError,
       primaryAction,
       actions = [],
-      onDelete
+      onDelete,
+      footer
     } = this.props;
     const { busy, failed } = this.state;
     const { deleteScheduled } = this.props;
@@ -470,6 +473,11 @@ class MobileDeviceItem extends Component {
             </BigButton>
           )}
         </div>
+        {footer && (
+          <div class={style.sheetFooter} data-cy="integration-device-footer">
+            {footer}
+          </div>
+        )}
       </div>
     );
   };

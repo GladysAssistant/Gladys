@@ -286,8 +286,11 @@ describe('zigbee2mqtt pairingDevices', () => {
       expect(lastSent()[1].device).to.deep.equal({ name: 'to add', ieee_address: '0x03' });
     });
 
-    it('should keep the generic devices not in Gladys, not the unsupported ones', () => {
-      zigbee2MqttManager.getDiscoveredDevices = fake.returns([{ name: 'generic', ieee_address: '0x01' }]);
+    it('should keep neither the generic devices not in Gladys nor the unsupported ones', () => {
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([
+        { name: 'generic', ieee_address: '0x01' },
+        { name: 'ready', ieee_address: '0x03' },
+      ]);
       const notSupported = { status: 'successful', supported: false };
       zigbee2MqttManager.handleBridgeEvent({
         type: 'device_interview',
@@ -297,8 +300,13 @@ describe('zigbee2mqtt pairingDevices', () => {
         type: 'device_interview',
         data: { ieee_address: '0x02', ...notSupported, definition: { exposes: [linkquality] } },
       });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: '0x03', status: 'successful', supported: true, definition },
+      });
       zigbee2MqttManager.clearPairingDevices(true);
-      expect(Object.keys(zigbee2MqttManager.pairingDevices)).to.deep.equal(['0x01']);
+      // Declining the confirmation of a generic device is an answer: it stays in the Discover tab only
+      expect(Object.keys(zigbee2MqttManager.pairingDevices)).to.deep.equal(['0x03']);
     });
 
     it('should tell nothing when every device is kept', () => {

@@ -294,6 +294,16 @@
   font-weight: 600;
 }
 
+/* generic features: reached, amber as the badge of its card */
+.timeline-partial {
+  color: #b7791f;
+  font-weight: 600;
+}
+
+.timeline-partial .timelineDot {
+  background: currentColor;
+}
+
 /* ---------- what happened to it ---------- */
 
 .advice {

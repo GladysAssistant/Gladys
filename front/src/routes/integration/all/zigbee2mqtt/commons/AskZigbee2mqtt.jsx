@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 
 import copyText from '../utils/copyText';
 import { Z2M_SUPPORT_NEW_DEVICES_URL, getZigbee2mqttReport } from '../utils/support';
@@ -67,8 +68,17 @@ class AskZigbee2mqtt extends Component {
             )}
           </div>
         )}
-        <span class="small text-success" aria-live="polite" data-cy="z2m-support-copied">
-          {copied && <Text id={`${T}.copied`} />}
+        {/* The text in the colour of the page (the green of Tabler is under the contrast of small text), the check
+            telling it; a line of its own, spaced from the buttons on a phone */}
+        <span
+          class={cx('d-block small', { 'mt-2': copied && isMobile })}
+          aria-live="polite"
+          data-cy="z2m-support-copied"
+        >
+          {copied && [
+            <i key="icon" class="fe fe-check text-success mr-1" aria-hidden="true" />,
+            <Text key="text" id={`${T}.copied`} />
+          ]}
         </span>
         {refusedText && (
           <div class="mt-2" data-cy="z2m-support-copy-refused">

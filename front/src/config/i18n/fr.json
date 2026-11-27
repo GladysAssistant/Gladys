@@ -2853,10 +2853,11 @@
         "hideExistingDevices": "Cacher les appareils déjà ajoutés",
         "noDeviceDiscovered": "Aucun nouvel appareil dans le réseau. Pour en ajouter un, cliquez sur « Appairer un appareil ».",
         "noNewDevice": "Aucun nouvel appareil trouvé.",
+        "noNewSupportedDevice": "Aucun nouvel appareil pris en charge par Zigbee2MQTT.",
         "serverNoResponse": "Gladys n'est pas accessible.",
         "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",
         "deviceNotHandled": "Zigbee2MQTT connaît cet appareil, mais Gladys ne sait encore utiliser aucune de ses fonctions. Proposez-le sur le forum !",
-        "suggestDevice": "Proposer ce périphérique",
+        "suggestDevice": "Proposer cet appareil",
         "addToGladys": "Ajouter à Gladys"
       },
       "noDeviceFound": "Aucun appareil zigbee2mqtt n'a encore été ajouté.",
@@ -2913,6 +2914,7 @@
           "running": "(en cours)",
           "failed": "(échoué)",
           "warning": "(non pris en charge)",
+          "partial": "(prise en charge partielle)",
           "todo": "(à venir)"
         },
         "preparing": "Préparation de l'appareil…",
@@ -2931,9 +2933,11 @@
       },
       "support": {
         "genericBadge": "Fonctions génériques",
-        "genericText": "Zigbee2MQTT ne connaît pas ce modèle : ces fonctions sont déduites de ce que l'appareil déclare. Certaines peuvent manquer ou ne pas marcher.",
+        "genericText": "Zigbee2MQTT ne connaît pas ce modèle : ces fonctions sont déduites de ce que l'appareil déclare. Certaines peuvent manquer ou ne pas fonctionner.",
+        "modelIdLabel": "Identifiant du modèle",
+        "manufacturerLabel": "Fabricant",
         "confirmTitle": "Ajouter avec des fonctions génériques ?",
-        "confirmText": "Zigbee2MQTT ne connaît pas ce modèle. Gladys va créer les fonctions que Zigbee2MQTT a déduites de ce que l'appareil déclare : certaines peuvent manquer ou ne pas marcher. L'ajouter quand même ?",
+        "confirmText": "Zigbee2MQTT ne connaît pas ce modèle. Gladys va créer les fonctions que Zigbee2MQTT a déduites de ce que l'appareil déclare : certaines peuvent manquer ou ne pas fonctionner. L'ajouter quand même ?",
         "confirmAdd": "Ajouter",
         "unsupportedText": "Zigbee2MQTT ne connaît pas ce modèle et n'y a rien trouvé que Gladys puisse piloter.",
         "askZigbee2mqtt": "Demander sa prise en charge à Zigbee2MQTT",
@@ -2941,8 +2945,13 @@
         "copied": "Copié",
         "copyRefused": "Le navigateur a refusé la copie : sélectionnez le texte ci-dessous et copiez-le.",
         "interviewFailed": "Identification échouée",
+        "unknownModel": "Inconnu de Zigbee2MQTT",
         "sectionTitle": "Non pris en charge par Zigbee2MQTT ({{count}})",
         "sectionText": "Des appareils que Zigbee2MQTT ne prend pas en charge ou n'a pas pu identifier : certains s'ajoutent avec des fonctions génériques, d'autres peuvent être signalés ou doivent être réappairés.",
+        "sectionAddable": {
+          "one": "1 peut être ajouté avec des fonctions génériques.",
+          "other": "{{count}} peuvent être ajoutés avec des fonctions génériques."
+        },
         "forumTitle": "Zigbee2MQTT : prise en charge de {{model}}",
         "forumCut": "(coupé : les exposes sont trop longs pour un lien)",
         "onlySecondary": "Gladys n'utilise que la batterie ou le signal de cet appareil. Proposez-le sur le forum pour qu'il ait ses fonctions !"

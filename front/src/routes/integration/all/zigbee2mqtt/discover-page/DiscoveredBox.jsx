@@ -1,28 +1,36 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import { getZ2mDeviceUrl } from '../utils/getZ2mUrl';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
 import style from './style.css';
 import { MobileNotice, MobilePill, ConfirmSheet, kitStyle } from '../../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../../components/integration/mobile';
 import AskZigbee2mqtt from '../commons/AskZigbee2mqtt';
 import SuggestDevice from '../commons/SuggestDevice';
-import { ZIGBEE2MQTT_SUPPORT, getSupport, hasUsefulFeature } from '../utils/support';
+import { getGenericConfirm } from '../commons/genericConfirm';
+import { ZIGBEE2MQTT_SUPPORT, getUsage } from '../utils/support';
 
 const S = 'integration.zigbee2mqtt.support';
 
-// The confirmation of a device added with the features Zigbee2mqtt generated (E.3)
-export const getGenericConfirm = dictionary => ({
-  title: get(dictionary, `${S}.confirmTitle`),
-  text: <Text id={`${S}.confirmText`} />,
-  confirmLabel: <Text id={`${S}.confirmAdd`} />
-});
+// What tells which physical device a card that cannot add it is about: its model and manufacturer as Zigbee2mqtt
+// tells them, and its IEEE address when its name is not already it (docs/specs/zigbee2mqtt-pairing.md, E.5)
+const getIdentity = device => {
+  const info = device.zigbee2mqtt_info || {};
+  return [
+    { id: 'model-id', label: <Text id={`${S}.modelIdLabel`} />, value: info.model_id, mono: true },
+    { id: 'manufacturer', label: <Text id={`${S}.manufacturerLabel`} />, value: info.manufacturer },
+    device.ieee_address !== device.name && {
+      id: 'ieee-address',
+      label: <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />,
+      value: device.ieee_address,
+      mono: true
+    }
+  ].filter(detail => detail && detail.value);
+};
 
 class DiscoveredBox extends Component {
   updateName = e => {
@@ -75,36 +83,81 @@ class DiscoveredBox extends Component {
     return saved;
   };
 
-  // What the card says of a device it cannot add as is (docs/specs/zigbee2mqtt-pairing.md, E.4)
+  // What the card says of a device it cannot add as is (docs/specs/zigbee2mqtt-pairing.md, E.4): its explanation, and
+  // the report it can make (none for a failed identification)
   renderNotUsable({ device, support, isMobile, dictionary }) {
-    const notice = id =>
+    const notice = (id, dataCy) =>
       isMobile ? (
-        <MobileNotice tone="warning" icon="alert-triangle">
+        <MobileNotice tone="warning" icon="alert-triangle" data-cy={dataCy}>
           <Text id={id} />
         </MobileNotice>
       ) : (
-        <div class="alert alert-warning">
+        <div class="alert alert-warning" data-cy={dataCy}>
           <Text id={id} />
         </div>
       );
     if (support === ZIGBEE2MQTT_SUPPORT.INTERVIEW_FAILED) {
-      return (
-        <div data-cy="z2m-discovered-interview-failed">{notice('integration.zigbee2mqtt.pairing.failedText')}</div>
-      );
+      return {
+        notice: notice('integration.zigbee2mqtt.pairing.failedText', 'z2m-discovered-interview-failed'),
+        report: null
+      };
     }
     if (support === ZIGBEE2MQTT_SUPPORT.UNSUPPORTED) {
-      return (
-        <div data-cy="z2m-discovered-unsupported">
-          {notice(`${S}.unsupportedText`)}
-          <AskZigbee2mqtt device={device} isMobile={isMobile} />
-        </div>
-      );
+      return {
+        notice: notice(`${S}.unsupportedText`, 'z2m-discovered-unsupported'),
+        report: <AskZigbee2mqtt device={device} isMobile={isMobile} />
+      };
     }
     // Known by Zigbee2mqtt, no feature Gladys can use, not even a signal
+    return {
+      notice: notice('integration.zigbee2mqtt.discover.deviceNotHandled', 'z2m-discovered-not-handled'),
+      report: <SuggestDevice device={device} dictionary={dictionary} isMobile={isMobile} />
+    };
+  }
+
+  // The pill of a device the row cannot add: in Gladys already, its identification failed, a model Zigbee2mqtt does
+  // not know, or a model Gladys cannot use
+  getNotUsableLabel(device, support) {
+    if (device.created_at) {
+      return 'mobileDeviceList.inGladys';
+    }
+    if (support === ZIGBEE2MQTT_SUPPORT.INTERVIEW_FAILED) {
+      return `${S}.interviewFailed`;
+    }
+    if (support === ZIGBEE2MQTT_SUPPORT.UNSUPPORTED) {
+      return `${S}.unknownModel`;
+    }
+    return 'mobileDeviceList.notSupported';
+  }
+
+  // A device the card cannot add: what it is as text, not a field to fill in with nothing to save (E.5)
+  renderIdentity(device) {
+    const identity = getIdentity(device);
     return (
-      <div data-cy="z2m-discovered-not-handled">
-        {notice('integration.zigbee2mqtt.discover.deviceNotHandled')}
-        <SuggestDevice device={device} dictionary={dictionary} isMobile={isMobile} />
+      <div class="mb-3" data-cy="z2m-discovered-identity">
+        <div class={cx('h4 mb-2', style.identityName)} data-cy="z2m-discovered-name">
+          {device.name}
+        </div>
+        {identity.length > 0 && (
+          <dl class={style.identity}>
+            {identity.map(detail => (
+              <div key={detail.id} class={style.identityRow}>
+                <dt>{detail.label}</dt>
+                <dd class={cx({ 'text-monospace': detail.mono })}>{detail.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
+    );
+  }
+
+  renderNotUsableDesktop(params) {
+    const { notice, report } = this.renderNotUsable({ ...params, isMobile: false });
+    return (
+      <div>
+        {notice}
+        {report}
       </div>
     );
   }
@@ -129,15 +182,9 @@ class DiscoveredBox extends Component {
     let primaryAction;
     if (!usable) {
       // Already in Gladys (added before, not recognized since): said so, nothing to add or update
-      let label = 'mobileDeviceList.notSupported';
-      if (device.created_at) {
-        label = 'mobileDeviceList.inGladys';
-      } else if (support === ZIGBEE2MQTT_SUPPORT.INTERVIEW_FAILED) {
-        label = `${S}.interviewFailed`;
-      }
       status = (
-        <MobilePill tone={device.created_at ? 'success' : undefined}>
-          <Text id={label} />
+        <MobilePill tone={device.created_at ? 'success' : undefined} data-cy="z2m-discovered-status">
+          <Text id={this.getNotUsableLabel(device, support)} />
         </MobilePill>
       );
     } else if (enableUpdateButton) {
@@ -167,21 +214,25 @@ class DiscoveredBox extends Component {
         confirm: generic ? getGenericConfirm(dictionary) : undefined
       };
     }
+    // The reports come after the action of the sheet: they are not what one opens it for
     let notices = null;
+    let report = null;
     if (generic) {
       notices = (
         <MobileNotice tone="warning" icon="alert-triangle">
           <Text id={`${S}.genericText`} />
         </MobileNotice>
       );
+      report = <AskZigbee2mqtt device={device} isMobile />;
     } else if (onlySecondary) {
       notices = (
         <MobileNotice icon="info" data-cy="z2m-discovered-only-secondary">
           <Text id={`${S}.onlySecondary`} />
         </MobileNotice>
       );
+      report = <SuggestDevice device={device} dictionary={dictionary} isMobile />;
     } else if (!usable) {
-      notices = this.renderNotUsable({ device, support, isMobile: true, dictionary });
+      ({ notice: notices, report } = this.renderNotUsable({ device, support, isMobile: true, dictionary }));
     }
     return (
       <MobileDeviceItem
@@ -197,10 +248,10 @@ class DiscoveredBox extends Component {
           )
         }
         notices={notices}
-        onNameChange={this.updateName}
+        // A device that cannot be added has no name to type: its sheet tells what it is (E.5)
+        onNameChange={usable ? this.updateName : undefined}
         onRoomChange={usable ? this.updateRoom : undefined}
         namePlaceholderId="integration.zigbee2mqtt.namePlaceholder"
-        fieldsDisabled={!usable}
         guard={false}
         showFeatures={usable}
         details={
@@ -209,10 +260,11 @@ class DiscoveredBox extends Component {
                 { label: <Text id="integration.zigbee2mqtt.topicLabel" />, value: device.external_id, mono: true },
                 { label: <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />, value: ieeeAddress, mono: true }
               ]
-            : []
+            : getIdentity(device)
         }
         saveError={saveError && <Text id="integration.zigbee2mqtt.saveError" />}
         primaryAction={primaryAction}
+        footer={report}
         dataCy="z2m-discovered-row"
       >
         {usable && z2mUrl && ieeeAddress && (
@@ -227,8 +279,6 @@ class DiscoveredBox extends Component {
             <Text id="integration.zigbee2mqtt.openInZ2mButton" />
           </a>
         )}
-        {generic && <AskZigbee2mqtt device={device} isMobile />}
-        {onlySecondary && <SuggestDevice device={device} dictionary={dictionary} isMobile />}
       </MobileDeviceItem>
     );
   }
@@ -237,15 +287,10 @@ class DiscoveredBox extends Component {
     { device = {}, deviceIndex, houses = [], z2mUrl, isMobile, dictionary },
     { loading, saveError, confirmGeneric }
   ) {
-    const { features = [], ieee_address = null } = device;
-    const support = getSupport(device);
+    const { ieee_address = null } = device;
+    // What Gladys can add, and a supported device of which it only uses the battery or signal (E.2, E.4 b)
+    const { support, usable, onlySecondary } = getUsage(device);
     const generic = support === ZIGBEE2MQTT_SUPPORT.GENERIC;
-    const native = support === ZIGBEE2MQTT_SUPPORT.NATIVE;
-    // What Gladys can add: a supported model with a feature besides its battery (a router and its signal included),
-    // or the generic features of a model Zigbee2mqtt does not know (E.2)
-    const usable = generic || (native && features.some(f => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY));
-    // Supported, but only its battery or signal used by Gladys: added all the same, and suggested on the forum (E.4 b)
-    const onlySecondary = native && usable && !hasUsefulFeature(features);
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
     const alreadyExistsButton = usable && !enableSaveButton && !enableUpdateButton;
@@ -281,23 +326,33 @@ class DiscoveredBox extends Component {
                     <Text id="integration.zigbee2mqtt.saveError" />
                   </div>
                 )}
-                <div class="form-group">
-                  <label class="form-label" for={`name_${deviceIndex}`}>
-                    <Text id="integration.zigbee2mqtt.nameLabel" />
-                  </label>
-                  <Localizer>
-                    <input
-                      id={`name_${deviceIndex}`}
-                      type="text"
-                      value={device.name}
-                      onInput={this.updateName}
-                      class="form-control"
-                      placeholder={<Text id="integration.zigbee2mqtt.namePlaceholder" />}
-                      disabled={!usable}
-                    />
-                  </Localizer>
-                </div>
-                {!usable && this.renderNotUsable({ device, support, isMobile: false, dictionary })}
+                {/* Over the name, on the card: inside the warning it took the colours of the warning */}
+                {generic && (
+                  <div class="mb-3">
+                    <span class="badge badge-warning" data-cy="z2m-discovered-generic">
+                      <Text id={`${S}.genericBadge`} />
+                    </span>
+                  </div>
+                )}
+                {usable && (
+                  <div class="form-group">
+                    <label class="form-label" for={`name_${deviceIndex}`}>
+                      <Text id="integration.zigbee2mqtt.nameLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        id={`name_${deviceIndex}`}
+                        type="text"
+                        value={device.name}
+                        onInput={this.updateName}
+                        class="form-control"
+                        placeholder={<Text id="integration.zigbee2mqtt.namePlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+                )}
+                {!usable && this.renderIdentity(device)}
+                {!usable && this.renderNotUsableDesktop({ device, support, dictionary })}
                 {!usable && device.created_at && (
                   <button disabled="true" class="btn btn-primary" data-cy="z2m-discovered-in-gladys">
                     <Text id="integration.zigbee2mqtt.alreadyExistsButton" />
@@ -308,9 +363,6 @@ class DiscoveredBox extends Component {
                   <div>
                     {generic && (
                       <div class="alert alert-warning">
-                        <span class="badge badge-warning mr-2" data-cy="z2m-discovered-generic">
-                          <Text id={`${S}.genericBadge`} />
-                        </span>
                         <Text id={`${S}.genericText`} />
                       </div>
                     )}

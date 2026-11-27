@@ -136,30 +136,56 @@ describe('Zigbee2MQTT devices not supported', () => {
       cy.viewport(1280, 800);
     });
 
-    it('should keep the devices Zigbee2MQTT does not support in a folded section after the list', () => {
+    it('should keep the devices Zigbee2MQTT does not support in a section after the list, open with one to add', () => {
       visitDiscover();
-      cy.get('[data-cy=z2m-discovered-card]').should('have.length', 2);
-      cy.get('[data-cy=z2m-discover-unsupported-toggle]')
-        .should('have.attr', 'aria-expanded', 'false')
-        .and('contain', i18n(`${S}.sectionTitle`).replace('{{count}}', 3))
-        .click();
-      cy.get('[data-cy=z2m-discover-unsupported-toggle]').should('have.attr', 'aria-expanded', 'true');
       cy.get('[data-cy=z2m-discover-unsupported] [data-cy=z2m-discovered-card]').should('have.length', 3);
+      // A generic device can be added: the section is open, and says how many can
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]')
+        .should('have.attr', 'aria-expanded', 'true')
+        .and('contain', i18n(`${S}.sectionTitle`).replace('{{count}}', 3));
+      cy.get('[data-cy=z2m-discover-unsupported-addable]').should(
+        'contain',
+        i18n(`${S}.sectionAddable.one`).replace('{{count}}', 1)
+      );
+      cy.get('[data-cy=z2m-discovered-card]').should('have.length', 5);
+      // The list holds devices: no line saying it is empty
+      cy.get('[data-cy=z2m-discover-no-native]').should('not.exist');
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]').should('have.attr', 'aria-expanded', 'false');
+      cy.get('[data-cy=z2m-discovered-card]').should('have.length', 2);
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
 
-      // Failed identification: the advice, nothing to add or report
+      // Failed identification: the advice, nothing to add or report, what it is as text
       cy.get('[data-cy=z2m-discovered-card][data-support=interview_failed]').within(() => {
         cy.get('[data-cy=z2m-discovered-interview-failed]').i18n('integration.zigbee2mqtt.pairing.failedText');
         cy.get('[data-cy=z2m-discovered-save]').should('not.exist');
         cy.get('[data-cy=z2m-support-ask-z2m]').should('not.exist');
+        cy.get('input').should('not.exist');
+        cy.get('[data-cy=z2m-discovered-name]').should('have.text', '0x00158d0000000bad');
       });
+    });
+
+    it('should fold the section when nothing in it can be added', () => {
+      cy.intercept({ method: 'GET', url: api('/service/zigbee2mqtt/discovered*') }, [
+        bulb,
+        unsupportedValve,
+        failedSensor
+      ]).as('getDiscovered');
+      visitDiscover();
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]').should('have.attr', 'aria-expanded', 'false');
+      cy.get('[data-cy=z2m-discover-unsupported-addable]').should('not.exist');
+      cy.get('[data-cy=z2m-discovered-card]').should('have.length', 1);
     });
 
     it('should add a generic device only once the user confirmed it', () => {
       stubSave();
       visitDiscover();
-      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
       cy.get('[data-cy=z2m-discovered-card][data-support=generic]').within(() => {
         cy.get('[data-cy=z2m-discovered-generic]').i18n(`${S}.genericBadge`);
+        // On the card, not inside the warning whose colours it would take
+        cy.get('[data-cy=z2m-discovered-generic]')
+          .parents('.alert')
+          .should('have.length', 0);
         cy.get('input[id^=name_]').clear();
         cy.get('input[id^=name_]').type('Garden switch');
         cy.get('[data-cy=z2m-discovered-save]').click();
@@ -189,10 +215,17 @@ describe('Zigbee2MQTT devices not supported', () => {
 
     it('should send a model Zigbee2MQTT does not know to its page, with the information to paste', () => {
       visitDiscover();
-      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
       cy.get('[data-cy=z2m-discovered-card][data-support=unsupported]').within(() => {
         cy.get('[data-cy=z2m-discovered-unsupported]').i18n(`${S}.unsupportedText`);
         cy.get('[data-cy=z2m-discovered-save]').should('not.exist');
+        // Which device it is, as text: no field to fill in with nothing to save
+        cy.get('input').should('not.exist');
+        cy.get('[data-cy=z2m-discovered-name]').should('have.text', '0xa4c138000000cafe');
+        cy.get('[data-cy=z2m-discovered-identity]')
+          .should('contain', i18n(`${S}.modelIdLabel`))
+          .and('contain', 'TS0601')
+          .and('contain', i18n(`${S}.manufacturerLabel`))
+          .and('contain', '_TZE200_valve');
         cy.get('[data-cy=z2m-support-ask-z2m-link]')
           .should('have.attr', 'target', '_blank')
           .and('have.attr', 'href')
@@ -214,7 +247,6 @@ describe('Zigbee2MQTT devices not supported', () => {
 
     it('should show the information to select by hand when the browser refuses to copy it', () => {
       visitDiscover();
-      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
       cy.window().then(win => {
         cy.stub(win.navigator.clipboard, 'writeText').rejects(new Error('not allowed'));
         cy.stub(win.document, 'execCommand').returns(false);
@@ -294,9 +326,10 @@ describe('Zigbee2MQTT devices not supported', () => {
       };
       cy.intercept({ method: 'GET', url: api('/service/zigbee2mqtt/discovered*') }, [inGladys]).as('getDiscovered');
       visitDiscover();
-      // Only a device in the section: the list does not say there is nothing
+      // Only a device in the section: the list does not say there is nothing, but that it holds no supported device
       cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
       cy.contains(i18n('integration.zigbee2mqtt.discover.noDeviceDiscovered')).should('not.exist');
+      cy.get('[data-cy=z2m-discover-no-native]').i18n('integration.zigbee2mqtt.discover.noNewSupportedDevice');
       cy.get('[data-cy=z2m-discovered-card][data-support=unsupported]').within(() => {
         cy.get('[data-cy=z2m-discovered-in-gladys]')
           .should('be.disabled')
@@ -311,22 +344,34 @@ describe('Zigbee2MQTT devices not supported', () => {
       cy.viewport('iphone-x');
     });
 
-    it('should fold the section and add a generic device after the confirmation sheet', () => {
+    it('should open the section holding a generic device and add it after the confirmation sheet', () => {
       stubSave();
       visitDiscover();
-      cy.get('[data-cy=z2m-discover-mobile] [data-cy=z2m-discovered-row]').should('have.length', 2);
       cy.get('[data-cy=z2m-discover-unsupported-toggle]')
-        .should('have.attr', 'aria-expanded', 'false')
-        .click();
+        .should('have.attr', 'aria-expanded', 'true')
+        .and('contain', i18n(`${S}.sectionAddable.one`).replace('{{count}}', 1));
       cy.get('[data-cy=z2m-discover-unsupported] [data-cy=z2m-discovered-row]').should('have.length', 3);
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
+      cy.get('[data-cy=z2m-discover-mobile] [data-cy=z2m-discovered-row]').should('have.length', 2);
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
 
       cy.contains('[data-cy=z2m-discovered-row]', '0xa4c138000000f00d')
         .should('contain', i18n(`${S}.genericBadge`))
         .click();
+      cy.get('[data-cy=integration-device-sheet]').should('contain', i18n(`${S}.genericText`));
+      // The reports after "Add to Gladys": the action of the sheet comes first
+      cy.get('[data-cy=integration-device-footer] [data-cy=z2m-support-ask-z2m-link]').should('exist');
       cy.get('[data-cy=integration-device-sheet]')
-        .should('contain', i18n(`${S}.genericText`))
-        .find('[data-cy=z2m-support-ask-z2m-link]')
-        .should('exist');
+        .find(
+          '[data-cy=integration-device-primary], [data-cy=integration-device-features], [data-cy=integration-device-footer]'
+        )
+        .then(elements => {
+          expect([...elements].map(element => element.dataset.cy)).to.deep.equal([
+            'integration-device-features',
+            'integration-device-primary',
+            'integration-device-footer'
+          ]);
+        });
       cy.get('[data-cy=integration-device-primary]').click();
       cy.get('[data-cy=integration-device-primary-confirm]').should('contain', i18n(`${S}.confirmText`));
       cy.get('[data-cy=integration-device-primary-confirm] [data-cy=confirm-sheet-confirm]').click();
@@ -339,13 +384,19 @@ describe('Zigbee2MQTT devices not supported', () => {
 
     it('should say what to do with a model Zigbee2MQTT does not know, and with a failed identification', () => {
       visitDiscover();
-      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
-      cy.contains('[data-cy=z2m-discovered-row]', '0xa4c138000000cafe').click();
+      cy.contains('[data-cy=z2m-discovered-row]', '0xa4c138000000cafe')
+        .should('contain', i18n(`${S}.unknownModel`))
+        .click();
       cy.get('[data-cy=integration-device-sheet]').within(() => {
         cy.get('[data-cy=z2m-discovered-unsupported]').i18n(`${S}.unsupportedText`);
-        cy.get('[data-cy=z2m-support-ask-z2m-link]').should('exist');
-        cy.get('[data-cy=z2m-support-copy]').should('exist');
+        cy.get('[data-cy=integration-device-footer] [data-cy=z2m-support-ask-z2m-link]').should('exist');
+        cy.get('[data-cy=integration-device-footer] [data-cy=z2m-support-copy]').should('exist');
         cy.get('[data-cy=integration-device-primary]').should('not.exist');
+        // What it is, not a disabled name repeating the title
+        cy.get('[data-cy=integration-device-name]').should('not.exist');
+        cy.get('[data-cy=integration-device-details]')
+          .should('contain', 'TS0601')
+          .and('contain', '_TZE200_valve');
         cy.get('[data-cy=sheet-close]').click();
       });
       cy.contains('[data-cy=z2m-discovered-row]', '0x00158d0000000bad')

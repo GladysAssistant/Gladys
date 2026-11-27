@@ -438,6 +438,9 @@ describe('Zigbee2mqtt pairing window', () => {
             .and('not.contain', 'Automatically generated definition');
           cy.get('[data-cy=z2m-pairing-unsupported]').i18n('integration.zigbee2mqtt.support.unsupportedText');
           cy.get('[data-cy=z2m-pairing-add]').should('not.exist');
+          // Its model is the raw ID of a generated definition, maybe the name of another product: its icon
+          cy.get('[data-cy=z2m-pairing-photo] img').should('not.exist');
+          cy.get('[data-cy=z2m-pairing-photo] i.fe').should('exist');
           // The last step says it in words, not by its colour only
           cy.get('[data-cy=z2m-pairing-timeline] li')
             .eq(2)
@@ -478,6 +481,13 @@ describe('Zigbee2mqtt pairing window', () => {
           cy.get('[data-cy=z2m-pairing-timeline] li')
             .eq(2)
             .i18n(`${T}.steps.generic`);
+          // Reached, but not as a ready device: told so to a screen reader too
+          cy.get('[data-cy=z2m-pairing-timeline] .sr-only')
+            .eq(2)
+            .i18n(`${T}.stepStates.partial`);
+          // `TS0001` names another product on zigbee2mqtt.io: the icon of what it is, not a photo
+          cy.get('[data-cy=z2m-pairing-photo] img').should('not.exist');
+          cy.get('[data-cy=z2m-pairing-photo] i.fe').should('exist');
           cy.get('[data-cy=z2m-pairing-generic]').i18n('integration.zigbee2mqtt.support.genericText');
           cy.get('[data-cy=z2m-support-ask-z2m-link]').should('exist');
           // A raw Tuya manufacturer name says nothing: the category alone
@@ -485,7 +495,8 @@ describe('Zigbee2mqtt pairing window', () => {
             .invoke('val')
             .should('not.contain', '_TZ3000');
         });
-      cy.get('[data-cy=z2m-pairing-to-add]').should('contain', '1');
+      // Declining its confirmation is an answer: it does not stay in the window until added, as a ready one does
+      cy.get('[data-cy=z2m-pairing-to-add]').should('not.exist');
 
       cy.intercept(
         { method: 'GET', url: `${serverUrl}/api/v1/service/zigbee2mqtt/pairing` },

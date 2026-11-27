@@ -8,7 +8,7 @@
 > the same diff.**
 >
 > Status: B to D **implemented** (lot 2 of the Zigbee2mqtt revamp, #3427); E (devices Zigbee2mqtt does not
-> support, step 2.3) **implemented** (PR to come). The setup wizard and the dashboard themselves are specified in
+> support, step 2.3) **implemented** (#3451). The setup wizard and the dashboard themselves are specified in
 > [zigbee2mqtt-installation.md](./zigbee2mqtt-installation.md) (M, N).
 
 ## A. Context
@@ -120,7 +120,7 @@ opened, and the ready ones of earlier windows not added to Gladys yet:
 | `device_leave`                                | —                       | `left`                    | removed (`left`: unchanged)        |
 | `bridge/devices`                              | —                       | name updated; the device listed with its interview finished (`interview_completed`, not `interviewing`): `ready`, `generic` or `unsupported` as `device_interview` `successful` | name updated; `device` computed again (`ready`, `generic`, `unsupported`); a `generic` / `unsupported` device the list now tells supported (Zigbee2mqtt updated meanwhile) becomes `ready` |
 | `bridge/devices` without the device (removed from Zigbee2mqtt) | —      | removed                   | removed, but `left` (no longer listed since it left) |
-| a new window opens (`allowed` false → true, not the same window, B.1) | — | removed | removed, but `ready` / `generic` with a `device` not in Gladys (no `id`) or not known yet |
+| a new window opens (`allowed` false → true, not the same window, B.1) | — | removed | removed, but `ready` with a `device` not in Gladys (no `id`) or not known yet |
 | Stop, `disconnect`, `reset`                   | emptied                 | emptied                   | emptied                            |
 
 - `device_announce` is ignored: every known device announces itself when it powers up.
@@ -136,7 +136,9 @@ opened, and the ready ones of earlier windows not added to Gladys yet:
   the ready devices later. A new run of Zigbee2mqtt keeps it too, and so does the same window told again
   after a reconnection or an init (B.1). A new window keeps the ready devices while they are not in
   Gladys: the window reopened shows them with their photo and suggested name, not only the Discover tab
-  under their IEEE address.
+  under their IEEE address. Not the `generic` ones: their confirmation says that features may be missing
+  or not work, and declining it is an answer, not a device forgotten; a row the user cannot dismiss would
+  come back at every window. They stay in the Discover tab (E.5), with the same Add and confirmation.
 - A device leaving before its interview ended stays `left`: its row says why it is gone, until it joins
   again or a new window opens.
 - An event arriving while joining is closed (a device joining through the Zigbee2mqtt interface) is
@@ -186,9 +188,10 @@ device".
 - **Tips** (approach, pairing mode, add it here) while the registry is empty; once a device is listed, while
   joining is permitted, a line under the rows says another device can be put in pairing mode.
 - **One row per entry**, a timeline "Joined → Identification → Ready" (the last step reads "Generic
-  features" for a `generic` entry, "Not supported" for an `unsupported` one; each step also tells its state —
-  done, in progress, failed, not supported, to come — in a text for screen readers, told as it changes:
-  a polite live region; in the header, only the title is one, not the countdown):
+  features" for a `generic` entry, reached but amber as its badge, "Not supported" for an `unsupported` one; each
+  step also tells its state — done, in progress, failed, partial support, not supported, to come — in a text for
+  screen readers, told as it changes: a polite live region; in the header, only the title is one, not the
+  countdown):
   - `joined`, `interviewing`: the step running, the friendly name (an IEEE address until the device
     has a name);
   - `ready`, `device` known, not in Gladys: a card — photo (D.3), suggested name (D.4, editable),
@@ -203,9 +206,11 @@ device".
     do not undo it;
   - `ready`, already in Gladys (`device.id`): "Already in Gladys" with a link (a device paired again);
   - `generic` (D65, D68): the card of a `ready` device with the "Generic features" badge and the
-    features listed; **Add** asks for the confirmation of E.3 first;
+    features listed, the icon of its category instead of a photo (D.3); **Add** asks for the confirmation of
+    E.3 first;
   - `unsupported`: "Not supported by Zigbee2MQTT" with the model when known (desktop and phone), the
-    explanation of E.4 and its two actions; no Add;
+    icon of its category (D.3), the explanation of E.4 and its two actions; no Add; on a phone its sheet lists
+    no features (there is nothing Gladys can control);
   - `failed` (D59): "Identification failed" and the advice: "Bring the device closer to the dongle or to a
     mains-powered device, then put it in pairing mode again"; the row starts over if it joins again;
   - `left`: "Left the network before its identification ended" and the advice to put it in pairing mode
@@ -218,19 +223,24 @@ device".
   (it closes by itself); the registry stays on the server. Back on the dashboard or the Discover tab,
   the devices of the network not in Gladys are read again: the ones just added are no longer new. While
   ready devices are not added, a notice under the rows counts them and says they stay in the window until
-  added (C.2): nothing blocks the close.
+  added (C.2): nothing blocks the close. A `generic` device is not counted: a new window does not keep it.
 - The screen of its own holds an entry of the history: "back" (browser, Android button, iOS swipe) closes
   it, back to the dashboard or the Discover tab, not out of the Zigbee2mqtt page; on a phone, a "back"
   with the sheet of a device open closes the sheet first. Closed by its button, it leaves its entry.
 - On a phone, the ready card is the sheet of the Discover tab (`MobileDeviceItem`, `primaryAction`
-  "Add to Gladys"), opened from the row.
+  "Add to Gladys"), opened from the row. The reports of E.4 come after "Add to Gladys" (`footer`): the
+  action of the sheet first.
 
 ### D.3 Photo (D58)
 
 `https://www.zigbee2mqtt.io/images/devices/<model>.png`, the model with `:`, `/` and spaces replaced by
 `-` (as the Zigbee2mqtt interface does), loaded by the browser; the icon of the device category
 (`getDeviceIcon`) when the image fails to load or the model is unknown. The model of the device is
-thus sent to zigbee2mqtt.io by the browser, as the Zigbee2mqtt interface does.
+thus sent to zigbee2mqtt.io by the browser, as the Zigbee2mqtt interface does. A `generic` or
+`unsupported` entry has no photo, only the icon: the model of a generated definition is the raw model ID
+of the device (`TS0001`, `TS0601`), shared by unrelated products and sometimes the name of another one in the
+catalogue of zigbee2mqtt.io — a photo would say "this is your device" above a card saying Zigbee2mqtt does
+not know it.
 
 ### D.4 Suggested name
 
@@ -338,16 +348,31 @@ secondary features gives the user nothing to control or read.
 ### E.5 Discover tab (D67, D71)
 
 - The main list holds the `native` devices, as today (case b included). Below it, a section **"Not
-  supported by Zigbee2MQTT (n)"**, collapsed by default (desktop and phone), holds the `generic`,
-  `unsupported` and `interview_failed` devices, each with what E.3 and E.4 say; absent when empty. A
+  supported by Zigbee2MQTT (n)"** (desktop and phone) holds the `generic`, `unsupported` and
+  `interview_failed` devices, each with what E.3 and E.4 say; absent when empty. It is collapsed by default,
+  unless it holds a `generic` device not in Gladys: then it is open, and its title row says how many can be
+  added ("1 can be added with generic features") — the device the user can add is not hidden under "Not
+  supported". Opened or collapsed by the user, it stays so. A
   `generic` device already in Gladys shows "Already in Gladys" / Update as in the main list; an
   `unsupported` or `interview_failed` one already in Gladys (added before, not recognized since) shows
   "Already in Gladys" with its explanation, never Update (its features would be emptied).
-- "No new device" shows only when the list and the section are both empty.
+- A card that cannot add its device (`unsupported`, `interview_failed`, `native` with nothing Gladys can use)
+  has no name field: its name as text, and what tells which physical device it is — the model ID and the
+  manufacturer of `zigbee2mqtt_info`, the IEEE address when the name is not already it. On a phone, the
+  sheet has no name field either, and lists them as details; its pill says "Unknown to Zigbee2MQTT" for an
+  `unsupported` device, "Identification failed", or "Not supported" (by Gladys) for a `native` one.
+- The "Generic features" badge of a desktop card sits on the card, over the name, not inside the warning
+  (whose colours it would take).
+- "No new device" shows only when the list and the section are both empty. When the list is empty and the
+  section is not, the list says "No new device supported by Zigbee2MQTT.": not a blank card above the
+  section.
 - The count of new devices of the dashboard (`countNewDevices`) counts the `native` devices only.
 - On a phone, the section is a row that opens and closes it; each device is the sheet of the tab
   (`MobileDeviceItem`): `primaryAction` "Add to Gladys" for a `generic` one (then the confirmation sheet),
-  the two actions of (a) for an `unsupported` one, the advice of D59 for an `interview_failed` one.
+  the two actions of (a) for an `unsupported` one, the advice of D59 for an `interview_failed` one. The
+  reports (a) and (b) are the `footer` of the sheet, after its action and its features. "Copied" is a line of
+  its own, in the colour of the text with a check (the green of the theme is under the AA contrast of small
+  text).
 
 ## F. Tests
 
@@ -357,9 +382,12 @@ secondary features gives the user nothing to control or read.
   1 and 2 interview fields), the useful-feature rule, `zigbee2mqtt_info` only where E.2 says, a generic
   device controlled and read once in Gladys (`setValue`, `readValue`, `findMatchingExpose` without definition),
   a generic device turning `native` (Update), a state of a device not supported logged in debug only.
-- Cypress (E): the collapsed section (desktop, phone), the confirmation (Cancel keeps the card, Add sends
-  the request) in the Discover tab and the pairing window, a `generic` row, an `unsupported` one (link,
-  copy on HTTP, copy refused), case (b) (the forum URL, cut), `interview_failed`, the count of new devices.
+- Cypress (E): the section open with a `generic` device to add, collapsed otherwise (desktop, phone), the line
+  of an empty main list, the confirmation (Cancel keeps the card, Add sends the request) in the Discover tab
+  and the pairing window, a `generic` row (no photo, the reports after Add on a phone, not counted as to add),
+  an `unsupported` one (its model ID and manufacturer as text, no name field, link, copy on HTTP, copy
+  refused, no features in its phone sheet), case (b) (the forum URL, cut), `interview_failed`, the count of new
+  devices.
 - Cypress (`setup/Zigbee2MqttPairing.cy.js`, `…PairingMobile.cy.js`, step ④ in `…Wizard*.cy.js`,
   Pair in `…Dashboard.cy.js`): countdown, Extend, Stop, the three failures of a request, a slow
   answer after a message, Zigbee2mqtt not answering; a device going joined → interviewing → ready →

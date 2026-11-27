@@ -22,7 +22,7 @@ import { PAIRING_STATUS, getDevicePhotoUrl, getPairingIcon, suggestName, formatC
 import { withoutSupportFields, hasUsefulFeature } from '../../utils/support';
 import AskZigbee2mqtt from '../../commons/AskZigbee2mqtt';
 import SuggestDevice from '../../commons/SuggestDevice';
-import { getGenericConfirm } from '../../discover-page/DiscoveredBox';
+import { getGenericConfirm } from '../../commons/genericConfirm';
 import style from './pairing.css';
 
 const T = 'integration.zigbee2mqtt.pairing';
@@ -34,6 +34,11 @@ const S = 'integration.zigbee2mqtt.support';
 
 // A device to add once its interview ended: supported, or with the generic features Zigbee2mqtt deduced (E.3)
 const isAddable = status => status === PAIRING_STATUS.READY || status === PAIRING_STATUS.GENERIC;
+
+// The model whose photo the row shows: not the one of a definition Zigbee2mqtt generated, which is the raw model ID of
+// the device (`TS0601`), shared by unrelated products and sometimes the name of another one on zigbee2mqtt.io (D.3)
+const getPhotoModel = entry =>
+  entry.status === PAIRING_STATUS.GENERIC || entry.status === PAIRING_STATUS.UNSUPPORTED ? null : entry.model;
 
 // The photo of a device model; the icon of its category without Internet or without known photo (D58)
 class DevicePhoto extends Component {
@@ -61,8 +66,10 @@ const getSteps = status => {
     case PAIRING_STATUS.INTERVIEWING:
       return ['done', 'running', 'todo'];
     case PAIRING_STATUS.READY:
-    case PAIRING_STATUS.GENERIC:
       return ['done', 'done', 'done'];
+    case PAIRING_STATUS.GENERIC:
+      // Can be added, with features that may be missing: amber, as its card says
+      return ['done', 'done', 'partial'];
     case PAIRING_STATUS.UNSUPPORTED:
       return ['done', 'done', 'warning'];
     default:
@@ -72,11 +79,11 @@ const getSteps = status => {
 };
 
 // The label of a step: the last one says "Not supported" or "Generic features" in words, not only by its colour
-const getStepLabel = (step, index, status) => {
+const getStepLabel = (step, index) => {
   if (index === 2 && step === 'warning') {
     return 'unsupported';
   }
-  return index === 2 && status === PAIRING_STATUS.GENERIC ? 'generic' : STEPS[index];
+  return index === 2 && step === 'partial' ? 'generic' : STEPS[index];
 };
 
 // `inline` on a phone: in the row, a button or a link, which holds no list. A live region: a step that changes is told
@@ -89,7 +96,7 @@ const Timeline = ({ status, inline }) => {
       {getSteps(status).map((step, index) => (
         <Step key={index} class={cx(style.timelineStep, style[`timeline-${step}`])}>
           <span class={style.timelineDot} aria-hidden="true" />
-          <Text id={`${T}.steps.${getStepLabel(step, index, status)}`} />
+          <Text id={`${T}.steps.${getStepLabel(step, index)}`} />
           {/* What the dot and the colours tell, for a screen reader */}
           <span class="sr-only">
             {' '}
@@ -782,7 +789,7 @@ class PairingWindow extends Component {
     const subtitle = this.getSubtitle(entry);
     return (
       <li key={entry.ieee_address} class={style.row} data-cy="z2m-pairing-row" data-status={entry.status}>
-        <DevicePhoto model={entry.model} device={entry.device} />
+        <DevicePhoto model={getPhotoModel(entry)} device={entry.device} />
         <div class={style.rowMain}>
           <div class={style.rowTitle}>
             <strong>{this.getTitle(entry, card)}</strong>
@@ -813,7 +820,7 @@ class PairingWindow extends Component {
           pills={timeline}
           notices={[
             <div key="photo" class={style.sheetPhoto}>
-              <DevicePhoto model={entry.model} device={device} />
+              <DevicePhoto model={getPhotoModel(entry)} device={device} />
             </div>,
             generic && (
               <MobileNotice key="generic" tone="warning" icon="alert-triangle" data-cy="z2m-pairing-generic">
@@ -839,11 +846,15 @@ class PairingWindow extends Component {
             dataCy: 'z2m-pairing-add',
             confirm: generic ? getGenericConfirm(get(this.props, 'intl.dictionary')) : undefined
           }}
+          // The reports after "Add", which is what the sheet is for
+          footer={
+            (generic && <AskZigbee2mqtt device={device} isMobile />) ||
+            (onlySecondary && (
+              <SuggestDevice device={device} dictionary={get(this.props, 'intl.dictionary')} isMobile />
+            ))
+          }
           dataCy="z2m-pairing-row"
-        >
-          {generic && <AskZigbee2mqtt device={device} isMobile />}
-          {onlySecondary && <SuggestDevice device={device} dictionary={get(this.props, 'intl.dictionary')} isMobile />}
-        </MobileDeviceItem>
+        />
       );
     }
     // Not supported, known by Gladys: its sheet holds what to do about it (E.4)
@@ -862,10 +873,11 @@ class PairingWindow extends Component {
             </MobileNotice>
           }
           guard={false}
+          // Nothing Gladys can control: no empty "Features", as in the Discover tab
+          showFeatures={false}
+          footer={<AskZigbee2mqtt device={device} isMobile />}
           dataCy="z2m-pairing-row"
-        >
-          <AskZigbee2mqtt device={device} isMobile />
-        </MobileDeviceItem>
+        />
       );
     }
     const selector = card && card.added ? card.selector : device && device.id !== undefined && device.selector;
@@ -914,11 +926,14 @@ class PairingWindow extends Component {
     );
   }
 
-  // The ready devices the user has not added yet: they stay in the window (and in the Discover tab) until added
+  // The ready devices the user has not added yet: they stay in the window (and in the Discover tab) until added. Not the
+  // generic ones: declining their confirmation is an answer, a new window forgets them (C.2)
   countToAdd = () =>
     this.state.entries.filter(entry => {
       const card = this.state.cards[entry.ieee_address];
-      return isAddable(entry.status) && entry.device && entry.device.id === undefined && card && !card.added;
+      return (
+        entry.status === PAIRING_STATUS.READY && entry.device && entry.device.id === undefined && card && !card.added
+      );
     }).length;
 
   render({ isMobile, online }, { entries, loadError, allowed, confirmEntry, cards }) {

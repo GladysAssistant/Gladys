@@ -97,6 +97,12 @@ const MobileDiscoverTab = props => {
         {native.length === 0 && unsupported.length === 0 && !loading && (
           <MobileEmptyState icon="radio" text={<Text id="integration.zigbee2mqtt.discover.noNewDevice" />} />
         )}
+        {/* An empty list says so, the section after it holding the others (E.5) */}
+        {native.length === 0 && unsupported.length > 0 && (
+          <MobileTextNotice icon="info" data-cy="z2m-discover-no-native">
+            <Text id="integration.zigbee2mqtt.discover.noNewSupportedDevice" />
+          </MobileTextNotice>
+        )}
         {unsupported.length > 0 && <UnsupportedSection entries={unsupported} isMobile boxProps={props} />}
       </MobileListLoader>
       {/* The links to the Zigbee2MQTT interface are only in the sheets: what is missing for them
@@ -179,6 +185,14 @@ const DiscoverTab = ({ children, ...props }) => {
                 <DiscoveredBox key={device.external_id} {...props} device={device} deviceIndex={index} />
               ))}
               {native.length === 0 && unsupported.length === 0 && <EmptyState />}
+              {/* An empty list says so, the section after it holding the others (E.5) */}
+              {native.length === 0 && unsupported.length > 0 && (
+                <div class="col-12">
+                  <p class="mb-0" data-cy="z2m-discover-no-native">
+                    <Text id="integration.zigbee2mqtt.discover.noNewSupportedDevice" />
+                  </p>
+                </div>
+              )}
             </div>
             {unsupported.length > 0 && <UnsupportedSection entries={unsupported} boxProps={props} />}
           </div>

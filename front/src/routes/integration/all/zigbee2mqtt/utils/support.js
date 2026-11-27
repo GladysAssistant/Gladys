@@ -53,6 +53,35 @@ export const hasUsefulFeature = features =>
   (features || []).some(feature => !SECONDARY_CATEGORIES.includes(feature.category));
 
 /**
+ * @description What the card of a discovered device can do with it (E.2, E.4 b).
+ * @param {object} device - A device of GET /discovered.
+ * @returns {object} `support`; `usable`: Gladys can add it, a supported model with a feature besides its battery (a
+ * router and its signal included) or the generic features of a model Zigbee2mqtt does not know; `onlySecondary`: a
+ * supported model of which Gladys only uses the battery or the signal, added all the same and suggested on the forum.
+ * @example
+ * getUsage({ zigbee2mqtt_support: 'native', features: [{ category: 'light' }] }); // usable, not onlySecondary
+ */
+export const getUsage = device => {
+  const support = getSupport(device);
+  const features = (device && device.features) || [];
+  const native = support === ZIGBEE2MQTT_SUPPORT.NATIVE;
+  const usable =
+    support === ZIGBEE2MQTT_SUPPORT.GENERIC ||
+    (native && features.some(feature => feature.category !== DEVICE_FEATURE_CATEGORIES.BATTERY));
+  return { support, usable, onlySecondary: native && usable && !hasUsefulFeature(features) };
+};
+
+/**
+ * @description How many devices of a list can be added with generic features: generic, not in Gladys yet (E.5).
+ * @param {Array} devices - Devices of GET /discovered.
+ * @returns {number} Their number.
+ * @example
+ * countGenericToAdd([{ zigbee2mqtt_support: 'generic' }]); // 1
+ */
+export const countGenericToAdd = devices =>
+  (devices || []).filter(device => getSupport(device) === ZIGBEE2MQTT_SUPPORT.GENERIC && !device.created_at).length;
+
+/**
  * @description The device to save: without what GET /discovered adds to it for the page (E.2).
  * @param {object} device - A device of GET /discovered.
  * @returns {object} The device without `zigbee2mqtt_support` and `zigbee2mqtt_info`.

@@ -244,6 +244,13 @@ a.fabLink:focus {
   margin-top: 20px;
 }
 
+/* what the integration offers after the action of the sheet (reporting a device) */
+.sheetFooter {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0f5;
+}
+
 /* a progress (a synchronization running) inside a row or a sheet */
 .progress {
   display: block;
