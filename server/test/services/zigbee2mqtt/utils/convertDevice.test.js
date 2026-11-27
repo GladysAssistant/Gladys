@@ -21,6 +21,11 @@ describe('zigbee2mqtt convertDevice', () => {
     return assert.deepEqual(result, notManagedGladysDevice);
   });
 
+  it('should return a device without features when its definition is null (Zigbee2mqtt 1, interview not over)', () => {
+    const result = convertDevice({ friendly_name: 'joining', definition: null }, serviceId);
+    expect(result).to.deep.include({ model: undefined, features: [] });
+  });
+
   it('should return managed device', () => {
     const managedDevice = {
       friendly_name: 'Xiaomi Aqara Sensor',

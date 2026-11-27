@@ -11,6 +11,22 @@ const NOW = '2026-11-20T10:00:00.000Z';
 const IEEE = '0x00158d0001';
 
 const definition = { model: 'LED1545G12', vendor: 'IKEA', description: 'TRADFRI bulb E27' };
+const occupancy = {
+  type: 'binary',
+  name: 'occupancy',
+  property: 'occupancy',
+  access: 1,
+  value_on: true,
+  value_off: false,
+};
+const linkquality = { type: 'numeric', name: 'linkquality', property: 'linkquality', access: 1 };
+// What Zigbee2mqtt generates for a model it does not know, from the clusters of the device
+const generated = {
+  model: 'lumi.unknown',
+  vendor: 'LUMI',
+  description: 'Automatically generated definition',
+  exposes: [occupancy, linkquality],
+};
 
 describe('zigbee2mqtt pairingDevices', () => {
   let zigbee2MqttManager;
@@ -102,7 +118,7 @@ describe('zigbee2mqtt pairingDevices', () => {
       expect(lastSent()[0]).to.include({ status: 'interviewing', friendly_name: IEEE });
     });
 
-    it('should tell a device Zigbee2mqtt does not support, with its model', () => {
+    it('should tell a device Zigbee2mqtt does not support, with its model and its device for the reports', () => {
       zigbee2MqttManager.handleBridgeEvent({
         type: 'device_interview',
         data: {
@@ -113,7 +129,36 @@ describe('zigbee2mqtt pairingDevices', () => {
           definition: { model: 'lumi.unknown' },
         },
       });
-      expect(lastSent()[0]).to.include({ status: 'unsupported', model: 'lumi.unknown', vendor: null, device: null });
+      expect(lastSent()[0]).to.include({ status: 'unsupported', model: 'lumi.unknown', vendor: null });
+      expect(lastSent()[0].device).to.deep.include({ name: 'kitchen bulb' });
+    });
+
+    it('should tell a device Zigbee2mqtt does not support, with a useful generated feature, as generic', () => {
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: {
+          friendly_name: IEEE,
+          ieee_address: IEEE,
+          status: 'successful',
+          supported: false,
+          definition: generated,
+        },
+      });
+      expect(lastSent()[0]).to.include({ status: 'generic', model: 'lumi.unknown', vendor: 'LUMI' });
+      expect(lastSent()[0].device).to.deep.include({ name: 'kitchen bulb' });
+    });
+
+    it('should tell a generated definition with only the link quality as not supported', () => {
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: {
+          ieee_address: IEEE,
+          status: 'successful',
+          supported: false,
+          definition: { ...generated, exposes: [linkquality] },
+        },
+      });
+      expect(lastSent()[0].status).to.equal('unsupported');
     });
 
     it('should tell a device without definition as not supported', () => {
@@ -241,6 +286,21 @@ describe('zigbee2mqtt pairingDevices', () => {
       expect(lastSent()[1].device).to.deep.equal({ name: 'to add', ieee_address: '0x03' });
     });
 
+    it('should keep the generic devices not in Gladys, not the unsupported ones', () => {
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([{ name: 'generic', ieee_address: '0x01' }]);
+      const notSupported = { status: 'successful', supported: false };
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: '0x01', ...notSupported, definition: generated },
+      });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: '0x02', ...notSupported, definition: { exposes: [linkquality] } },
+      });
+      zigbee2MqttManager.clearPairingDevices(true);
+      expect(Object.keys(zigbee2MqttManager.pairingDevices)).to.deep.equal(['0x01']);
+    });
+
     it('should tell nothing when every device is kept', () => {
       zigbee2MqttManager.handleBridgeEvent({
         type: 'device_interview',
@@ -355,6 +415,46 @@ describe('zigbee2mqtt pairingDevices', () => {
       expect(zigbee2MqttManager.pairingDevices['0x99'].status).to.equal('interviewing');
       expect(zigbee2MqttManager.pairingDevices['0x98'].status).to.equal('failed');
     });
+
+    it('should take a generic end of an interview whose event was missed', () => {
+      zigbee2MqttManager.handleBridgeEvent({ type: 'device_joined', data: { ieee_address: IEEE } });
+      const changed = zigbee2MqttManager.updatePairingFromList([
+        { ieee_address: IEEE, interview_completed: true, supported: false, definition: generated },
+      ]);
+      expect(changed).to.equal(true);
+      expect(zigbee2MqttManager.pairingDevices[IEEE]).to.include({ status: 'generic', model: 'lumi.unknown' });
+    });
+
+    it('should tell ready a device not supported that Zigbee2mqtt supports now (updated meanwhile)', () => {
+      const notSupported = { status: 'successful', supported: false };
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: IEEE, ...notSupported, definition: generated },
+      });
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: '0x99', ...notSupported, definition: { exposes: [linkquality] } },
+      });
+      sinon.clock.tick(1000);
+      // Still not supported: nothing changes
+      expect(
+        zigbee2MqttManager.updatePairingFromList([
+          { ieee_address: IEEE, interview_completed: true, supported: false, definition: generated },
+          { ieee_address: '0x99', interview_completed: true, supported: false, definition: { exposes: [] } },
+        ]),
+      ).to.equal(false);
+      const changed = zigbee2MqttManager.updatePairingFromList([
+        { ieee_address: IEEE, interview_completed: true, supported: true, definition },
+        { ieee_address: '0x99', interview_completed: true, supported: true, definition },
+      ]);
+      expect(changed).to.equal(true);
+      expect(zigbee2MqttManager.pairingDevices[IEEE]).to.include({
+        status: 'ready',
+        model: 'LED1545G12',
+        updated_at: '2026-11-20T10:00:01.000Z',
+      });
+      expect(zigbee2MqttManager.pairingDevices['0x99'].status).to.equal('ready');
+    });
   });
 
   describe('emitPairingDevicesAfterList', () => {
@@ -387,6 +487,19 @@ describe('zigbee2mqtt pairingDevices', () => {
       zigbee2MqttManager.emitPairingDevicesAfterList(false);
       assert.calledTwice(gladys.event.emit);
       expect(lastSent()[0].device.id).to.equal('a1');
+    });
+
+    it('should tell a generic device again when its Gladys device changed', () => {
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([]);
+      zigbee2MqttManager.handleBridgeEvent({
+        type: 'device_interview',
+        data: { ieee_address: IEEE, status: 'successful', supported: false, definition: generated },
+      });
+      gladys.event.emit = fake();
+      zigbee2MqttManager.getDiscoveredDevices = fake.returns([{ name: 'kitchen bulb', ieee_address: IEEE }]);
+      zigbee2MqttManager.emitPairingDevicesAfterList(false);
+      assert.calledOnce(gladys.event.emit);
+      expect(lastSent()[0].device).to.deep.equal({ name: 'kitchen bulb', ieee_address: IEEE });
     });
 
     it('should tell nothing when no name changed and no device is ready', () => {

@@ -69,9 +69,18 @@ const PAIRING_STATUS = {
   JOINED: 'joined',
   INTERVIEWING: 'interviewing',
   READY: 'ready',
+  GENERIC: 'generic',
   UNSUPPORTED: 'unsupported',
   FAILED: 'failed',
   LEFT: 'left',
+};
+
+// What Gladys can do with a device of the network (docs/specs/zigbee2mqtt-pairing.md, E.2)
+const ZIGBEE2MQTT_SUPPORT = {
+  NATIVE: 'native',
+  GENERIC: 'generic',
+  UNSUPPORTED: 'unsupported',
+  INTERVIEW_FAILED: 'interview_failed',
 };
 
 // Longest joining window Zigbee2mqtt opens, in seconds
@@ -244,6 +253,7 @@ module.exports = {
   ADAPTER_MODE,
   INSTALLATION_STATE,
   PAIRING_STATUS,
+  ZIGBEE2MQTT_SUPPORT,
   PERMIT_JOIN_MAX_SECONDS,
   INSTALLATION_KIND,
   INSTALLATION_PHASE,

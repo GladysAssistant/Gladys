@@ -64,7 +64,8 @@
         "name": "IEEE_ADDRESS",
         "value": "0x00158d00033e88d5"
       }
-    ]
+    ],
+    "zigbee2mqtt_support": "native"
   },
   {
     "name": "0x00158d00033e88d1",
@@ -143,7 +144,8 @@
         "name": "IEEE_ADDRESS",
         "value": "0x00158d00033e88d1"
       }
-    ]
+    ],
+    "zigbee2mqtt_support": "native"
   },
   {
     "name": "0x00158d0004019127",
@@ -195,7 +197,8 @@
         "name": "IEEE_ADDRESS",
         "value": "0x00158d0004019127"
       }
-    ]
+    ],
+    "zigbee2mqtt_support": "native"
   },
   {
     "name": "0x00158d00045b2740",
@@ -295,7 +298,8 @@
         "name": "IEEE_ADDRESS",
         "value": "0x00158d00045b2740"
       }
-    ]
+    ],
+    "zigbee2mqtt_support": "native"
   },
   {
     "name": "bosch-outdoor-siren",
@@ -335,7 +339,8 @@
         "name": "IEEE_ADDRESS",
         "value": "0x00124b0023a1b2c3"
       }
-    ]
+    ],
+    "zigbee2mqtt_support": "native"
   },
   {
     "name": "heiman-indoor-siren",
@@ -387,6 +392,7 @@
         "name": "IEEE_ADDRESS",
         "value": "0x00124b0023a1b2c4"
       }
-    ]
+    ],
+    "zigbee2mqtt_support": "native"
   }
 ]

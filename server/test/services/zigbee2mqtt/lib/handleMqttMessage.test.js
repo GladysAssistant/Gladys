@@ -370,7 +370,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
   });
 
-  it('should receive devices, exclude unsupported and coordinator', async () => {
+  it('should receive devices, keep the ones Zigbee2mqtt does not support and exclude the coordinator', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub
@@ -389,8 +389,21 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // ASSERT
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
-      payload: expectedDevicesPayload,
+      payload: sinon.match.array,
     });
+    const discovered = gladys.event.emit.firstCall.args[1].payload;
+    expect(discovered.filter((device) => device.zigbee2mqtt_support === 'native')).to.deep.equal(
+      expectedDevicesPayload,
+    );
+    // Not supported, without definition after its interview: listed, with what a report needs
+    expect(discovered[4]).to.deep.include({
+      external_id: 'zigbee2mqtt:0x23158d00045b2740',
+      features: [],
+      zigbee2mqtt_support: 'unsupported',
+    });
+    expect(discovered[4].zigbee2mqtt_info).to.include({ model_id: 'ZNCZ02LM', manufacturer: 'Lidl' });
+    expect(zigbee2mqttManager.discoveredDevices).to.have.property('0x23158d00045b2740');
+    expect(zigbee2mqttManager.discoveredDevices).to.not.have.property('Coordinator');
     assert.calledOnce(zigbee2mqttManager.syncRenamedDevices);
     expect(zigbee2mqttManager.zigbee2mqttConnected).to.eq(true);
   });

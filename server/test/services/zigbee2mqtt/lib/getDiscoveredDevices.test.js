@@ -65,6 +65,91 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     expect(devices).deep.eq(expectedDevicesPayload);
   });
 
+  describe('devices Zigbee2mqtt does not support', () => {
+    const occupancy = {
+      type: 'binary',
+      name: 'occupancy',
+      property: 'occupancy',
+      access: 1,
+      value_on: true,
+      value_off: false,
+    };
+    const linkquality = { type: 'numeric', name: 'linkquality', property: 'linkquality', access: 1 };
+    const z2mDevice = (name, fields) => ({
+      friendly_name: name,
+      ieee_address: name,
+      model_id: 'lumi.unknown',
+      manufacturer: 'LUMI',
+      endpoints: { 1: { clusters: { input: ['msOccupancySensing'], output: [] } } },
+      ...fields,
+    });
+    const generatedDefinition = (exposes) => ({
+      model: 'lumi.unknown',
+      vendor: 'LUMI',
+      description: 'Automatically generated definition',
+      exposes,
+    });
+
+    beforeEach(() => {
+      gladys.stateManager.get.returns(null);
+    });
+
+    it('should tell what Gladys can do with each device, and give what the reports need', () => {
+      zigbee2MqttService.device.discoveredDevices = {
+        native: z2mDevice('native', {
+          supported: true,
+          interview_state: 'SUCCESSFUL',
+          definition: generatedDefinition([occupancy, linkquality]),
+        }),
+        nativeNothingUseful: z2mDevice('nativeNothingUseful', {
+          supported: true,
+          interview_state: 'SUCCESSFUL',
+          definition: generatedDefinition([linkquality]),
+        }),
+        generic: z2mDevice('generic', {
+          supported: false,
+          interview_state: 'SUCCESSFUL',
+          definition: generatedDefinition([occupancy, linkquality]),
+        }),
+        unsupported: z2mDevice('unsupported', {
+          supported: false,
+          interview_state: 'SUCCESSFUL',
+          definition: generatedDefinition([linkquality]),
+        }),
+        failed: z2mDevice('failed', { supported: false, interview_state: 'FAILED' }),
+        interviewing: z2mDevice('interviewing', { supported: false, interview_state: 'IN_PROGRESS' }),
+      };
+
+      const devices = zigbee2MqttService.device.getDiscoveredDevices();
+
+      expect(devices.map((d) => [d.name, d.zigbee2mqtt_support, Boolean(d.zigbee2mqtt_info)])).to.deep.equal([
+        ['native', 'native', false],
+        ['nativeNothingUseful', 'native', true],
+        ['generic', 'generic', true],
+        ['unsupported', 'unsupported', true],
+        ['failed', 'interview_failed', true],
+      ]);
+      const generic = devices.find((d) => d.name === 'generic');
+      expect(generic.features.map((f) => f.category)).to.deep.equal(['motion-sensor', 'signal']);
+      expect(generic.zigbee2mqtt_info).to.deep.include({ model_id: 'lumi.unknown', manufacturer: 'LUMI' });
+    });
+
+    it('should keep its support on a device already in Gladys', () => {
+      gladys.stateManager.get.returns({ id: 'gladys-id', room_id: 'room_id', name: 'Motion', features: [] });
+      zigbee2MqttService.device.discoveredDevices = {
+        generic: z2mDevice('generic', {
+          supported: false,
+          interview_state: 'SUCCESSFUL',
+          definition: generatedDefinition([occupancy]),
+        }),
+      };
+
+      const [device] = zigbee2MqttService.device.getDiscoveredDevices();
+
+      expect(device).to.include({ id: 'gladys-id', name: 'Motion', zigbee2mqtt_support: 'generic' });
+    });
+  });
+
   it('get discovered devices without duplicate features', async () => {
     // PREPARE
     gladys.stateManager.get

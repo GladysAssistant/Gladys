@@ -1,5 +1,24 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { PAIRING_STATUS } = require('./constants');
+const { hasUsefulDefinition } = require('../utils/support');
+
+// The entries that get their Gladys device: to add (ready, generic), or to report (unsupported)
+const WITH_DEVICE = [PAIRING_STATUS.READY, PAIRING_STATUS.GENERIC, PAIRING_STATUS.UNSUPPORTED];
+
+/**
+ * @description The status of a device whose interview ended well (docs/specs/zigbee2mqtt-pairing.md, C.2): ready when
+ * Zigbee2mqtt supports it, generic when the definition it generated gives a useful feature, else unsupported.
+ * @param {object} data - The device: `supported`, `definition`, `ieee_address`.
+ * @returns {string} A PAIRING_STATUS.
+ * @example
+ * getInterviewedStatus({ supported: true, definition: {} }); // 'ready'
+ */
+function getInterviewedStatus(data) {
+  if (data.supported && data.definition) {
+    return PAIRING_STATUS.READY;
+  }
+  return hasUsefulDefinition(data.ieee_address, data.definition) ? PAIRING_STATUS.GENERIC : PAIRING_STATUS.UNSUPPORTED;
+}
 
 /**
  * @description The status a `bridge/event` of Zigbee2mqtt gives to a device (docs/specs/zigbee2mqtt-pairing.md, C.2).
@@ -18,7 +37,7 @@ function getStatus(type, data) {
       return PAIRING_STATUS.INTERVIEWING;
     }
     if (data.status === 'successful') {
-      return data.supported && data.definition ? PAIRING_STATUS.READY : PAIRING_STATUS.UNSUPPORTED;
+      return getInterviewedStatus(data);
     }
     if (data.status === 'failed') {
       return PAIRING_STATUS.FAILED;
@@ -40,13 +59,12 @@ function getStatus(type, data) {
  */
 function getPairingDevices(defaultElectricMeterDeviceFeatureId) {
   const entries = Object.values(this.pairingDevices);
-  const anyReady = entries.some((entry) => entry.status === PAIRING_STATUS.READY);
-  const gladysDevices = anyReady ? this.getDiscoveredDevices({}, defaultElectricMeterDeviceFeatureId) : [];
+  const anyWithDevice = entries.some((entry) => WITH_DEVICE.includes(entry.status));
+  const gladysDevices = anyWithDevice ? this.getDiscoveredDevices({}, defaultElectricMeterDeviceFeatureId) : [];
   return entries.map((entry) => {
-    const device =
-      entry.status === PAIRING_STATUS.READY
-        ? gladysDevices.find((gladysDevice) => gladysDevice.ieee_address === entry.ieee_address)
-        : undefined;
+    const device = WITH_DEVICE.includes(entry.status)
+      ? gladysDevices.find((gladysDevice) => gladysDevice.ieee_address === entry.ieee_address)
+      : undefined;
     return { ...entry, device: device || null };
   });
 }
@@ -60,7 +78,7 @@ function getPairingDevices(defaultElectricMeterDeviceFeatureId) {
  */
 function getReadyDevicesKey(entries) {
   return entries
-    .filter((entry) => entry.status === PAIRING_STATUS.READY)
+    .filter((entry) => WITH_DEVICE.includes(entry.status))
     .map((entry) => `${entry.ieee_address}:${entry.device ? entry.device.id || 'new' : 'none'}`)
     .join(',');
 }
@@ -90,7 +108,11 @@ function clearPairingDevices(keepDevicesToAdd = false) {
   const kept = new Set(
     keepDevicesToAdd
       ? this.getPairingDevices()
-          .filter((entry) => entry.status === PAIRING_STATUS.READY && !(entry.device && entry.device.id !== undefined))
+          .filter(
+            (entry) =>
+              [PAIRING_STATUS.READY, PAIRING_STATUS.GENERIC].includes(entry.status) &&
+              !(entry.device && entry.device.id !== undefined),
+          )
           .map((entry) => entry.ieee_address)
       : [],
   );
@@ -192,9 +214,13 @@ function updatePairingFromList(devices) {
       changed = true;
     }
     const waiting = entry.status === PAIRING_STATUS.JOINED || entry.status === PAIRING_STATUS.INTERVIEWING;
-    if (waiting && device.interview_completed === true && device.interviewing !== true) {
+    // Not supported when its interview ended, supported now: Zigbee2mqtt updated meanwhile
+    const nowSupported =
+      [PAIRING_STATUS.GENERIC, PAIRING_STATUS.UNSUPPORTED].includes(entry.status) &&
+      getInterviewedStatus(device) === PAIRING_STATUS.READY;
+    if ((waiting && device.interview_completed === true && device.interviewing !== true) || nowSupported) {
       const definition = device.definition || {};
-      entry.status = device.supported && device.definition ? PAIRING_STATUS.READY : PAIRING_STATUS.UNSUPPORTED;
+      entry.status = getInterviewedStatus(device);
       entry.model = definition.model || null;
       entry.vendor = definition.vendor || null;
       entry.description = definition.description || null;
@@ -218,7 +244,7 @@ function emitPairingDevicesAfterList(entriesChanged) {
     this.emitPairingDevices();
     return;
   }
-  if (!Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY)) {
+  if (!Object.values(this.pairingDevices).some((entry) => WITH_DEVICE.includes(entry.status))) {
     return;
   }
   const entries = this.getPairingDevices();
