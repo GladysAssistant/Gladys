@@ -175,7 +175,8 @@ const DiscoverTab = ({ children, ...props }) => {
           <div class={cx('dimmer-content', style.zigbee2mqttListBody)}>
             <div class="row">
               {native.map(({ device, index }) => (
-                <DiscoveredBox {...props} device={device} deviceIndex={index} />
+                // keyed: a card added leaves the list, the next one must not take its state (spinner, error)
+                <DiscoveredBox key={device.external_id} {...props} device={device} deviceIndex={index} />
               ))}
               {native.length === 0 && unsupported.length === 0 && <EmptyState />}
             </div>

@@ -251,6 +251,35 @@ describe('Zigbee2MQTT devices not supported', () => {
     });
   });
 
+  describe('forum link', () => {
+    beforeEach(() => {
+      cy.viewport(1280, 800);
+    });
+
+    it('should keep the link of the forum short even when the fields of the device alone are too long', () => {
+      const longRemote = {
+        ...remote,
+        zigbee2mqtt_info: {
+          ...remote.zigbee2mqtt_info,
+          model_id: '\u00e9'.repeat(1000),
+          definition: { ...remote.zigbee2mqtt_info.definition, description: '\u00e9'.repeat(1000) }
+        }
+      };
+      cy.intercept({ method: 'GET', url: api('/service/zigbee2mqtt/discovered*') }, [longRemote]).as('getDiscovered');
+      visitDiscover();
+      cy.get('[data-cy=z2m-discovered-suggest]')
+        .should('have.attr', 'href')
+        .then(href => {
+          expect(href.length).to.be.at.most(6000);
+          const params = new URL(href).searchParams;
+          expect(params.get('title')).to.include('IKEA E1743');
+          // The fields alone did not fit: cut to a few words, and said so
+          expect(params.get('body')).to.include(`${'\u00e9'.repeat(80)}\u2026`);
+          expect(params.get('body')).to.not.include('\u00e9'.repeat(81));
+        });
+    });
+  });
+
   describe('devices already in Gladys', () => {
     beforeEach(() => {
       cy.viewport(1280, 800);

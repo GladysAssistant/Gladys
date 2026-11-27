@@ -329,7 +329,8 @@ secondary features gives the user nothing to control or read.
   (`https://community.gladysassistant.com/new-topic?title=…&body=…&category=feature-requests`): title
   "Zigbee2MQTT: support for <vendor> <model>", body with the model, vendor, description, model ID and
   the exposes in a code block, cut (and said so, by character, never inside one) for the whole URL to stay
-  under 6,000 characters. It replaces the GitHub issue, which the old criterion ("a feature other than the
+  under 6,000 characters; when even without the exposes it does not fit, the title and each field are cut to
+  80 characters, ending with "…". It replaces the GitHub issue, which the old criterion ("a feature other than the
   battery", always met since `linkquality` is converted) no longer reached. A `native` device without any
   feature but its battery cannot be added: "Not supported by Gladys" and the same link.
 - `interview_failed`: "Identification failed" and the advice of D59; no Add, no report.

@@ -234,8 +234,8 @@ function updatePairingFromList(devices) {
 
 /**
  * @description Tell the registry once a device list of Zigbee2mqtt (`bridge/devices`) is handled: when an entry
- * changed, or when the Gladys device of a ready, generic or unsupported entry did (only now known, added to Gladys or deleted from it since
- * last sent). Not at each list while an entry is ready: the registry may keep one for weeks.
+ * changed, or when the Gladys device of a ready, generic or unsupported entry did (only now known, added to Gladys or
+ * deleted from it since last sent). Not at each list while an entry is ready: the registry may keep one for weeks.
  * @param {boolean} entriesChanged - Whether updatePairingFromList changed an entry.
  * @example
  * emitPairingDevicesAfterList(true);

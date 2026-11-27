@@ -23,6 +23,15 @@ const FORUM_NEW_TOPIC_URL = 'https://community.gladysassistant.com/new-topic';
 const FORUM_CATEGORY = 'feature-requests';
 // A longer URL may be refused on the way to the forum (E.4)
 const FORUM_URL_MAX_LENGTH = 6000;
+// The title and each field of the report, in characters, when even without the exposes the URL is too long. Five of
+// them, each character encoded on 12 at most, stay under 6,000 with the rest of the URL
+const FORUM_FIELD_MAX_LENGTH = 80;
+
+// The start of a text, by character (never half of an emoji), "…" telling it was cut
+const shorten = (text, max) => {
+  const characters = Array.from(String(text));
+  return characters.length > max ? `${characters.slice(0, max).join('')}…` : characters.join('');
+};
 
 /**
  * @description What Gladys can do with a discovered device; a device told by an older server is a supported one.
@@ -91,7 +100,8 @@ export const getZigbee2mqttReport = device => {
 
 /**
  * @description A new topic of the Gladys forum, prefilled, for a model Zigbee2mqtt knows and Gladys cannot convert
- * (E.4 b). Its exposes are cut, and said so, for the URL to stay under 6,000 characters.
+ * (E.4 b). Its exposes are cut, and said so, for the URL to stay under 6,000 characters; its title and fields too, with
+ * "…", only when they alone would not fit.
  * @param {object} device - A device of GET /discovered, with its `zigbee2mqtt_info`.
  * @param {string} title - The title of the topic, in the language of the user.
  * @param {string} cutNotice - What replaces the end of the exposes when they are cut.
@@ -102,20 +112,24 @@ export const getZigbee2mqttReport = device => {
 export const getForumUrl = (device, title, cutNotice) => {
   const info = (device && device.zigbee2mqtt_info) || {};
   const definition = info.definition || {};
-  const head = [
-    `- Model: \`${definition.model || '-'}\``,
-    `- Vendor: ${definition.vendor || '-'}`,
-    `- Description: ${definition.description || '-'}`,
-    `- Model ID: \`${info.model_id || '-'}\``,
-    '',
-    '```json'
-  ].join('\n');
-  const build = exposes =>
-    `${FORUM_NEW_TOPIC_URL}?title=${encodeURIComponent(title)}&category=${FORUM_CATEGORY}&body=${encodeURIComponent(
-      `${head}\n${exposes}\n\`\`\``
-    )}`;
+  // The title and the fields as they are, or cut to a few words (max) when even without the exposes they do not fit
+  const builder = max => {
+    const field = value => shorten(value || '-', max);
+    const head = [
+      `- Model: \`${field(definition.model)}\``,
+      `- Vendor: ${field(definition.vendor)}`,
+      `- Description: ${field(definition.description)}`,
+      `- Model ID: \`${field(info.model_id)}\``,
+      '',
+      '```json'
+    ].join('\n');
+    return exposes =>
+      `${FORUM_NEW_TOPIC_URL}?title=${encodeURIComponent(
+        shorten(title, max)
+      )}&category=${FORUM_CATEGORY}&body=${encodeURIComponent(`${head}\n${exposes}\n\`\`\``)}`;
+  };
   const exposes = JSON.stringify(definition.exposes || [], null, 2);
-  const url = build(exposes);
+  const url = builder(Infinity)(exposes);
   if (url.length <= FORUM_URL_MAX_LENGTH) {
     return url;
   }
@@ -123,6 +137,8 @@ export const getForumUrl = (device, title, cutNotice) => {
   // unit: half of an emoji would make encodeURIComponent throw
   const characters = Array.from(exposes);
   const start = count => `${characters.slice(0, count).join('')}\n${cutNotice}`;
+  const full = builder(Infinity);
+  const build = full(start(0)).length <= FORUM_URL_MAX_LENGTH ? full : builder(FORUM_FIELD_MAX_LENGTH);
   let low = 0;
   let high = characters.length;
   while (low < high) {
