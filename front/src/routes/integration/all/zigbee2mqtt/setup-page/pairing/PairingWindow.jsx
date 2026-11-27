@@ -225,7 +225,28 @@ class PairingWindow extends Component {
     return { entries, cards };
   };
 
-  setEntries = entries => this.setState(state => this.withCards(entries, state.cards, true));
+  // A confirmation asked for a generic device yields to a registry that no longer offers it to add (left, removed,
+  // added elsewhere)
+  setEntries = entries =>
+    this.setState(state => {
+      const next = this.withCards(entries, state.cards, true);
+      const { confirmEntry } = state;
+      if (confirmEntry) {
+        const current = entries.find(entry => entry.ieee_address === confirmEntry.ieee_address);
+        const card = next.cards[confirmEntry.ieee_address];
+        const toAdd =
+          current &&
+          current.status === PAIRING_STATUS.GENERIC &&
+          current.device &&
+          current.device.id === undefined &&
+          card &&
+          !card.added;
+        if (!toAdd) {
+          next.confirmEntry = null;
+        }
+      }
+      return next;
+    });
 
   updateCard = (ieeeAddress, changes) =>
     this.setState(state => ({

@@ -2809,7 +2809,7 @@
         "copyRefused": "Der Browser hat das Kopieren verweigert: Markiere den Text unten und kopiere ihn.",
         "interviewFailed": "Identifizierung fehlgeschlagen",
         "sectionTitle": "Von Zigbee2MQTT nicht unterstützt ({{count}})",
-        "sectionText": "Modelle, die Zigbee2MQTT nicht kennt: Einige lassen sich mit generischen Funktionen hinzufügen, die anderen können gemeldet werden.",
+        "sectionText": "Geräte, die Zigbee2MQTT nicht unterstützt oder nicht identifizieren konnte: Einige lassen sich mit generischen Funktionen hinzufügen, andere können gemeldet werden oder müssen erneut angelernt werden.",
         "forumTitle": "Zigbee2MQTT: Unterstützung für {{model}}",
         "forumCut": "(gekürzt: die Exposes sind für einen Link zu lang)",
         "onlySecondary": "Gladys nutzt von diesem Gerät nur die Batterie oder das Signal. Schlage es im Forum vor, damit es seine Funktionen bekommt!"

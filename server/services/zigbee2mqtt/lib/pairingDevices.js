@@ -70,7 +70,8 @@ function getPairingDevices(defaultElectricMeterDeviceFeatureId) {
 }
 
 /**
- * @description What the window shows of the Gladys devices of the ready entries: not known yet, to add, or in Gladys.
+ * @description What the window shows of the Gladys devices of the entries that have one (ready, generic, unsupported):
+ * not known yet, to add, or in Gladys.
  * @param {Array} entries - The entries of the registry, as getPairingDevices gives them.
  * @returns {string} A key that changes only with one of them.
  * @example
@@ -233,7 +234,7 @@ function updatePairingFromList(devices) {
 
 /**
  * @description Tell the registry once a device list of Zigbee2mqtt (`bridge/devices`) is handled: when an entry
- * changed, or when the Gladys device of a ready entry did (only now known, added to Gladys or deleted from it since
+ * changed, or when the Gladys device of a ready, generic or unsupported entry did (only now known, added to Gladys or deleted from it since
  * last sent). Not at each list while an entry is ready: the registry may keep one for weeks.
  * @param {boolean} entriesChanged - Whether updatePairingFromList changed an entry.
  * @example

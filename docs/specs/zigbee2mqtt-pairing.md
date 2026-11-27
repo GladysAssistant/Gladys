@@ -145,13 +145,13 @@ opened, and the ready ones of earlier windows not added to Gladys yet:
   that follows come in any order, and a device added to Gladys meanwhile gets its `id`. Until the
   device is in `discoveredDevices`, a `ready` or `generic` entry has `device: null` (the window shows
   "Getting the device ready…"), an `unsupported` one shows its explanation without "Copy the
-  information" (E.4).
+  information" (E.4); on a phone, its row opens no sheet, and so holds no link, until the device is known.
 
 ### C.3 `zigbee2mqtt.pairing` and `GET /pairing`
 
 - `zigbee2mqtt.pairing`: the whole registry, `[entry]` ordered by first appearance, sent each time an
-  entry changes (and after a `bridge/devices` that changes the `device` of a `ready` entry: known, or
-  its `id`). The list is
+  entry changes (and after a `bridge/devices` that changes the `device` of a `ready`, `generic` or
+  `unsupported` entry: known, or its `id`). The list is
   small (the devices of one session).
 - `GET /api/v1/service/zigbee2mqtt/pairing` (authenticated): the same list, for a page opened or
   reloaded during pairing.
@@ -297,7 +297,9 @@ secondary features gives the user nothing to control or read.
 
 ### E.3 Adding a generic device (D65, D69)
 
-- Discover tab and pairing window alike: **Add** (Save) on a `generic` device opens a confirmation:
+- Discover tab and pairing window alike: **Add** (Save) on a `generic` device opens a confirmation (closed by
+  itself in the window when a registry received no longer offers that device to add: left, removed, added
+  elsewhere):
   "Zigbee2MQTT does not know this model. Gladys will create the features Zigbee2MQTT deduced from what the
   device declares: some may be missing or not work. Add it anyway?" — **Cancel** / **Add**. A modal on a
   large screen, the confirmation sheet of the kit on a phone. Only **Add** sends the request; Cancel
@@ -344,7 +346,7 @@ secondary features gives the user nothing to control or read.
 - The count of new devices of the dashboard (`countNewDevices`) counts the `native` devices only.
 - On a phone, the section is a row that opens and closes it; each device is the sheet of the tab
   (`MobileDeviceItem`): `primaryAction` "Add to Gladys" for a `generic` one (then the confirmation sheet),
-  the two actions of (a) otherwise.
+  the two actions of (a) for an `unsupported` one, the advice of D59 for an `interview_failed` one.
 
 ## F. Tests
 

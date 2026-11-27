@@ -518,6 +518,16 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
     });
 
+    it('should close the confirmation of a generic device that leaves meanwhile', () => {
+      openPairing();
+      sendPairing([genericSwitch]);
+      cy.get('[data-cy=z2m-pairing-add]').click();
+      cy.get('[data-cy=z2m-pairing-generic-confirm]').should('be.visible');
+      // Gone from the registry (left the network, removed from Zigbee2mqtt): nothing left to confirm
+      sendPairing([]);
+      cy.get('[data-cy=z2m-pairing-generic-confirm]').should('not.exist');
+    });
+
     it('should add a device of which Gladys only uses the signal, and suggest it on the forum', () => {
       openPairing();
       const repeater = {

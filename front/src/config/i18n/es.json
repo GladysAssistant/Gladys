@@ -2565,7 +2565,7 @@
         "copyRefused": "El navegador rechazó la copia: selecciona el texto de abajo y cópialo.",
         "interviewFailed": "Identificación fallida",
         "sectionTitle": "No soportados por Zigbee2MQTT ({{count}})",
-        "sectionText": "Modelos que Zigbee2MQTT no conoce: algunos se pueden añadir con funciones genéricas, los demás se pueden notificar.",
+        "sectionText": "Dispositivos que Zigbee2MQTT no soporta o no pudo identificar: algunos se pueden añadir con funciones genéricas, otros se pueden notificar o deben emparejarse de nuevo.",
         "forumTitle": "Zigbee2MQTT: soporte para {{model}}",
         "forumCut": "(cortado: los exposes son demasiado largos para un enlace)",
         "onlySecondary": "Gladys solo usa la batería o la señal de este dispositivo. ¡Propónlo en el foro para que tenga sus funciones!"

@@ -2942,7 +2942,7 @@
         "copyRefused": "Le navigateur a refusé la copie : sélectionnez le texte ci-dessous et copiez-le.",
         "interviewFailed": "Identification échouée",
         "sectionTitle": "Non pris en charge par Zigbee2MQTT ({{count}})",
-        "sectionText": "Des modèles que Zigbee2MQTT ne connaît pas : certains s'ajoutent avec des fonctions génériques, les autres peuvent être signalés.",
+        "sectionText": "Des appareils que Zigbee2MQTT ne prend pas en charge ou n'a pas pu identifier : certains s'ajoutent avec des fonctions génériques, d'autres peuvent être signalés ou doivent être réappairés.",
         "forumTitle": "Zigbee2MQTT : prise en charge de {{model}}",
         "forumCut": "(coupé : les exposes sont trop longs pour un lien)",
         "onlySecondary": "Gladys n'utilise que la batterie ou le signal de cet appareil. Proposez-le sur le forum pour qu'il ait ses fonctions !"
