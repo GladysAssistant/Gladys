@@ -197,6 +197,37 @@ describe('thermostat pilot wire on two switches', () => {
     expect(savedOperatingStates(warm)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
   });
 
+  it('should keep the side the switches carry inside the hysteresis band, as for a switch (C.1.2)', async () => {
+    const regulated = { THERMOSTAT_TYPE: 'virtual', THERMOSTAT_TEMPERATURE_FEATURE: 'temp-sensor' };
+    // 21 °C on comfort at 21 °C: inside the ±0.5 °C band, the order carried is its memory.
+    // Comfort turned to frost protection elsewhere stays at rest.
+    const turnedDown = buildGladys({ q1: 0, q2: 1, temp: 21 });
+    await regulate(turnedDown, twoSwitchDevice('comfort', regulated));
+    expect(turnedDown.device.setValue.callCount).to.equal(0);
+    expect(savedOperatingStates(turnedDown)).to.deep.equal([THERMOSTAT_OPERATING_STATE.IDLE]);
+
+    // Comfort carried stays on comfort.
+    const heating = buildGladys({ q1: 0, q2: 0, temp: 21 });
+    await regulate(heating, twoSwitchDevice('comfort', regulated));
+    expect(heating.device.setValue.callCount).to.equal(0);
+    expect(savedOperatingStates(heating)).to.deep.equal([THERMOSTAT_OPERATING_STATE.HEATING]);
+
+    // Only the side is kept: off set elsewhere rests on the standby order, frost protection.
+    const stopped = buildGladys({ q1: 1, q2: 0, temp: 21 });
+    await regulate(stopped, twoSwitchDevice('comfort', regulated));
+    expect(written(stopped)).to.deep.equal({ 'relay-q1': 0, 'relay-q2': 1 });
+
+    // Eco is not the standby order: it counts as heating, and comfort is written back.
+    const eco = buildGladys({ q1: 1, q2: 1, temp: 21 });
+    await regulate(eco, twoSwitchDevice('comfort', regulated));
+    expect(written(eco)).to.deep.equal({ 'relay-q1': 0, 'relay-q2': 0 });
+
+    // Out of the band, the change made elsewhere is undone: comfort comes back below 20.5 °C.
+    const cold = buildGladys({ q1: 0, q2: 1, temp: 20.4 });
+    await regulate(cold, twoSwitchDevice('comfort', regulated));
+    expect(written(cold)).to.deep.equal({ 'relay-q2': 0 });
+  });
+
   it('should leave no mark: the switches are not followed as a module is', async () => {
     const gladys = buildGladys();
     const selfWritten = new Map();
