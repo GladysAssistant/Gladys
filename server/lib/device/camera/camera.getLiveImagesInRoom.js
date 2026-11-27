@@ -28,7 +28,7 @@ function isUsableCamera(device) {
  * (a camera that publishes its images, like an MQTT one), the last image stored for that
  * camera is used instead, if it is less than one hour old (camera.getImage). Disabled cameras
  * are skipped, their stored image included, and so is a camera disabled while its picture was
- * being taken (spec docs/specs/camera-enable-disable.md).
+ * being taken or before the other cameras were done (spec docs/specs/camera-enable-disable.md).
  * @param {string|null} roomId - Id of the room, null for the cameras assigned to no room.
  * @returns {Promise<Array<string>>} Resolve with the images found, one per camera at most.
  * @example
@@ -86,7 +86,10 @@ async function getLiveImagesInRoom(roomId) {
     { concurrency: MAX_LIVE_IMAGES_IN_PARALLEL },
   );
 
-  return images.filter(Boolean);
+  // The images are only returned once every camera is done, up to 20 s after the first one:
+  // a camera disabled in the meantime, while another one was still being asked, must not
+  // have its picture returned either, live or stored. Promise.map keeps the order of selectors.
+  return images.filter((image, index) => image && isUsableCamera(this.stateManager.get('device', selectors[index])));
 }
 
 module.exports = {

@@ -267,4 +267,40 @@ describe('Camera.getLiveImagesInRoom', () => {
     expect(maxInFlight).to.equal(MAX_LIVE_IMAGES_IN_PARALLEL);
     expect([...images].sort()).to.deep.equal(selectors.map((selector) => `image/jpg;base64,${selector}`).sort());
   });
+
+  [
+    // the first camera's picture: taken now, or its stored one (a service that cannot take one)
+    ['live', () => ({ device: { getImage: fake.resolves(LIVE_IMAGE) } })],
+    ['stored', () => ({ device: {} })],
+  ].forEach(([kind, buildFirstCameraService]) => {
+    it(`should not return the ${kind} picture of a camera disabled while another camera was still asked`, async () => {
+      await createCameraInRoom(2);
+      // test-camera answers at once, test-camera-2 is slow: the user turns test-camera off
+      // during the capture of test-camera-2, before the tool answers
+      stateManager.setState('device', 'test-camera', {
+        ...buildCameraState(),
+        selector: 'test-camera',
+        service_id: 'first',
+      });
+      stateManager.setState('device', 'test-camera-2', { ...buildCameraState(), selector: 'test-camera-2' });
+      const slowImage = fake(async () => {
+        // test-camera is done by then: only the check made once every camera is done catches it
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        stateManager.setState('device', 'test-camera', buildCameraState({ enabled: 0 }));
+        return 'image/jpg;base64,U0xPVw==';
+      });
+      const services = {
+        first: buildFirstCameraService(),
+        [SERVICE_ID]: { device: { getImage: slowImage } },
+      };
+      serviceManager.getServiceById = fake((serviceId) => services[serviceId]);
+
+      const images = await deviceManager.camera.getLiveImagesInRoom(ROOM_ID);
+
+      expect(slowImage.callCount).to.equal(1);
+      expect(images).to.deep.equal(['image/jpg;base64,U0xPVw==']);
+    });
+  });
 });
