@@ -42,6 +42,13 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
   });
 };
 
+// A state of a feature the box does not show changes nothing in it. Every box receives every
+// device event of the house: without this check, each of them re-rendered all its rows, and a
+// native select open in one of them (a mode picker on Android) was disturbed by states of
+// devices that have nothing to do with it.
+const hasDeviceFeature = (deviceFeatures, deviceFeatureSelector) =>
+  Array.isArray(deviceFeatures) && deviceFeatures.some(feature => feature.selector === deviceFeatureSelector);
+
 const updateDeviceFeaturesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
@@ -148,36 +155,36 @@ class DevicesComponent extends Component {
       last_value: payload.last_value,
       last_value_changed: payload.last_value_changed
     });
-    let { deviceFeatures } = this.state;
-    if (deviceFeatures) {
-      deviceFeatures = updateDeviceFeatures(
+    if (!hasDeviceFeature(this.state.deviceFeatures, payload.device_feature_selector)) {
+      return;
+    }
+    // from the state being applied, not from this.state: two states received before the next
+    // render (two features of the same box) must not undo one another
+    this.setState(({ deviceFeatures }) => ({
+      deviceFeatures: updateDeviceFeatures(
         deviceFeatures,
         payload.device_feature_selector,
         payload.last_value,
         payload.last_value_changed
-      );
-      this.setState({
-        deviceFeatures
-      });
-    }
+      )
+    }));
   };
   updateDeviceTextWebsocket = payload => {
     this.keepStateFromGladys(payload.device_feature, {
       last_value_string: payload.last_value_string,
       last_value_changed: payload.last_value_changed
     });
-    let { deviceFeatures } = this.state;
-    if (deviceFeatures) {
-      deviceFeatures = updateDeviceFeaturesString(
+    if (!hasDeviceFeature(this.state.deviceFeatures, payload.device_feature)) {
+      return;
+    }
+    this.setState(({ deviceFeatures }) => ({
+      deviceFeatures: updateDeviceFeaturesString(
         deviceFeatures,
         payload.device_feature,
         payload.last_value_string,
         payload.last_value_changed
-      );
-      this.setState({
-        deviceFeatures
-      });
-    }
+      )
+    }));
   };
 
   setValueDevice = async (deviceFeature, value, options) => {

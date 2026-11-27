@@ -3,6 +3,7 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { toSelectValue } from '../../../../utils/selectValue';
 
 // Recall-a-preset row. Recalling a preset is an action, not a state: no option stays
 // selected, and the select returns to its placeholder after each command.
@@ -39,7 +40,7 @@ class CameraPresetDeviceFeature extends Component {
                 <Text id="dashboard.boxes.devicesInRoom.cameraPresetPlaceholder" />
               </option>
               {supportedOptions.map(option => (
-                <option value={option.value} key={option.value}>
+                <option value={toSelectValue(option.value)} key={option.value}>
                   {option.label}
                 </option>
               ))}

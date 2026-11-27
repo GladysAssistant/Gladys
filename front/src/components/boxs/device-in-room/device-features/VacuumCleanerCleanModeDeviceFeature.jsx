@@ -2,6 +2,7 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { toSelectValue } from '../../../../utils/selectValue';
 import { resolveFeatureOptions } from '../../../../utils/supportedOptions';
 import { VACUUM_CLEANER_CLEAN_MODE } from '../../../../../../server/utils/constants';
 
@@ -37,9 +38,13 @@ const VacuumCleanerCleanModeDeviceFeature = ({ children, ...props }) => {
       <td class="py-0">
         <div class="justify-content-end">
           <div class="form-group mb-0">
-            <select value={props.deviceFeature.last_value} onChange={updateValue} class="form-control form-control-sm">
+            <select
+              value={toSelectValue(props.deviceFeature.last_value)}
+              onChange={updateValue}
+              class="form-control form-control-sm"
+            >
               {options.map(option => (
-                <option value={option.value} key={option.value}>
+                <option value={toSelectValue(option.value)} key={option.value}>
                   {option.i18nKey ? (
                     <Text
                       id={`deviceFeatureAction.category.vacuum-cleaner.clean-mode.${option.i18nKey}`}
