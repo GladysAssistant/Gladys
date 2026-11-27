@@ -518,6 +518,26 @@ describe('Zigbee2mqtt pairing window', () => {
       cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
     });
 
+    it('should add a device of which Gladys only uses the signal, and suggest it on the forum', () => {
+      openPairing();
+      const repeater = {
+        ...readyBulb,
+        model: 'E1746',
+        description: 'TRADFRI signal repeater',
+        device: {
+          ...readyBulb.device,
+          features: [{ ...readyBulb.device.features[0], category: 'signal', type: 'integer', name: 'linkquality' }]
+        }
+      };
+      sendPairing([repeater]);
+      cy.get('[data-cy=z2m-pairing-add]').should('exist');
+      cy.get('[data-cy=z2m-pairing-only-secondary]')
+        .should('contain', Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.support.onlySecondary'))
+        .find('[data-cy=z2m-discovered-suggest]')
+        .should('have.attr', 'href')
+        .and('include', 'category=feature-requests');
+    });
+
     it('should offer to copy the information of a device not supported, once Gladys knows it', () => {
       openPairing();
       sendPairing([{ ...genericSwitch, status: 'unsupported', device: { ...genericSwitch.device, features: [] } }]);

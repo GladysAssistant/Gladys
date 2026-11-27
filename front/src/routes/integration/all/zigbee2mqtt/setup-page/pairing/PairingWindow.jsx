@@ -19,8 +19,9 @@ import {
 import { MobileDeviceItem } from '../../../../../../components/integration/mobile';
 import { PERMIT_JOIN_CONFIRM_TIMEOUT_IN_MS } from '../constants';
 import { PAIRING_STATUS, getDevicePhotoUrl, getPairingIcon, suggestName, formatCountdown } from './pairingUtils';
-import { withoutSupportFields } from '../../utils/support';
+import { withoutSupportFields, hasUsefulFeature } from '../../utils/support';
 import AskZigbee2mqtt from '../../commons/AskZigbee2mqtt';
+import SuggestDevice from '../../commons/SuggestDevice';
 import { getGenericConfirm } from '../../discover-page/DiscoveredBox';
 import style from './pairing.css';
 
@@ -656,6 +657,8 @@ class PairingWindow extends Component {
     }
     const id = entry.ieee_address;
     const generic = status === PAIRING_STATUS.GENERIC;
+    // Supported, only its battery or signal used by Gladys: added all the same, and suggested on the forum (E.4 b)
+    const onlySecondary = !generic && !hasUsefulFeature(device.features);
     return (
       <div class={style.card} data-cy="z2m-pairing-card">
         {generic && (
@@ -729,6 +732,14 @@ class PairingWindow extends Component {
             <AskZigbee2mqtt device={device} />
           </div>
         )}
+        {onlySecondary && (
+          <div class="mt-3" data-cy="z2m-pairing-only-secondary">
+            <p class={style.advice}>
+              <Text id={`${S}.onlySecondary`} />
+            </p>
+            <SuggestDevice device={device} dictionary={get(this.props, 'intl.dictionary')} />
+          </div>
+        )}
       </div>
     );
   }
@@ -770,6 +781,7 @@ class PairingWindow extends Component {
     const timeline = <Timeline status={status} inline />;
     const generic = status === PAIRING_STATUS.GENERIC;
     if (isAddable(status) && device && device.id === undefined && card && !card.added) {
+      const onlySecondary = !generic && !hasUsefulFeature(device.features);
       return (
         <MobileDeviceItem
           key={entry.ieee_address}
@@ -785,6 +797,11 @@ class PairingWindow extends Component {
             generic && (
               <MobileNotice key="generic" tone="warning" icon="alert-triangle" data-cy="z2m-pairing-generic">
                 <Text id={`${S}.genericText`} />
+              </MobileNotice>
+            ),
+            onlySecondary && (
+              <MobileNotice key="secondary" icon="info" data-cy="z2m-pairing-only-secondary">
+                <Text id={`${S}.onlySecondary`} />
               </MobileNotice>
             )
           ]}
@@ -804,6 +821,7 @@ class PairingWindow extends Component {
           dataCy="z2m-pairing-row"
         >
           {generic && <AskZigbee2mqtt device={device} isMobile />}
+          {onlySecondary && <SuggestDevice device={device} dictionary={get(this.props, 'intl.dictionary')} isMobile />}
         </MobileDeviceItem>
       );
     }

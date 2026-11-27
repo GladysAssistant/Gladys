@@ -6,24 +6,16 @@ import get from 'get-value';
 import { RequestStatus } from '../../../../../utils/consts';
 import { getZ2mDeviceUrl } from '../utils/getZ2mUrl';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
 import style from './style.css';
-import { MobileNotice, MobilePill, BigButton, ConfirmSheet, kitStyle } from '../../../../../components/mobile';
+import { MobileNotice, MobilePill, ConfirmSheet, kitStyle } from '../../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../../components/integration/mobile';
 import AskZigbee2mqtt from '../commons/AskZigbee2mqtt';
-import { ZIGBEE2MQTT_SUPPORT, getSupport, hasUsefulFeature, getForumUrl } from '../utils/support';
+import SuggestDevice from '../commons/SuggestDevice';
+import { ZIGBEE2MQTT_SUPPORT, getSupport, hasUsefulFeature } from '../utils/support';
 
 const S = 'integration.zigbee2mqtt.support';
-
-// A model Zigbee2mqtt knows and Gladys cannot convert: a prefilled topic of the forum (docs/specs/zigbee2mqtt-pairing.md,
-// E.4 b)
-const getSuggestUrl = (device, dictionary) => {
-  const info = device.zigbee2mqtt_info || {};
-  const definition = info.definition || {};
-  const model = [definition.vendor, definition.model || device.model].filter(Boolean).join(' ');
-  const title = (get(dictionary, `${S}.forumTitle`) || '').replace('{{model}}', model);
-  return getForumUrl(device, title, get(dictionary, `${S}.forumCut`) || '');
-};
 
 // The confirmation of a device added with the features Zigbee2mqtt generated (E.3)
 export const getGenericConfirm = dictionary => ({
@@ -108,25 +100,11 @@ class DiscoveredBox extends Component {
         </div>
       );
     }
-    // Known by Zigbee2mqtt, nothing Gladys can use
-    const link = {
-      href: getSuggestUrl(device, dictionary),
-      target: '_blank',
-      rel: 'noopener noreferrer',
-      'data-cy': 'z2m-discovered-suggest'
-    };
+    // Known by Zigbee2mqtt, no feature Gladys can use, not even a signal
     return (
       <div data-cy="z2m-discovered-not-handled">
         {notice('integration.zigbee2mqtt.discover.deviceNotHandled')}
-        {isMobile ? (
-          <BigButton icon="message-circle" {...link}>
-            <Text id="integration.zigbee2mqtt.discover.suggestDevice" />
-          </BigButton>
-        ) : (
-          <a class="btn btn-primary" {...link}>
-            <Text id="integration.zigbee2mqtt.discover.suggestDevice" />
-          </a>
-        )}
+        <SuggestDevice device={device} dictionary={dictionary} isMobile={isMobile} />
       </div>
     );
   }
@@ -139,6 +117,7 @@ class DiscoveredBox extends Component {
     z2mUrl,
     support,
     usable,
+    onlySecondary,
     enableUpdateButton,
     alreadyExistsButton,
     saveError,
@@ -149,10 +128,15 @@ class DiscoveredBox extends Component {
     let status = null;
     let primaryAction;
     if (!usable) {
-      const label =
-        support === ZIGBEE2MQTT_SUPPORT.INTERVIEW_FAILED ? `${S}.interviewFailed` : 'mobileDeviceList.notSupported';
+      // Already in Gladys (added before, not recognized since): said so, nothing to add or update
+      let label = 'mobileDeviceList.notSupported';
+      if (device.created_at) {
+        label = 'mobileDeviceList.inGladys';
+      } else if (support === ZIGBEE2MQTT_SUPPORT.INTERVIEW_FAILED) {
+        label = `${S}.interviewFailed`;
+      }
       status = (
-        <MobilePill>
+        <MobilePill tone={device.created_at ? 'success' : undefined}>
           <Text id={label} />
         </MobilePill>
       );
@@ -188,6 +172,12 @@ class DiscoveredBox extends Component {
       notices = (
         <MobileNotice tone="warning" icon="alert-triangle">
           <Text id={`${S}.genericText`} />
+        </MobileNotice>
+      );
+    } else if (onlySecondary) {
+      notices = (
+        <MobileNotice icon="info" data-cy="z2m-discovered-only-secondary">
+          <Text id={`${S}.onlySecondary`} />
         </MobileNotice>
       );
     } else if (!usable) {
@@ -238,6 +228,7 @@ class DiscoveredBox extends Component {
           </a>
         )}
         {generic && <AskZigbee2mqtt device={device} isMobile />}
+        {onlySecondary && <SuggestDevice device={device} dictionary={dictionary} isMobile />}
       </MobileDeviceItem>
     );
   }
@@ -249,9 +240,12 @@ class DiscoveredBox extends Component {
     const { features = [], ieee_address = null } = device;
     const support = getSupport(device);
     const generic = support === ZIGBEE2MQTT_SUPPORT.GENERIC;
-    // What Gladys can add: a supported model with a feature to control or read, or the generic features of a model
-    // Zigbee2mqtt does not know (E.2)
-    const usable = generic || (support === ZIGBEE2MQTT_SUPPORT.NATIVE && hasUsefulFeature(features));
+    const native = support === ZIGBEE2MQTT_SUPPORT.NATIVE;
+    // What Gladys can add: a supported model with a feature besides its battery (a router and its signal included),
+    // or the generic features of a model Zigbee2mqtt does not know (E.2)
+    const usable = generic || (native && features.some(f => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY));
+    // Supported, but only its battery or signal used by Gladys: added all the same, and suggested on the forum (E.4 b)
+    const onlySecondary = native && usable && !hasUsefulFeature(features);
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
     const alreadyExistsButton = usable && !enableSaveButton && !enableUpdateButton;
@@ -263,6 +257,7 @@ class DiscoveredBox extends Component {
         z2mUrl,
         support,
         usable,
+        onlySecondary,
         enableUpdateButton,
         alreadyExistsButton,
         saveError,
@@ -303,6 +298,11 @@ class DiscoveredBox extends Component {
                   </Localizer>
                 </div>
                 {!usable && this.renderNotUsable({ device, support, isMobile: false, dictionary })}
+                {!usable && device.created_at && (
+                  <button disabled="true" class="btn btn-primary" data-cy="z2m-discovered-in-gladys">
+                    <Text id="integration.zigbee2mqtt.alreadyExistsButton" />
+                  </button>
+                )}
 
                 {usable && (
                   <div>
@@ -312,6 +312,11 @@ class DiscoveredBox extends Component {
                           <Text id={`${S}.genericBadge`} />
                         </span>
                         <Text id={`${S}.genericText`} />
+                      </div>
+                    )}
+                    {onlySecondary && (
+                      <div class="alert alert-info" data-cy="z2m-discovered-only-secondary">
+                        <Text id={`${S}.onlySecondary`} />
                       </div>
                     )}
                     <div class="form-group">
@@ -398,6 +403,7 @@ class DiscoveredBox extends Component {
                       )}
                     </div>
                     {generic && <AskZigbee2mqtt device={device} />}
+                    {onlySecondary && <SuggestDevice device={device} dictionary={dictionary} />}
                   </div>
                 )}
               </div>

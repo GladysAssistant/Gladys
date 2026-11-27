@@ -2567,7 +2567,8 @@
         "sectionTitle": "No soportados por Zigbee2MQTT ({{count}})",
         "sectionText": "Modelos que Zigbee2MQTT no conoce: algunos se pueden añadir con funciones genéricas, los demás se pueden notificar.",
         "forumTitle": "Zigbee2MQTT: soporte para {{model}}",
-        "forumCut": "(cortado: los exposes son demasiado largos para un enlace)"
+        "forumCut": "(cortado: los exposes son demasiado largos para un enlace)",
+        "onlySecondary": "Gladys solo usa la batería o la señal de este dispositivo. ¡Propónlo en el foro para que tenga sus funciones!"
       }
     },
     "nodeRed": {

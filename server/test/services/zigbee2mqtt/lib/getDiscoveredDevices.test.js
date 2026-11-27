@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const Zigbee2MqttService = require('../../../../services/zigbee2mqtt');
+const { convertDevice } = require('../../../../services/zigbee2mqtt/utils/convertDevice');
 
 const discoveredDevices = require('./payloads/mqtt_devices_get.json');
 const expectedDevicesPayload = require('./payloads/event_device_result.json');
@@ -132,6 +133,32 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
       const generic = devices.find((d) => d.name === 'generic');
       expect(generic.features.map((f) => f.category)).to.deep.equal(['motion-sensor', 'signal']);
       expect(generic.zigbee2mqtt_info).to.deep.include({ model_id: 'lumi.unknown', manufacturer: 'LUMI' });
+    });
+
+    it('should offer to update a generic device of Gladys once Zigbee2mqtt supports its model', () => {
+      // Added with its generic features (motion only); Zigbee2mqtt updated since knows the model, with an illuminance
+      const existing = convertDevice(
+        z2mDevice('generic', { supported: false, definition: generatedDefinition([occupancy]) }),
+        serviceId,
+      );
+      gladys.stateManager.get.returns({ ...existing, id: 'gladys-id', name: 'Motion', room_id: 'room_id' });
+      const illuminance = { type: 'numeric', name: 'illuminance', property: 'illuminance', access: 1, unit: 'lx' };
+      zigbee2MqttService.device.discoveredDevices = {
+        generic: z2mDevice('generic', {
+          supported: true,
+          interview_state: 'SUCCESSFUL',
+          definition: {
+            model: 'RTCGQ11LM',
+            vendor: 'Aqara',
+            description: 'Motion sensor',
+            exposes: [occupancy, illuminance],
+          },
+        }),
+      };
+
+      const [device] = zigbee2MqttService.device.getDiscoveredDevices();
+
+      expect(device).to.include({ id: 'gladys-id', name: 'Motion', zigbee2mqtt_support: 'native', updatable: true });
     });
 
     it('should keep its support on a device already in Gladys', () => {

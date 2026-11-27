@@ -790,6 +790,25 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       assert.notCalled(gladys.event.emit);
     });
 
+    it('should only tell in debug a state of a device Zigbee2mqtt does not support, not in Gladys', async () => {
+      // PREPARE
+      const warnStub = sinon.stub(logger, 'warn');
+      const debugStub = sinon.stub(logger, 'debug');
+      zigbee2mqttManager.gladys.stateManager.get = sinon.stub().returns(null);
+      zigbee2mqttManager.discoveredDevices['tuya/valve'] = {
+        friendly_name: 'tuya/valve',
+        ieee_address: '0xa4c138000000cafe',
+        supported: false,
+      };
+      // EXECUTE
+      await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/tuya/valve', `{"linkquality":120}`);
+      // ASSERT
+      assert.notCalled(warnStub);
+      assert.calledWithExactly(debugStub, 'Zigbee2mqtt device tuya/valve not configured in Gladys.');
+      // Kept all the same: replayed if it is added with generic features
+      expect(zigbee2mqttManager.lastReceivedStates['0xa4c138000000cafe']).to.have.property('linkquality');
+    });
+
     describe('last values received', () => {
       let clock;
 

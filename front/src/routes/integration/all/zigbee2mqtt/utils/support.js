@@ -119,16 +119,19 @@ export const getForumUrl = (device, title, cutNotice) => {
   if (url.length <= FORUM_URL_MAX_LENGTH) {
     return url;
   }
-  // The longest start of the exposes that fits, the encoding of each character varying
+  // The longest start of the exposes that fits, the encoding of each character varying. By character, not by UTF-16
+  // unit: half of an emoji would make encodeURIComponent throw
+  const characters = Array.from(exposes);
+  const start = count => `${characters.slice(0, count).join('')}\n${cutNotice}`;
   let low = 0;
-  let high = exposes.length;
+  let high = characters.length;
   while (low < high) {
     const middle = Math.ceil((low + high) / 2);
-    if (build(`${exposes.slice(0, middle)}\n${cutNotice}`).length <= FORUM_URL_MAX_LENGTH) {
+    if (build(start(middle)).length <= FORUM_URL_MAX_LENGTH) {
       low = middle;
     } else {
       high = middle - 1;
     }
   }
-  return build(`${exposes.slice(0, low)}\n${cutNotice}`);
+  return build(start(low));
 };

@@ -8,7 +8,7 @@
 > the same diff.**
 >
 > Status: B to D **implemented** (lot 2 of the Zigbee2mqtt revamp, #3427); E (devices Zigbee2mqtt does not
-> support, step 2.3) **specified, to implement**. The setup wizard and the dashboard themselves are specified in
+> support, step 2.3) **implemented** (PR to come). The setup wizard and the dashboard themselves are specified in
 > [zigbee2mqtt-installation.md](./zigbee2mqtt-installation.md) (M, N).
 
 ## A. Context
@@ -109,7 +109,7 @@ opened, and the ready ones of earlier windows not added to Gladys yet:
 
 ### C.2 Transitions
 
-| Event                                         | No entry                | `joined` / `interviewing` | `ready` / `unsupported` / `failed` / `left` |
+| Event                                         | No entry                | `joined` / `interviewing` | `ready` / `generic` / `unsupported` / `failed` / `left` |
 | --------------------------------------------- | ----------------------- | ------------------------- | ---------------------------------- |
 | `device_joined`                               | create `joined`         | `joined`                  | `joined` (joined again)            |
 | `device_interview` `started`                  | create `interviewing`   | `interviewing`            | `interviewing`                     |
@@ -320,21 +320,27 @@ secondary features gives the user nothing to control or read.
   HTTP (`document.execCommand('copy')` fallback, as the password of the interface); refused, the text is
   shown, selectable. The explanation of an `unsupported` device: "Zigbee2MQTT does not know this model and
   found nothing Gladys can control on it."
-- **(b) Known by Zigbee2mqtt, nothing useful in Gladys** (`native`, no useful feature): "Not supported by
-  Gladys" and **Suggest this device**: a new topic on the Gladys forum, prefilled
+- **(b) Known by Zigbee2mqtt, nothing useful in Gladys** (`native`, only secondary features, E.1): still added
+  as before (a router is added for its signal), in the Discover tab and the pairing window alike, and counted by
+  the dashboard; its card adds "Gladys only uses the battery or the signal of this device" and **Suggest this
+  device**: a new topic on the Gladys forum, prefilled
   (`https://community.gladysassistant.com/new-topic?title=…&body=…&category=feature-requests`): title
   "Zigbee2MQTT: support for <vendor> <model>", body with the model, vendor, description, model ID and
-  the exposes in a code block, cut (and said so) for the whole URL to stay under 6,000 characters. It
-  replaces the GitHub issue. The criterion was "a feature other than the battery", always met since
-  `linkquality` is converted: the button had become unreachable.
+  the exposes in a code block, cut (and said so, by character, never inside one) for the whole URL to stay
+  under 6,000 characters. It replaces the GitHub issue, which the old criterion ("a feature other than the
+  battery", always met since `linkquality` is converted) no longer reached. A `native` device without any
+  feature but its battery cannot be added: "Not supported by Gladys" and the same link.
 - `interview_failed`: "Identification failed" and the advice of D59; no Add, no report.
 
 ### E.5 Discover tab (D67, D71)
 
 - The main list holds the `native` devices, as today (case b included). Below it, a section **"Not
   supported by Zigbee2MQTT (n)"**, collapsed by default (desktop and phone), holds the `generic`,
-  `unsupported` and `interview_failed` devices, each with what E.3 and E.4 say; absent when empty. Its
-  devices already in Gladys show "Already in Gladys" / Update as in the main list.
+  `unsupported` and `interview_failed` devices, each with what E.3 and E.4 say; absent when empty. A
+  `generic` device already in Gladys shows "Already in Gladys" / Update as in the main list; an
+  `unsupported` or `interview_failed` one already in Gladys (added before, not recognized since) shows
+  "Already in Gladys" with its explanation, never Update (its features would be emptied).
+- "No new device" shows only when the list and the section are both empty.
 - The count of new devices of the dashboard (`countNewDevices`) counts the `native` devices only.
 - On a phone, the section is a row that opens and closes it; each device is the sheet of the tab
   (`MobileDeviceItem`): `primaryAction` "Add to Gladys" for a `generic` one (then the confirmation sheet),
@@ -346,7 +352,8 @@ secondary features gives the user nothing to control or read.
   `handleMqttMessage`, `stop`, the controller): B.1 sources and forgetting, B.2 bounds and "only on
   change" (fake timers), each transition of C.2, `GET /pairing`. E.2: each `zigbee2mqtt_support` (Zigbee2mqtt
   1 and 2 interview fields), the useful-feature rule, `zigbee2mqtt_info` only where E.2 says, a generic
-  device controlled once in Gladys, a generic device turning `native`.
+  device controlled and read once in Gladys (`setValue`, `readValue`, `findMatchingExpose` without definition),
+  a generic device turning `native` (Update), a state of a device not supported logged in debug only.
 - Cypress (E): the collapsed section (desktop, phone), the confirmation (Cancel keeps the card, Add sends
   the request) in the Discover tab and the pairing window, a `generic` row, an `unsupported` one (link,
   copy on HTTP, copy refused), case (b) (the forum URL, cut), `interview_failed`, the count of new devices.

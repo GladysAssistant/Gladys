@@ -94,7 +94,7 @@ const MobileDiscoverTab = props => {
             </MobileGroup>
           </div>
         )}
-        {native.length === 0 && !loading && (
+        {native.length === 0 && unsupported.length === 0 && !loading && (
           <MobileEmptyState icon="radio" text={<Text id="integration.zigbee2mqtt.discover.noNewDevice" />} />
         )}
         {unsupported.length > 0 && <UnsupportedSection entries={unsupported} isMobile boxProps={props} />}
@@ -177,7 +177,7 @@ const DiscoverTab = ({ children, ...props }) => {
               {native.map(({ device, index }) => (
                 <DiscoveredBox {...props} device={device} deviceIndex={index} />
               ))}
-              {native.length === 0 && <EmptyState />}
+              {native.length === 0 && unsupported.length === 0 && <EmptyState />}
             </div>
             {unsupported.length > 0 && <UnsupportedSection entries={unsupported} boxProps={props} />}
           </div>

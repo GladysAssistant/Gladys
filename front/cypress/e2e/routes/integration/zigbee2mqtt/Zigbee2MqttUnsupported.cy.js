@@ -229,9 +229,13 @@ describe('Zigbee2MQTT devices not supported', () => {
         .and('include', 'genOnOff');
     });
 
-    it('should suggest on the forum a model Zigbee2MQTT knows and Gladys cannot use, its link cut to stay short', () => {
+    it('should add a model of which Gladys only uses the signal, and suggest it on the forum with a short link', () => {
       visitDiscover();
-      cy.contains('[data-cy=z2m-discovered-card]', i18n('integration.zigbee2mqtt.discover.deviceNotHandled'))
+      // Added as before the section existed: a router is added for its signal
+      cy.contains('[data-cy=z2m-discovered-card]', i18n(`${S}.onlySecondary`))
+        .find('[data-cy=z2m-discovered-save]')
+        .should('exist');
+      cy.contains('[data-cy=z2m-discovered-card]', i18n(`${S}.onlySecondary`))
         .find('[data-cy=z2m-discovered-suggest]')
         .should('have.attr', 'target', '_blank')
         .and('have.attr', 'href')
@@ -244,6 +248,32 @@ describe('Zigbee2MQTT devices not supported', () => {
           expect(params.get('body')).to.include('TRADFRI on/off switch');
           expect(params.get('body')).to.include(i18n(`${S}.forumCut`));
         });
+    });
+  });
+
+  describe('devices already in Gladys', () => {
+    beforeEach(() => {
+      cy.viewport(1280, 800);
+    });
+
+    it('should tell a device not recognized since it was added as in Gladys, without offering to update it', () => {
+      const inGladys = {
+        ...unsupportedValve,
+        id: 'cy-valve',
+        created_at: '2026-01-01T00:00:00.000Z',
+        updatable: true
+      };
+      cy.intercept({ method: 'GET', url: api('/service/zigbee2mqtt/discovered*') }, [inGladys]).as('getDiscovered');
+      visitDiscover();
+      // Only a device in the section: the list does not say there is nothing
+      cy.get('[data-cy=z2m-discover-unsupported-toggle]').click();
+      cy.contains(i18n('integration.zigbee2mqtt.discover.noDeviceDiscovered')).should('not.exist');
+      cy.get('[data-cy=z2m-discovered-card][data-support=unsupported]').within(() => {
+        cy.get('[data-cy=z2m-discovered-in-gladys]')
+          .should('be.disabled')
+          .and('contain', i18n('integration.zigbee2mqtt.alreadyExistsButton'));
+        cy.contains(i18n('integration.zigbee2mqtt.updateButton')).should('not.exist');
+      });
     });
   });
 

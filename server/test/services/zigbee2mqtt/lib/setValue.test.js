@@ -63,6 +63,26 @@ const featureSirenMaxDuration = {
   type: 'decimal',
 };
 
+// A model Zigbee2mqtt does not know, with the generic definition it deduced from its clusters
+// (docs/specs/zigbee2mqtt-pairing.md, E.2): controlled and read like any other once in Gladys
+const genericDevice = {
+  friendly_name: '0xa4c138000000f00d',
+  ieee_address: '0xa4c138000000f00d',
+  supported: false,
+  interview_state: 'SUCCESSFUL',
+  definition: {
+    model: 'TS0001',
+    vendor: '_TZ3000_abcd',
+    description: 'Automatically generated definition',
+    exposes: [
+      {
+        type: 'switch',
+        features: [{ type: 'binary', name: 'state', property: 'state', access: 7, value_on: 'ON', value_off: 'OFF' }],
+      },
+    ],
+  },
+};
+
 describe('zigbee2mqtt setValue', () => {
   // PREPARE
   let zigbee2MqttManager;
@@ -155,6 +175,20 @@ describe('zigbee2mqtt setValue', () => {
         `Zigbee2mqtt expose not found: "zigbee2mqtt:0x00158d00045b2740:light:color:color" with property "color"`,
       );
     }
+  });
+
+  it('should control a device Zigbee2mqtt does not support through its generic definition', async () => {
+    zigbee2MqttManager.discoveredDevices[genericDevice.friendly_name] = genericDevice;
+    await zigbee2MqttManager.setValue(
+      null,
+      { external_id: 'zigbee2mqtt:0xa4c138000000f00d:switch:binary:state', type: 'binary' },
+      1,
+    );
+    assert.calledOnceWithExactly(
+      mqttClient.publish,
+      'zigbee2mqtt/0xa4c138000000f00d/set',
+      JSON.stringify({ state: 'ON' }),
+    );
   });
 
   it('set value good topic ON', async () => {

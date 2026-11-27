@@ -327,9 +327,10 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   the Zigbee2MQTT interface, another installation) and those to update. "Hide already added
   devices" is a switch row. A device is added with "Save"
   or updated with "Update", as on the card; its sheet shows the topic and the IEEE address, and
-  "Open in Zigbee2MQTT" as on the "Devices" tab. A device Zigbee2MQTT supports that exposes nothing
-  besides secondary features (battery, signal…) is "Not supported by Gladys": its sheet says so and
-  holds "Suggest this device" (a prefilled topic of the Gladys forum, in a new tab). The devices
+  "Open in Zigbee2MQTT" as on the "Devices" tab. A device Zigbee2MQTT supports of which Gladys only uses
+  the battery or the signal is added all the same; its sheet says so and holds "Suggest this device" (a
+  prefilled topic of the Gladys forum, in a new tab). With nothing but a battery, it is "Not supported":
+  no Add, the same link. The devices
   Zigbee2MQTT does not support are in a row "Not supported by Zigbee2MQTT (n)" after the list, which
   opens and closes their section: a device with generic features is added with "Add to Gladys" after
   a confirmation sheet, the others hold "Ask Zigbee2MQTT to support it" and "Copy the information",

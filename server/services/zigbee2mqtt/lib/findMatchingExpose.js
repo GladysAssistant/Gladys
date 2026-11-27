@@ -34,7 +34,8 @@ function findMatchingExpose(deviceName, property) {
   }
 
   // Looks for matching "expose" or sub-feature
-  const { exposes } = discoveredDevice.definition;
+  // No definition until its interview ended (`null` with Zigbee2mqtt 1): nothing to match
+  const { exposes = [] } = discoveredDevice.definition || {};
   const expose = recursiveSearch({ features: exposes }, undefined, property);
   if (!expose) {
     logger.debug(`Exposed property "${property}" on device "${deviceName}" not found`);
