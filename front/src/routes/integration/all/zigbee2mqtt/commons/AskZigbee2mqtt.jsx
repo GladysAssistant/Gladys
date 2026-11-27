@@ -3,7 +3,7 @@ import { Text } from 'preact-i18n';
 
 import copyText from '../utils/copyText';
 import { Z2M_SUPPORT_NEW_DEVICES_URL, getZigbee2mqttReport } from '../utils/support';
-import { BigButton } from '../../../../../components/mobile';
+import { BigButton, kitStyle } from '../../../../../components/mobile';
 
 const T = 'integration.zigbee2mqtt.support';
 
@@ -37,16 +37,17 @@ class AskZigbee2mqtt extends Component {
     return (
       <div data-cy="z2m-support-ask-z2m">
         {isMobile ? (
-          [
-            <BigButton key="link" icon="external-link" {...link} data-cy="z2m-support-ask-z2m-link">
+          // Stacked with the spacing of the kit
+          <div class={kitStyle.buttons}>
+            <BigButton icon="external-link" {...link} data-cy="z2m-support-ask-z2m-link">
               <Text id={`${T}.askZigbee2mqtt`} />
-            </BigButton>,
-            canCopy && (
-              <BigButton key="copy" icon="copy" onClick={this.copy} data-cy="z2m-support-copy">
+            </BigButton>
+            {canCopy && (
+              <BigButton icon="copy" onClick={this.copy} data-cy="z2m-support-copy">
                 <Text id={`${T}.copyInformation`} />
               </BigButton>
-            )
-          ]
+            )}
+          </div>
         ) : (
           <div class="d-flex flex-wrap">
             <a class="btn btn-outline-primary btn-sm mr-2 mb-2" {...link} data-cy="z2m-support-ask-z2m-link">
