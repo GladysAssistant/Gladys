@@ -101,11 +101,99 @@ describe('Device.carryForwardAggregates', () => {
       values: [aggregatedValue(changeDate, 19)],
       ...period,
     });
+    // Held at 7 until just before the change, so a line chart draws a step, not a ramp over 22 hours
     expect(values.map((value) => [value.created_at.getTime(), value.value, value.carried_forward])).to.deep.equal([
       [period.startDate.getTime(), 7, true],
+      [changeDate.getTime() - 1, 7, true],
       [changeDate.getTime(), 19, undefined],
       [period.endDate.getTime(), 19, true],
     ]);
+  });
+
+  it('should only read the last week before the period when a state was recorded during it', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 7, new Date(NOW - 3 * ONE_DAY));
+    const changeDate = new Date(NOW - 2 * ONE_HOUR);
+    await db.duckDbInsertState(FEATURE_ID, 19, changeDate);
+    const queryStub = sinon.spy(db, 'duckDbReadConnectionAllAsync');
+    const deviceFeature = { id: FEATURE_ID, read_only: false, last_value: 19, last_value_changed: changeDate };
+    const period = buildPeriod();
+    await carryForwardAggregates({ deviceFeature, values: [aggregatedValue(changeDate, 19)], ...period });
+    expect(queryStub.callCount).to.equal(1);
+    const [query, featureId, from, to] = queryStub.firstCall.args;
+    expect(query).to.contain('created_at > ?');
+    expect(featureId).to.equal(FEATURE_ID);
+    expect(from.getTime()).to.equal(period.startDateForQuery.getTime() - 7 * ONE_DAY);
+    expect(to.getTime()).to.equal(period.startDateForQuery.getTime());
+  });
+
+  it('should read the older history when nothing was recorded during the last week before the period', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 7, new Date(NOW - 60 * ONE_DAY));
+    const changeDate = new Date(NOW - 2 * ONE_HOUR);
+    await db.duckDbInsertState(FEATURE_ID, 19, changeDate);
+    const queryStub = sinon.spy(db, 'duckDbReadConnectionAllAsync');
+    const deviceFeature = { id: FEATURE_ID, read_only: false, last_value: 19, last_value_changed: changeDate };
+    const period = buildPeriod();
+    const values = await carryForwardAggregates({
+      deviceFeature,
+      values: [aggregatedValue(changeDate, 19)],
+      ...period,
+    });
+    expect(queryStub.callCount).to.equal(2);
+    expect(queryStub.secondCall.args[0]).to.not.contain('created_at > ?');
+    expect(values[0].created_at.getTime()).to.equal(period.startDate.getTime());
+    expect(values[0].value).to.equal(7);
+  });
+
+  it('should not hold the value before the first state when that state has the same value', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 19, new Date(NOW - 3 * ONE_DAY));
+    const repeatedAt = new Date(NOW - 2 * ONE_HOUR);
+    const deviceFeature = { id: FEATURE_ID, read_only: false, last_value: 19, last_value_changed: repeatedAt };
+    const period = buildPeriod();
+    const values = await carryForwardAggregates({
+      deviceFeature,
+      values: [aggregatedValue(repeatedAt, 19)],
+      ...period,
+    });
+    expect(values.map((value) => [value.created_at.getTime(), value.value])).to.deep.equal([
+      [period.startDate.getTime(), 19],
+      [repeatedAt.getTime(), 19],
+      [period.endDate.getTime(), 19],
+    ]);
+  });
+
+  it('should not hold the value before the first state when that state is at the start of the period', async () => {
+    await db.duckDbInsertState(FEATURE_ID, 7, new Date(NOW - 3 * ONE_DAY));
+    const period = buildPeriod();
+    const deviceFeature = {
+      id: FEATURE_ID,
+      read_only: false,
+      last_value: 19,
+      last_value_changed: new Date(NOW - ONE_HOUR),
+    };
+    const values = await carryForwardAggregates({
+      deviceFeature,
+      values: [aggregatedValue(period.startDate, 19)],
+      ...period,
+    });
+    expect(values.map((value) => [value.created_at.getTime(), value.value])).to.deep.equal([
+      [period.startDate.getTime(), 7],
+      [period.startDate.getTime(), 19],
+      [period.endDate.getTime(), 19],
+    ]);
+  });
+
+  it('should leave a feature that keeps no history as it is, without any query', async () => {
+    const queryStub = sinon.spy(db, 'duckDbReadConnectionAllAsync');
+    const deviceFeature = {
+      id: FEATURE_ID,
+      read_only: false,
+      keep_history: false,
+      last_value: 7,
+      last_value_changed: new Date(NOW - 180 * ONE_DAY),
+    };
+    const values = await carryForwardAggregates({ deviceFeature, values: [], ...buildPeriod() });
+    expect(values).to.deep.equal([]);
+    expect(queryStub.called).to.equal(false);
   });
 
   it('should carry the last recorded state, not the last average, at the end of a past period', async () => {
@@ -223,6 +311,9 @@ describe('Device.carryForwardBinaryStates', () => {
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
   });
+  afterEach(() => {
+    sinon.restore();
+  });
 
   const switchOn = {
     id: FEATURE_ID,
@@ -296,6 +387,19 @@ describe('Device.carryForwardBinaryStates', () => {
       { value: 0, created_at: offAt, end_time: onAt },
       { value: 1, created_at: onAt, end_time: null },
     ]);
+  });
+
+  it('should leave a switch that keeps no history as it is, without any query', async () => {
+    const queryStub = sinon.spy(db, 'duckDbReadConnectionAllAsync');
+    const period = buildPeriod();
+    const values = await carryForwardBinaryStates({
+      deviceFeature: { ...switchOn, keep_history: false },
+      values: [],
+      startDate: period.startDate,
+      startDateForQuery: period.startDateForQuery,
+    });
+    expect(values).to.deep.equal([]);
+    expect(queryStub.called).to.equal(false);
   });
 
   it('should leave the segments as they are when no state was recorded before the period', async () => {

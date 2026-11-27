@@ -1,5 +1,21 @@
 const db = require('../../models');
 
+// The table has no index: bounded on both sides, like the aggregate queries, DuckDB only reads the row
+// groups of the window instead of the whole history of the instance.
+const LAST_STATE_IN_WINDOW_QUERY = `
+  SELECT
+    value
+  FROM
+    t_device_feature_state
+  WHERE
+    device_feature_id = ?
+    AND created_at > ?
+    AND created_at <= ?
+  ORDER BY
+    created_at DESC
+  LIMIT 1;
+`;
+
 const LAST_STATE_BEFORE_QUERY = `
   SELECT
     value
@@ -12,6 +28,11 @@ const LAST_STATE_BEFORE_QUERY = `
     created_at DESC
   LIMIT 1;
 `;
+
+// How far back the value in force is looked for first. A feature whose last change is older is read
+// from RAM when it has not changed since; the whole history is only read when it changed in the
+// period after more than this without any change.
+const LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * @description Convert a date coming from the DB or the state manager into a timestamp.
@@ -50,8 +71,23 @@ function buildCarriedForwardPoint(date, value) {
 }
 
 /**
+ * @description Tell whether the states of a feature are recorded. A feature that keeps no history has
+ * nothing in the database, while its last value is still kept in RAM: carrying that value would draw a
+ * line or a segment that comes and goes with the age of its last change.
+ * @param {object} deviceFeature - The device feature.
+ * @returns {boolean} False when the feature keeps no history.
+ * @example
+ * keepsHistory({ keep_history: false }); // false
+ */
+function keepsHistory(deviceFeature) {
+  return deviceFeature.keep_history !== false;
+}
+
+/**
  * @description Get the value of a feature in force at a given time: the last state recorded at or before it.
  * When the feature has not changed since that time, it is the last value kept in RAM, without any query.
+ * Otherwise the last week before that time is read first, and the whole history only when nothing was
+ * recorded during it.
  * @param {object} deviceFeature - The device feature.
  * @param {Date} date - The real time.
  * @param {Date} dateForQuery - The same time, shifted the way the aggregate queries expect it.
@@ -69,17 +105,28 @@ async function getValueInForceAt(deviceFeature, date, dateForQuery) {
   ) {
     return deviceFeature.last_value;
   }
-  const rows = await db.duckDbReadConnectionAllAsync(LAST_STATE_BEFORE_QUERY, deviceFeature.id, dateForQuery);
+  const lookbackStart = new Date(dateForQuery.getTime() - LOOKBACK_MS);
+  let rows = await db.duckDbReadConnectionAllAsync(
+    LAST_STATE_IN_WINDOW_QUERY,
+    deviceFeature.id,
+    lookbackStart,
+    dateForQuery,
+  );
+  if (rows.length === 0) {
+    rows = await db.duckDbReadConnectionAllAsync(LAST_STATE_BEFORE_QUERY, deviceFeature.id, lookbackStart);
+  }
   return rows.length > 0 ? rows[0].value : null;
 }
 
 /**
  * @description Show a value that is set and does not move (a setpoint, a mode): a value set before the
  * period is still in force during it, until someone changes it.
- * - At the start of the period, a point carries the value in force at that time.
+ * - At the start of the period, a point carries the value in force at that time. When the value changed
+ *   during the period, a second point holds it until just before the first recorded state: joined
+ *   straight to that state, it would draw a ramp over hours on a line chart, not a step.
  * - At the end, the last state recorded (not the last bucket average) is carried until the end of the period.
- * Only a feature that is set (read_only false) is carried: a measure (read_only true) is left as it is,
- * as nothing tells whether it would still measure the same value.
+ * Only a feature that is set (read_only false) and keeps its history is carried: a measure (read_only
+ * true) is left as it is, as nothing tells whether it would still measure the same value.
  * The points added are flagged "carried_forward" and count no state.
  * @param {object} params - Parameters.
  * @param {object} params.deviceFeature - The device feature.
@@ -100,7 +147,7 @@ async function carryForwardAggregates({
   startDateForQuery,
   endDateForQuery,
 }) {
-  if (deviceFeature.read_only !== false) {
+  if (deviceFeature.read_only !== false || !keepsHistory(deviceFeature)) {
     return values;
   }
 
@@ -108,6 +155,11 @@ async function carryForwardAggregates({
 
   const valueAtStart = await getValueInForceAt(deviceFeature, startDate, startDateForQuery);
   if (valueAtStart !== null) {
+    const firstStateTime = values.length > 0 ? toTimestamp(values[0].created_at) : null;
+    // Held flat up to the change, so that the line steps there.
+    if (firstStateTime !== null && firstStateTime - 1 > startDate.getTime() && values[0].value !== valueAtStart) {
+      result.unshift(buildCarriedForwardPoint(new Date(firstStateTime - 1), valueAtStart));
+    }
     result.unshift(buildCarriedForwardPoint(startDate, valueAtStart));
   }
 
@@ -134,7 +186,7 @@ async function carryForwardAggregates({
  * is still in force at its start. The first segment then starts at the start of the period: either the
  * first segment of the period is stretched back when it has the same state, or a segment with the state
  * in force is added before it. The end of the last segment is left as it is (open, the client carries it
- * until the end of the period).
+ * until the end of the period). A feature that keeps no history is left as it is.
  * @param {object} params - Parameters.
  * @param {object} params.deviceFeature - The device feature.
  * @param {Array} params.values - The state changes of the period, ordered by date.
@@ -145,6 +197,9 @@ async function carryForwardAggregates({
  * await carryForwardBinaryStates({ deviceFeature, values, startDate, startDateForQuery });
  */
 async function carryForwardBinaryStates({ deviceFeature, values, startDate, startDateForQuery }) {
+  if (!keepsHistory(deviceFeature)) {
+    return values;
+  }
   const valueAtStart = await getValueInForceAt(deviceFeature, startDate, startDateForQuery);
   if (valueAtStart === null) {
     return values;
