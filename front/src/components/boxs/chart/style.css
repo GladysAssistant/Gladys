@@ -67,9 +67,10 @@
 
 .dropdownItemChart {
   min-width: 11rem;
-  display: flex;
-  align-items: center;
   margin: 0;
+  /* a button does not inherit the font of the menu by itself; the shorthand
+     comes first, it resets the line height set after it */
+  font: inherit;
   line-height: 1.4285714;
   display: block;
   width: 100%;
@@ -77,12 +78,13 @@
   clear: both;
   font-weight: 500;
   color: inherit;
-  text-align: inherit;
+  text-align: left;
   white-space: nowrap;
   background-color: transparent;
   border: 0;
   border-radius: 10px;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .dropdownItemChart:focus,
@@ -92,12 +94,13 @@
   background-color: rgba(28, 35, 52, 0.06);
 }
 
-/* The `a` prefix is doing real work: these items are href-less <a>s, and
-   the framework's `a:not([href]):not([tabindex]) { color: inherit }` is one
-   type selector more specific than the classes alone — without it the
-   selected row keeps the ink text over the accent background */
-a.dropdownItemChart.active,
-a.dropdownItemChart:active {
+/* The rows are buttons: the keyboard reaches them and picks a period. The
+   selected row comes after the hover / focus rule and names both classes, so
+   it keeps its accent background under the pointer too. */
+.dropdownItemChart.active,
+.dropdownItemChart.active:focus,
+.dropdownItemChart.active:hover,
+.dropdownItemChart:active {
   color: #fff;
   font-weight: 600;
   text-decoration: none;
@@ -108,8 +111,8 @@ a.dropdownItemChart:active {
    a somber navy with BLACK text. Double-inverting the row (the same trick
    dark-mode.css uses for media) cancels the global filter, so it keeps the
    authored accent background and white text in both modes. */
-:global(.dark-mode) a.dropdownItemChart.active,
-:global(.dark-mode) a.dropdownItemChart:active {
+:global(.dark-mode) .dropdownItemChart.active,
+:global(.dark-mode) .dropdownItemChart:active {
   filter: invert(100%) hue-rotate(180deg);
 }
 

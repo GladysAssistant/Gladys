@@ -33,8 +33,7 @@ class ChartPeriodToolbar extends Component {
 
   toggleDropdown = () => this.setDropdown(!this.state.dropdown);
 
-  selectInterval = (event, interval) => {
-    event.preventDefault();
+  selectInterval = interval => {
     this.setDropdown(false);
     this.props.onSelectInterval(interval);
   };
@@ -95,15 +94,17 @@ class ChartPeriodToolbar extends Component {
             })}
           >
             {getIntervals(chartType).map(oneInterval => (
-              <a
+              <button
+                type="button"
                 key={oneInterval}
                 class={cx(style.dropdownItemChart, {
                   [style.active]: interval === oneInterval
                 })}
-                onClick={event => this.selectInterval(event, oneInterval)}
+                aria-current={interval === oneInterval ? 'true' : undefined}
+                onClick={() => this.selectInterval(oneInterval)}
               >
                 <Text id={INTERVAL_LABELS[oneInterval]} />
-              </a>
+              </button>
             ))}
           </div>
         </div>

@@ -137,6 +137,25 @@ describe('Dashboard chart box: enlarged view', () => {
     cy.get(`button[aria-label="${Cypress.env('i18n').dashboard.boxes.chart.backToNow}"]`).should('be.visible');
   });
 
+  it('picks a period from the menu with the keyboard', () => {
+    const labels = Cypress.env('i18n').dashboard.boxes.chart;
+    openExpandedView();
+    cy.get('[data-cy="chart-expanded"]')
+      .contains('button', labels.lastDay)
+      .click();
+    // the rows of the menu are buttons: they take the focus and answer Enter
+    cy.get('[data-cy="chart-expanded"]')
+      .contains('button', labels.lastSevenDays)
+      .focus();
+    cy.focused().type('{enter}');
+    cy.wait('@getStates')
+      .its('request.url')
+      .should('include', 'interval=10080');
+    cy.get('[data-cy="chart-expanded"]')
+      .contains('button', labels.lastSevenDays)
+      .should('be.visible');
+  });
+
   it('zooms on a selection: the statistics follow the range, and the pill resets it', () => {
     openExpandedView();
     cy.get('[data-cy="chart-expanded-reset-zoom"]').should('not.exist');

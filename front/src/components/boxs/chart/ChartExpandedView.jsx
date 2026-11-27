@@ -49,8 +49,19 @@ class ChartExpandedView extends Component {
     const opening = nextProps.open && !this.props.open;
     const devicesChanged = nextProps.seriesKey !== this.props.seriesKey;
     const periodChanged = nextProps.interval !== this.props.interval || nextProps.offset !== this.props.offset;
+    const loaded = nextProps.series !== this.props.series || (this.props.loading && !nextProps.loading);
+    // Between a change of period and its values, the chart still shows the previous period: a
+    // zoom started there would be a range of that period, applied to the next one
+    if (periodChanged) {
+      this.waitingForPeriod = true;
+    } else if (loaded) {
+      this.waitingForPeriod = false;
+    }
     // a view opens on the whole period with every series, and a zoom belongs to the period it
-    // was made on
+    // was made on — a pinch under way included
+    if (opening || devicesChanged || periodChanged) {
+      this.stopPinch({ discard: true });
+    }
     if (opening || devicesChanged) {
       this.setState({ hiddenSeriesIndexes: [], zoomRange: null });
     } else if (periodChanged && this.state.zoomRange) {
@@ -84,26 +95,31 @@ class ChartExpandedView extends Component {
     }
   };
 
-  stopPinch = () => {
+  // discard: the gesture is dropped where it is (the period it was made on is gone), instead of
+  // ending on its last step
+  stopPinch = ({ discard } = {}) => {
     if (!this.pinch) {
       return;
     }
     this.pinch.targets.forEach(target => {
       target.removeEventListener('touchmove', this.onTouchMove);
-      target.removeEventListener('touchend', this.stopPinch);
-      target.removeEventListener('touchcancel', this.stopPinch);
+      target.removeEventListener('touchend', this.endPinch);
+      target.removeEventListener('touchcancel', this.endPinch);
     });
     const { frame, range } = this.pinch;
     this.pinch = null;
-    // the fingers left before the last step was drawn: it is drawn now, the gesture ends where
-    // they were
     if (frame) {
       cancelAnimationFrame(frame);
-      if (this.chartElement) {
+      // the fingers left before the last step was drawn: it is drawn now, the gesture ends where
+      // they were
+      if (!discard && this.chartElement) {
         this.setState({ zoomRange: range });
       }
     }
   };
+
+  // the listener of the end of a touch: its event is not an option of stopPinch
+  endPinch = () => this.stopPinch();
 
   // Where two fingers are: how far apart, and where their middle is along the plot (0 to 1)
   readPinch = (touches, plot) => ({
@@ -115,7 +131,7 @@ class ChartExpandedView extends Component {
     this.stopPinch();
     const grid = this.chartElement.querySelector('.apexcharts-grid');
     const fullRange = Array.isArray(this.props.series) ? getSeriesTimeRange(this.props.series) : null;
-    if (event.touches.length !== 2 || !grid || !fullRange) {
+    if (event.touches.length !== 2 || !grid || !fullRange || this.waitingForPeriod) {
       return;
     }
     // the plot is measured once, for the same reason
@@ -140,8 +156,8 @@ class ChartExpandedView extends Component {
     targets.forEach(target => {
       // not passive: the browser must not zoom the page while the chart is pinched
       target.addEventListener('touchmove', this.onTouchMove, { passive: false });
-      target.addEventListener('touchend', this.stopPinch);
-      target.addEventListener('touchcancel', this.stopPinch);
+      target.addEventListener('touchend', this.endPinch);
+      target.addEventListener('touchcancel', this.endPinch);
     });
   };
 
@@ -164,8 +180,12 @@ class ChartExpandedView extends Component {
     }
   };
 
+  // A selection dragged while the values of a new period are awaited is not kept: the chart is
+  // drawn again with those values, on the whole period
   handleZoomChange = zoomRange => {
-    this.setState({ zoomRange });
+    if (!this.waitingForPeriod) {
+      this.setState({ zoomRange });
+    }
   };
 
   resetZoom = () => {
@@ -455,8 +475,11 @@ class ChartExpandedView extends Component {
                   additionalHeight={isTimeline ? TIMELINE_ROW_HEIGHT * nbFeaturesDisplayed : 0}
                   dictionary={dictionary}
                   x_range={zoomRange}
+                  // not given to a binary chart: its y axis is the list of the devices
                   y_range={
-                    visible ? this.getYRange(this.getStats(series, zoomRange), hiddenSeriesIndexes, zoomRange) : null
+                    visible
+                      ? this.getYRange(this.getStats(series, zoomRange), hiddenSeriesIndexes, zoomRange)
+                      : undefined
                   }
                   onZoomChange={this.handleZoomChange}
                 />

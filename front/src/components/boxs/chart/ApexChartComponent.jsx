@@ -298,6 +298,10 @@ class ApexChartComponent extends Component {
     if (!this.props.onZoomChange) {
       return;
     }
+    // The zoom the caller holds is the selection dragged on the chart (and what the caller makes
+    // of a pinch). The wheel zoom of ApexCharts is on by default and swallows the wheel: over
+    // the chart, it would zoom instead of scrolling what the chart is in.
+    options.chart.zoom = { ...options.chart.zoom, allowMouseWheelZoom: false };
     const existingEvents = options.chart.events || {};
     options.chart.events = {
       ...existingEvents,
