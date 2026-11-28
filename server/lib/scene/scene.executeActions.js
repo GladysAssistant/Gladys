@@ -48,14 +48,15 @@ module.exports = (actionsFunc) => {
         }
         logger.warn(e);
       }
-    }
-
-    // send message to tell the UI the action has finished being executed
-    if (path !== undefined) {
-      self.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
-        payload: { path, sceneSelector: scope.sceneSelector },
-      });
+    } finally {
+      // send message to tell the UI the action has finished being executed, also when it
+      // aborted the scene: otherwise the editor would keep the step marked as executing
+      if (path !== undefined) {
+        self.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
+          payload: { path, sceneSelector: scope.sceneSelector },
+        });
+      }
     }
 
     return null;
