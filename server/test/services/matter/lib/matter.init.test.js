@@ -383,6 +383,7 @@ describe('Matter.init', () => {
     expect(matterHandler.devices[0].features[0].selector).to.equal(matterExternalIdToSelector('matter:12345:1:6'));
     expect(matterHandler.devices).to.deep.equal([
       {
+        matter_naming: { product: 'Test Product', role: null, index: 1, count: 2, alone: false },
         name: 'Test Vendor (Test Product) 1',
         external_id: 'matter:12345:1',
         selector: matterHandler.devices[0].selector,
@@ -668,6 +669,7 @@ describe('Matter.init', () => {
         params: [],
       },
       {
+        matter_naming: { product: 'Test Product', role: null, index: 2, count: 2, alone: false },
         name: 'Test Vendor (Test Product) 2',
         external_id: 'matter:12345:1:child_endpoint:2',
         selector: matterHandler.devices[1].selector,

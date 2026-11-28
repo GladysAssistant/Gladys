@@ -210,8 +210,13 @@ Only what differs from B, C and D.
   there ("already exists under another node", "has updates") and holds "Add to Gladys", "Update in
   Gladys" or "Replace the existing device". The row of an update and its sheet are titled with
   the name of the Gladys device it updates, like the card (`energy-hierarchy.md`, F, Matter), and
-  the search finds it by that name too. While the paired devices load, a waiting notice says
-  so. A disconnected node shows "Disconnected" on its devices.
+  the search finds it by that name too; a new device is titled with the name Gladys suggests
+  (`server/services/matter/docs/specs/matter.md`, A). While the paired devices load, a waiting notice says so. A device whose node
+  is offline, or whose bridge can not reach it, shows "Unavailable" on its row, live, and its sheet
+  says why in a notice (`server/services/matter/docs/specs/matter.md`, B).
+- **Settings.** The nodes are rows (network icon, name, vendor · product, firmware, Gladys
+  devices, status pill) opening the sheet of the node, with its actions (`server/services/matter/docs/specs/matter.md`, D). The
+  endpoint and cluster tree is in expert mode, a switch below the list.
 - **Add a device.** The pairing form: the explanation as a lead, the Thread border router warning
   as a notice, the pairing code (16 px, numeric keyboard, the same pattern), and "Add to Gladys"
   as a full-width button. While the device is paired — it can take minutes — a waiting notice says

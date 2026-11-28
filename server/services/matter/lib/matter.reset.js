@@ -18,6 +18,7 @@ async function reset() {
 
   // 2. Delete the Matter backup variable from database
   await this.gladys.variable.destroy(VARIABLES.MATTER_BACKUP, this.serviceId);
+  await this.gladys.variable.destroy(VARIABLES.MATTER_LAST_CONTACTS, this.serviceId);
   logger.info('Matter: backup variable deleted');
 
   // 3. Set MATTER_ENABLED to false
@@ -34,6 +35,7 @@ async function reset() {
   this.devices = [];
   this.nodesMap = new Map();
   this.stateChangeListeners = new Set();
+  this.lastContacts = new Map();
 
   logger.info('Matter: integration reset complete');
 }

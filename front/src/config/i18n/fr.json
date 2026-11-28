@@ -4249,7 +4249,126 @@
         "deviceHasUpdates": "Cet appareil existe déjà dans Gladys avec de nouvelles fonctionnalités ou des modifications. Vous pouvez le mettre à jour avec le bouton ci-dessous.",
         "deviceAlreadyExist": "Un appareil avec le même identifiant unique existe déjà, vous pouvez le mettre à jour avec le bouton ci-dessous.",
         "replaceExisting": "Mettre à jour l'appareil existant",
-        "nodeDisconnected": "Déconnecté"
+        "available": "Disponible",
+        "unavailable": "Indisponible",
+        "unavailableReason": {
+          "node-offline": "Le nœud ne répond plus",
+          "bridged-unreachable": "Le pont signale cet appareil injoignable"
+        }
+      },
+      "roles": {
+        "outlet": "Sortie",
+        "light": "Lumière",
+        "switch": "Interrupteur",
+        "button": "Bouton",
+        "temperature": "Température",
+        "humidity": "Humidité",
+        "illuminance": "Luminosité",
+        "occupancy": "Présence",
+        "contact": "Ouverture",
+        "leak": "Fuite d'eau",
+        "rain": "Pluie",
+        "freeze": "Gel",
+        "cover": "Volet",
+        "thermostat": "Thermostat",
+        "airConditioner": "Climatiseur",
+        "fan": "Ventilateur",
+        "airPurifier": "Purificateur",
+        "airQuality": "Qualité de l'air",
+        "lock": "Serrure",
+        "vacuum": "Aspirateur",
+        "energy": "Énergie"
+      },
+      "node": {
+        "unnamed": "Nœud {{nodeId}}",
+        "status": {
+          "connected": "Connecté",
+          "reconnecting": "Reconnexion",
+          "offline": "Hors ligne"
+        },
+        "firmwareShort": "Firmware {{version}}",
+        "linkedDevicesCount": {
+          "singular": "{{count}} appareil Gladys",
+          "plural": "{{count}} appareils Gladys"
+        },
+        "sections": {
+          "status": "Statut",
+          "appliance": "Appareil",
+          "network": "Réseau",
+          "controllers": "Contrôleurs ayant accès",
+          "devices": "Appareils",
+          "actions": "Actions"
+        },
+        "statusLabel": "Statut",
+        "lastContact": "Dernier contact",
+        "never": "Inconnu",
+        "manufacturer": "Fabricant",
+        "product": "Produit",
+        "label": "Libellé",
+        "firmware": "Firmware",
+        "hardware": "Version matérielle",
+        "serialNumber": "Numéro de série",
+        "identifiers": "Identifiants",
+        "network": {
+          "type": "Réseau",
+          "types": {
+            "wifi": "Wi-Fi",
+            "thread": "Thread",
+            "ethernet": "Ethernet",
+            "unknown": "Inconnu"
+          },
+          "signal": "Signal",
+          "threadRole": "Rôle Thread",
+          "threadRoles": {
+            "unspecified": "Non précisé",
+            "unassigned": "Non attribué",
+            "sleepy-end-device": "Appareil terminal en veille",
+            "end-device": "Appareil terminal",
+            "reed": "Appareil terminal éligible routeur",
+            "router": "Routeur",
+            "leader": "Leader"
+          },
+          "channel": "canal {{channel}}",
+          "powerSource": "Alimentation",
+          "powerSources": {
+            "battery": "Batterie",
+            "mains": "Secteur"
+          },
+          "ipAddresses": "Adresses IP"
+        },
+        "signal": {
+          "excellent": "Excellent",
+          "good": "Bon",
+          "fair": "Moyen",
+          "weak": "Faible"
+        },
+        "controllers": {
+          "unknown": "Les contrôleurs sont listés quand le nœud est connecté.",
+          "unknownController": "Contrôleur (fabricant {{vendorId}})",
+          "thisController": "Ce Gladys"
+        },
+        "noGladysDevices": "Aucun appareil de ce nœud n'est encore dans Gladys : ajoutez-les depuis l'onglet Appareils.",
+        "bridgedDevices": "Appareils du pont",
+        "reachable": "Joignable",
+        "unreachable": "Injoignable",
+        "unavailableNotice": "Ce nœud ne répond plus : ses appareils sont indisponibles. Vérifiez qu'il est alimenté et à portée de son réseau.",
+        "cachedNotice": "Le nœud n'est pas connecté pour le moment : les valeurs affichées sont les dernières connues.",
+        "loadError": "Les informations de ce nœud n'ont pas pu être chargées.",
+        "identify": "Identifier",
+        "identifySuccess": "L'appareil s'identifie pendant 15 secondes (il clignote ou bipe, selon le modèle).",
+        "identifyError": "Le nœud n'a pas pu s'identifier.",
+        "share": {
+          "button": "Partager avec une autre application",
+          "title": "Partager avec une autre application",
+          "opening": "Ouverture d'une fenêtre d'appairage sur le nœud…",
+          "error": "Le nœud n'a pas pu être partagé.",
+          "description": "Dans Apple Maison, Google Home, Alexa ou SmartThings, ajoutez un appareil Matter et scannez ce code, ou saisissez le code ci-dessous. <b>Gladys garde le contrôle de l'appareil.</b>",
+          "remaining": "Le code expire dans {{minutes}}:{{seconds}}.",
+          "expired": "La fenêtre d'appairage est fermée : partagez à nouveau le nœud pour obtenir un nouveau code.",
+          "close": "Fermer"
+        },
+        "remove": "Retirer ce nœud",
+        "removeTitle": "Retirer ce nœud ?"
       },
       "discoverDeviceDescr": "Ajouter un nouvel appareil Matter",
       "nameLabel": "Nom",
@@ -4301,8 +4420,6 @@
         "saveButton": "Enregistrer",
         "error": "Une erreur est survenue lors de l'enregistrement des paramètres",
         "nodesTitle": "Nœuds Matter",
-        "nodeIdLabel": "ID du nœud",
-        "nodeDetailsLabel": "Détails du nœud",
         "actionsLabel": "Actions",
         "decommissionButton": "Décommissionner",
         "decommission": {
@@ -4336,7 +4453,21 @@
           "confirmButton": "Oui, tout réinitialiser",
           "cancelButton": "Annuler",
           "error": "Une erreur est survenue lors de la réinitialisation de l'intégration."
-        }
+        },
+        "node": {
+          "ids": "ID du nœud : {{nodeId}} | ID fabricant : {{vendorId}} | ID produit : {{productId}}",
+          "device": "Appareil : {{name}} (endpoint {{number}})",
+          "childEndpoint": "Endpoint enfant :",
+          "clusterId": "ID du cluster",
+          "clusterName": "Nom du cluster",
+          "attributes": "Attributs",
+          "commands": "Commandes",
+          "showKeys": "Afficher les clés",
+          "hideKeys": "Masquer les clés",
+          "allKeys": "Toutes les clés :"
+        },
+        "expertMode": "Mode expert",
+        "expertModeDescription": "Affiche les endpoints et clusters de chaque nœud, et l'export des nœuds."
       }
     },
     "mcp": {

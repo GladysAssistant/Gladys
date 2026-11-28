@@ -96,8 +96,8 @@ describe('Integration devices on a phone', () => {
       cy.get('[data-cy=matter-device-row]').should('have.length', 2);
       cy.contains('[data-cy=matter-device-row]', 'Desk plug').i18n('device.noRoom');
       cy.contains('[data-cy=matter-device-row]', 'Bedroom sensor')
-        .find('[data-cy=matter-device-disconnected]')
-        .i18n('integration.matter.device.nodeDisconnected');
+        .find('[data-cy=matter-device-unavailable]')
+        .i18n('integration.matter.device.unavailable');
       cy.get('[data-cy=matter-paired-device-row]')
         .should('have.length', 1)
         .and('contain', 'Eve Motion');

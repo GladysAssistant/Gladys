@@ -28,8 +28,8 @@ describe('Matter.getGladysDevicesOfNode', () => {
       get: (entity, id) => (devicesById[id] === undefined ? null : devicesById[id]),
     };
     expect(getGladysDevicesOfNode(stateManager, 1234n)).to.deep.equal([
-      { name: 'Plug', selector: 'plug' },
-      { name: 'Plug 2', selector: 'plug-2' },
+      { name: 'Plug', selector: 'plug', external_id: 'matter:1234:1' },
+      { name: 'Plug 2', selector: 'plug-2', external_id: 'matter:1234:1:2' },
     ]);
     assert.calledOnceWithExactly(stateManager.getAllKeys, 'deviceById');
   });

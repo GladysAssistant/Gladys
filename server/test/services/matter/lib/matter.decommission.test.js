@@ -53,10 +53,21 @@ describe('Matter.decommission', () => {
     matterHandler.devices.push({
       external_id: 'matter:1234:1',
     });
+    const unsubscribe = fake();
+    matterHandler.watchedNodes.set('1234', { node: {}, unsubscribers: [unsubscribe] });
+    matterHandler.nodeStatuses.set('1234', { status: 'connected', since: new Date(), available: true });
+    matterHandler.unreachableDevicePaths.set('1234', new Set(['1:child_endpoint:3']));
+    matterHandler.lastContacts.set('1234', new Date());
     const result = await matterHandler.decommission(1234n);
     expect(result).to.deep.equal({ forced: false, deleted_devices: [], failed_devices: [] });
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
+    // the node is not followed anymore
+    assert.calledOnce(unsubscribe);
+    expect(matterHandler.watchedNodes.size).to.equal(0);
+    expect(matterHandler.nodeStatuses.size).to.equal(0);
+    expect(matterHandler.unreachableDevicePaths.size).to.equal(0);
+    expect(matterHandler.lastContacts.size).to.equal(0);
     assert.notCalled(matterHandler.commissioningController.removeNode);
     assert.notCalled(gladys.device.destroy);
   });
@@ -126,8 +137,8 @@ describe('Matter.decommission', () => {
     expect(result).to.deep.equal({
       forced: false,
       deleted_devices: [
-        { name: 'Plug', selector: 'plug' },
-        { name: 'Sensor', selector: 'sensor' },
+        { name: 'Plug', selector: 'plug', external_id: 'matter:1234:1' },
+        { name: 'Sensor', selector: 'sensor', external_id: 'matter:1234:2' },
       ],
       failed_devices: [],
     });
@@ -139,7 +150,7 @@ describe('Matter.decommission', () => {
     // "sensor" was created after the confirmation was shown: it was not listed, it is kept
     const result = await matterHandler.decommission(1234n, { gladysDeviceSelectors: ['plug', 'unknown'] });
     assert.calledOnceWithExactly(gladys.device.destroy, 'plug');
-    expect(result.deleted_devices).to.deep.equal([{ name: 'Plug', selector: 'plug' }]);
+    expect(result.deleted_devices).to.deep.equal([{ name: 'Plug', selector: 'plug', external_id: 'matter:1234:1' }]);
   });
   it('should report the Gladys devices which could not be deleted', async () => {
     matterHandler.nodesMap.set(1234n, {
@@ -151,8 +162,8 @@ describe('Matter.decommission', () => {
     const result = await matterHandler.decommission(1234n, { gladysDeviceSelectors: ['plug', 'sensor'] });
     expect(result).to.deep.equal({
       forced: false,
-      deleted_devices: [{ name: 'Sensor', selector: 'sensor' }],
-      failed_devices: [{ name: 'Plug', selector: 'plug' }],
+      deleted_devices: [{ name: 'Sensor', selector: 'sensor', external_id: 'matter:1234:2' }],
+      failed_devices: [{ name: 'Plug', selector: 'plug', external_id: 'matter:1234:1' }],
     });
   });
   it('should keep a Gladys device which is no longer a device of the node when it is deleted', async () => {

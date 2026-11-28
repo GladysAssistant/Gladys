@@ -15,6 +15,9 @@ describe('Matter.pairDevice', () => {
       job: {
         wrapper: fake.returns(null),
       },
+      event: {
+        emit: fake(),
+      },
     };
     const MatterMain = {};
     const ProjectChipMatter = {};
@@ -162,6 +165,18 @@ describe('Matter.pairDevice', () => {
     expect(matterHandler.devices[0].features).to.have.lengthOf(1);
     expect(matterHandler.nodesMap.size).to.equal(1);
     expect(matterHandler.devices[0].name).to.equal('Test Vendor (node label) 2');
+    // each bridged device is its own product, named after its own label
+    expect(matterHandler.devices[0].matter_naming).to.deep.equal({
+      product: 'node label',
+      role: null,
+      index: 1,
+      count: 1,
+      alone: true,
+    });
+    expect(Array.from(matterHandler.bridgedDevices.get('12345').entries())).to.deep.equal([
+      ['1', 'node label'],
+      ['2', 'node label'],
+    ]);
   });
   it('should not pair a device, commissioning failed', async () => {
     const pairingCode = '1450-134-1614';

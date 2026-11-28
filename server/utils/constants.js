@@ -2332,6 +2332,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS_CHANGE: 'nodered.status-change',
     MQTT_ERROR: 'nodered.mqtt-error',
   },
+  MATTER: {
+    NODE_STATUS_CHANGED: 'matter.node-status-changed',
+  },
   MATTERBRIDGE: {
     STATUS_CHANGE: 'matterbridge.status-change',
   },

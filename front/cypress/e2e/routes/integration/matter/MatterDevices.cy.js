@@ -43,7 +43,7 @@ describe('Matter devices', () => {
     ]
   };
 
-  const visitWithPairedDevice = device => {
+  const visitWithPairedDevice = (device, { gladys = gladysDevice, nodes = [] } = {}) => {
     cy.intercept(
       { method: 'GET', url: `${serverUrl}/api/v1/service/matter/variable/MATTER_ENABLED` },
       { body: { value: 'true' } }
@@ -51,10 +51,10 @@ describe('Matter devices', () => {
     // like the server, the search only matches the name of the Gladys device (and its external_id)
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/device*` }, req => {
       const { search } = req.query;
-      const matches = !search || gladysDevice.name.toLowerCase().includes(String(search).toLowerCase());
-      req.reply({ body: matches ? [gladysDevice] : [] });
+      const matches = !search || gladys.name.toLowerCase().includes(String(search).toLowerCase());
+      req.reply({ body: matches ? [gladys] : [] });
     });
-    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/node` }, { body: [] });
+    cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/node` }, { body: nodes });
     cy.intercept({ method: 'GET', url: `${serverUrl}/api/v1/service/matter/paired-device` }, { body: [device] }).as(
       'getPairedDevices'
     );
@@ -218,5 +218,110 @@ describe('Matter devices', () => {
       expect(body).to.have.property('room_id', 'room-id');
       expect(body.params.map(p => p.name)).to.include('ENERGY_INDEX_LAST_PROCESSED_feature-index-id');
     });
+  });
+
+  it('should suggest a readable name for a new device and its features, in the language of the user', () => {
+    const i18n = Cypress.env('i18n');
+    const outlet = number => ({
+      name: `Gladys Labs (Living room plug) ${number}`,
+      external_id: `matter:9999:${number}`,
+      features: [
+        {
+          name: 'OnOff - 1',
+          category: 'switch',
+          type: 'binary',
+          external_id: `matter:9999:${number}:6`,
+          selector: `matter-9999-${number}-6`,
+          read_only: false,
+          keep_history: true,
+          has_feedback: true,
+          min: 0,
+          max: 1
+        }
+      ],
+      params: [],
+      matter_naming: { product: 'Living room plug', role: 'outlet', index: number, count: 2, alone: false }
+    });
+    visitWithPairedDevice(outlet(2));
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, req => {
+      req.reply(req.body);
+    }).as('saveDevice');
+
+    const suggestedName = `Living room plug – ${i18n.integration.matter.roles.outlet} 2`;
+    cy.get('[data-cy=matter-paired-device]')
+      .should('have.length', 1)
+      .find('.card-header')
+      .should('contain', suggestedName)
+      .and('not.contain', 'Gladys Labs');
+    cy.get('[data-cy=matter-paired-device-save]').click();
+
+    cy.wait('@saveDevice').then(({ request }) => {
+      const { body } = request;
+      expect(body).to.have.property('name', suggestedName);
+      expect(body.features[0]).to.have.property('name', i18n.deviceFeatureCategory.switch.binary);
+      // the naming hints are not saved
+      expect(body).to.not.have.property('matter_naming');
+    });
+  });
+
+  it('should keep the names of the features already in Gladys when updating a device', () => {
+    const i18n = Cypress.env('i18n');
+    const renamedIndex = { ...indexFeature, name: 'Washing machine index' };
+    visitWithPairedDevice(
+      { ...pairedDevice, features: [{ ...indexFeature, name: 'ElectricalEnergy - 2 (Energy)' }, powerFeature] },
+      { gladys: { ...gladysDevice, features: [renamedIndex] } }
+    );
+    cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, req => {
+      req.reply(req.body);
+    }).as('saveDevice');
+
+    cy.get('[data-cy=matter-paired-device-save]').click();
+
+    cy.wait('@saveDevice').then(({ request }) => {
+      const { body } = request;
+      expect(body.features.map(f => f.name)).to.deep.equal([
+        'Washing machine index',
+        i18n.deviceFeatureCategory['energy-sensor'].power
+      ]);
+    });
+  });
+
+  it('should show live when a device becomes unavailable, and why', () => {
+    const i18n = Cypress.env('i18n');
+    visitWithPairedDevice(pairedDevice, {
+      nodes: [
+        { node_id: '1234', is_connected: true, status: 'connected', available: true, unreachable_device_paths: [] }
+      ]
+    });
+    cy.contains('.col-md-6', 'Washing machine plug')
+      .find('[data-cy=matter-device-unavailable]')
+      .should('not.exist');
+
+    cy.waitForWebSocket();
+    cy.sendWebSocket({
+      type: 'matter.node-status-changed',
+      payload: { node_id: '1234', status: 'disconnected', available: false, unreachable_device_paths: [] }
+    });
+    cy.contains('.col-md-6', 'Washing machine plug')
+      .find('[data-cy=matter-device-unavailable]')
+      .should('contain', i18n.integration.matter.device.unavailable)
+      .and('have.attr', 'title', i18n.integration.matter.device.unavailableReason['node-offline']);
+
+    // the node is back, but its bridge can not reach the device
+    cy.sendWebSocket({
+      type: 'matter.node-status-changed',
+      payload: { node_id: '1234', status: 'connected', available: true, unreachable_device_paths: ['2'] }
+    });
+    cy.contains('.col-md-6', 'Washing machine plug')
+      .find('[data-cy=matter-device-unavailable]')
+      .should('have.attr', 'title', i18n.integration.matter.device.unavailableReason['bridged-unreachable']);
+
+    cy.sendWebSocket({
+      type: 'matter.node-status-changed',
+      payload: { node_id: '1234', status: 'connected', available: true, unreachable_device_paths: [] }
+    });
+    cy.contains('.col-md-6', 'Washing machine plug')
+      .find('[data-cy=matter-device-unavailable]')
+      .should('not.exist');
   });
 });

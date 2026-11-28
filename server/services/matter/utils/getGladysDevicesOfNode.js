@@ -15,7 +15,7 @@ function getNodeExternalIdPrefix(nodeId) {
  * fields needed to show and delete them.
  * @param {object} stateManager - The Gladys state manager.
  * @param {bigint|string} nodeId - The Matter node ID.
- * @returns {Array<object>} The devices of the node, as { name, selector }.
+ * @returns {Array<object>} The devices of the node, as { name, selector, external_id }.
  * @example const devices = getGladysDevicesOfNode(gladys.stateManager, 1234n);
  */
 function getGladysDevicesOfNode(stateManager, nodeId) {
@@ -27,7 +27,7 @@ function getGladysDevicesOfNode(stateManager, nodeId) {
     .getAllKeys('deviceById')
     .map((id) => stateManager.get('deviceById', id))
     .filter((device) => device !== null && device.external_id.startsWith(externalIdPrefix))
-    .map((device) => ({ name: device.name, selector: device.selector }));
+    .map((device) => ({ name: device.name, selector: device.selector, external_id: device.external_id }));
 }
 
 module.exports = { getNodeExternalIdPrefix, getGladysDevicesOfNode };

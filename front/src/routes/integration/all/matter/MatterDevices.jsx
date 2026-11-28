@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import debounce from 'debounce';
+import get from 'get-value';
 
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
@@ -15,6 +16,18 @@ import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { getDeviceParam, stripDeviceStatesForSave } from '../../../../utils/device';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
+import { UnavailableTag } from './MatterAvailability';
+import {
+  applyNodeStatus,
+  buildNodesStatus,
+  createStatusEventsTracker,
+  getDeviceAvailability,
+  keepFeatureNames,
+  nameNewDevice,
+  suggestDeviceName
+} from './matterUtils';
 import style from './style.css';
 
 // Tells if a device already in Gladys is up to date with the device paired in Matter.
@@ -63,19 +76,26 @@ const compareDevices = (gladysDevice, pairedDevice) => {
 };
 
 // Updating a device already in Gladys only refreshes what the integration provides (features and
-// params): the device keeps its id, selector, name and room, and the params the integration doesn't
-// manage. Posting the paired device as-is would rename the device and delete those params.
-const mergePairedDeviceIntoGladysDevice = (gladysDevice, pairedDevice) => {
+// params): the device keeps its id, selector, name and room, the names of its features, and the
+// params the integration doesn't manage. Posting the paired device as-is would rename the device and
+// its features, and delete those params. A feature new to Gladys gets a suggested name.
+const mergePairedDeviceIntoGladysDevice = (gladysDevice, pairedDevice, dictionary) => {
+  const { matter_naming: naming, ...device } = pairedDevice;
   const pairedParams = pairedDevice.params || [];
   const paramsNotManagedByMatter = (gladysDevice.params || []).filter(
     gladysParam => !pairedParams.some(pairedParam => pairedParam.name === gladysParam.name)
   );
   return {
-    ...pairedDevice,
+    ...device,
     id: gladysDevice.id,
     selector: gladysDevice.selector,
     name: gladysDevice.name,
     room_id: gladysDevice.room_id,
+    features: keepFeatureNames(
+      pairedDevice.features || [],
+      feature => (gladysDevice.features || []).find(gladysFeature => gladysFeature.external_id === feature.external_id),
+      dictionary
+    ),
     params: [...pairedParams, ...paramsNotManagedByMatter]
   };
 };
@@ -86,15 +106,15 @@ const findGladysDeviceByExternalId = (matterDevices, externalId) =>
 // A re-paired device (new node id) replaces the existing Gladys device: on top of the merge, every
 // matched feature takes over the id, the selector and the energy parent of the existing feature.
 // The paired device is not mutated, so a failed save leaves its card as it was.
-const replaceGladysDeviceWithPairedDevice = (gladysDevice, pairedDevice) => {
+const replaceGladysDeviceWithPairedDevice = (gladysDevice, pairedDevice, dictionary) => {
   const oldExternalId = gladysDevice.external_id;
   const newExternalId = pairedDevice.external_id;
-  const deviceToSave = mergePairedDeviceIntoGladysDevice(gladysDevice, pairedDevice);
+  const deviceToSave = mergePairedDeviceIntoGladysDevice(gladysDevice, pairedDevice, dictionary);
 
   // the energy features derived by the server point to the ids of the paired features:
   // their parents follow the ids taken over from the existing device
   const replacedFeatureIds = new Map();
-  deviceToSave.features = (pairedDevice.features || []).map(pairedFeature => {
+  deviceToSave.features = deviceToSave.features.map(pairedFeature => {
     const feature = { ...pairedFeature };
     // try to find match feature to replace the external_id
     const gladysFeature = gladysDevice.features.find(gladysF => {
@@ -107,6 +127,7 @@ const replaceGladysDeviceWithPairedDevice = (gladysDevice, pairedDevice) => {
       }
       feature.id = gladysFeature.id;
       feature.selector = gladysFeature.selector;
+      feature.name = gladysFeature.name;
       // the server could not see the existing device (new node id): its index fell back on the
       // main meter, the meter the user chose (or none, for a root) is kept
       feature.energy_parent_id = gladysFeature.energy_parent_id || null;
@@ -124,6 +145,8 @@ const replaceGladysDeviceWithPairedDevice = (gladysDevice, pairedDevice) => {
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
+    // the status messages received while the nodes are requested win over the answer
+    this.statusEvents = createStatusEventsTracker();
     this.state = {
       search: '',
       orderDir: 'asc',
@@ -136,7 +159,8 @@ class MatterDevices extends Component {
       error: null,
       matterEnabled: null,
       devicesThatAlreadyExistButWithDifferentNodeId: new Map(),
-      nodesIsConnected: new Map(),
+      // the status of each node, kept live by the matter.node-status-changed message
+      nodesStatus: new Map(),
       pairedDeviceErrors: new Map(),
       pairedDeviceLoading: new Map()
     };
@@ -173,6 +197,27 @@ class MatterDevices extends Component {
   componentWillMount() {
     this.init();
   }
+
+  componentDidMount() {
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.MATTER.NODE_STATUS_CHANGED,
+      this.handleNodeStatusChanged
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.MATTER.NODE_STATUS_CHANGED,
+      this.handleNodeStatusChanged
+    );
+  }
+
+  handleNodeStatusChanged = payload => {
+    this.statusEvents.record(payload);
+    this.setState(prevState => ({ nodesStatus: applyNodeStatus(prevState.nodesStatus, payload) }));
+  };
+
+  getDictionary = () => get(this.props, 'intl.dictionary');
 
   // The search only filters the list of devices shown on the page: a paired device is compared with,
   // and merged into, the device of Gladys that has its external_id, whatever its name
@@ -272,13 +317,11 @@ class MatterDevices extends Component {
 
   getNodes = async () => {
     try {
-      const nodes = await this.props.httpClient.get('/api/v1/service/matter/node');
-      const nodesIsConnected = new Map();
-      nodes.forEach(node => {
-        nodesIsConnected.set(node.node_id, node.is_connected);
-      });
+      const { result: nodes, events } = await this.statusEvents.during(() =>
+        this.props.httpClient.get('/api/v1/service/matter/node')
+      );
       this.setState({
-        nodesIsConnected
+        nodesStatus: events.reduce(applyNodeStatus, buildNodesStatus(nodes))
       });
     } catch (e) {
       console.error(e);
@@ -321,9 +364,10 @@ class MatterDevices extends Component {
       // the core writes (energy watermarks) may have moved since the page was loaded
       const allGladysDevices = await this.getAllGladysMatterDevices();
       const existingGladysDevice = findGladysDeviceByExternalId(allGladysDevices, externalId);
+      // a new device is named in the language of the user (server/services/matter/docs/specs/matter.md)
       const deviceToSave = existingGladysDevice
-        ? mergePairedDeviceIntoGladysDevice(existingGladysDevice, device)
-        : device;
+        ? mergePairedDeviceIntoGladysDevice(existingGladysDevice, device, this.getDictionary())
+        : nameNewDevice(device, this.getDictionary());
       await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       await this.getMatterDevices();
       await this.getPairedDevices();
@@ -361,7 +405,7 @@ class MatterDevices extends Component {
       // On a copy: the paired device of the list stays as it was published until the list is
       // loaded again. A replacement that fails must not leave its card (or its phone row, whose
       // sheet stays open on a failure) under the name and the ids of the existing device.
-      const deviceToSave = replaceGladysDeviceWithPairedDevice(gladysDevice, device);
+      const deviceToSave = replaceGladysDeviceWithPairedDevice(gladysDevice, device, this.getDictionary());
       await this.props.httpClient.post('/api/v1/device', stripDeviceStatesForSave(deviceToSave));
       await this.getMatterDevices();
       await this.getPairedDevices();
@@ -425,7 +469,7 @@ class MatterDevices extends Component {
       housesWithRooms,
       devicesThatAlreadyExistButWithDifferentNodeId,
       matterEnabled,
-      nodesIsConnected,
+      nodesStatus,
       pairedDeviceErrors,
       pairedDeviceLoading
     }
@@ -437,7 +481,7 @@ class MatterDevices extends Component {
         : findGladysDeviceByExternalId(allMatterDevices, device.external_id);
     const getPairedDeviceTitle = device => {
       const deviceToUpdate = getDeviceToUpdate(device);
-      return (deviceToUpdate && deviceToUpdate.name) || device.name || device.model;
+      return (deviceToUpdate && deviceToUpdate.name) || suggestDeviceName(device, this.getDictionary()) || device.model;
     };
 
     // Apply client-side filtering to paired devices
@@ -491,12 +535,12 @@ class MatterDevices extends Component {
                 // like the desktop card: looked up whatever the search, and named after the Gladys device
                 isUpdate: Boolean(getDeviceToUpdate(device)),
                 title: getPairedDeviceTitle(device),
-                nodeIsDisconnected: nodesIsConnected.get(device.external_id.split(':')[1]) === false
+                availability: getDeviceAvailability(device, nodesStatus)
               };
             })}
             hasPairedDevices={pairedDevices.length > 0}
             housesWithRooms={housesWithRooms}
-            nodesIsConnected={nodesIsConnected}
+            nodesStatus={nodesStatus}
             addDeviceToGladys={this.addDeviceToGladys}
             replaceGladysDevice={this.replaceGladysDevice}
           />
@@ -571,16 +615,7 @@ class MatterDevices extends Component {
                               <div class="card-header">
                                 {/* an update card names the Gladys device it applies to */}
                                 {getPairedDeviceTitle(device)}
-                                {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
-                                  <div class="page-options d-flex">
-                                    <div class="tag tag-danger">
-                                      <Text id="integration.matter.device.nodeDisconnected" />
-                                      <span class="tag-addon">
-                                        <i class="fe fe-wifi-off" />
-                                      </span>
-                                    </div>
-                                  </div>
-                                )}
+                                <UnavailableTag availability={getDeviceAvailability(device, nodesStatus)} />
                               </div>
                               <div
                                 class={cx('dimmer', {
@@ -677,7 +712,7 @@ class MatterDevices extends Component {
                         device={device}
                         deviceIndex={index}
                         refreshMatterDevices={this.init}
-                        nodesIsConnected={nodesIsConnected}
+                        nodesStatus={nodesStatus}
                         housesWithRooms={housesWithRooms}
                       />
                     ))}
@@ -694,4 +729,4 @@ class MatterDevices extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(withMobileViewport(MatterDevices));
+export default withIntlAsProp(connect('httpClient,user,session', {})(withMobileViewport(MatterDevices)));

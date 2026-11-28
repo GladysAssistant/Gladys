@@ -9,9 +9,11 @@ import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
 import MatterDeviceSaveErrorAlert, { MatterDeviceSaveErrorContent } from './MatterDeviceSaveErrorAlert';
 import style from './style.css';
 import { stripDeviceStatesForSave } from '../../../../utils/device';
-import { MobileNotice, MobilePill } from '../../../../components/mobile';
+import { MobileNotice } from '../../../../components/mobile';
 import { MobileDeviceItem } from '../../../../components/integration/mobile';
 import DeleteDeviceButton from '../../../../components/device/DeleteDeviceButton';
+import { UnavailableTag, UnavailablePill, UnavailableReason } from './MatterAvailability';
+import { getDeviceAvailability, UNAVAILABLE_REASONS } from './matterUtils';
 
 class MatterDeviceBox extends Component {
   constructor(props) {
@@ -134,7 +136,7 @@ class MatterDeviceBox extends Component {
   renderMobile(
     { editable, deleteButton, housesWithRooms },
     { device, errorMessage, errorDetail, isKnownError, errorOrigin, tooMuchStatesError, statesNumber },
-    { validModel, nodeIsDisconnected }
+    { validModel, availability }
   ) {
     let deleteError = null;
     if (tooMuchStatesError) {
@@ -146,21 +148,22 @@ class MatterDeviceBox extends Component {
       <MobileDeviceItem
         device={device}
         houses={housesWithRooms}
-        pills={
-          nodeIsDisconnected ? (
-            <MobilePill tone="danger" data-cy="matter-device-disconnected">
-              <i class="fe fe-wifi-off" aria-hidden="true" />
-              <Text id="integration.matter.device.nodeDisconnected" />
-            </MobilePill>
-          ) : null
-        }
-        notices={
+        pills={<UnavailablePill availability={availability} />}
+        notices={[
+          availability && availability.available === false && (
+            <MobileNotice
+              tone="danger"
+              icon={availability.reason === UNAVAILABLE_REASONS.BRIDGED_UNREACHABLE ? 'link-2' : 'wifi-off'}
+            >
+              <UnavailableReason reason={availability.reason} />
+            </MobileNotice>
+          ),
           !validModel && (
             <MobileNotice tone="warning" icon="alert-triangle">
               <Text id="integration.matter.noFeaturesHandled" />
             </MobileNotice>
           )
-        }
+        ]}
         onNameChange={this.updateName}
         onRoomChange={this.updateRoom}
         namePlaceholderId="integration.matter.namePlaceholder"
@@ -192,15 +195,14 @@ class MatterDeviceBox extends Component {
   }
 
   render(
-    { deviceIndex, editable, deleteButton, housesWithRooms, nodesIsConnected, isMobile },
+    { deviceIndex, editable, deleteButton, housesWithRooms, nodesStatus, isMobile },
     { device, loading, errorMessage, errorDetail, isKnownError, tooMuchStatesError, statesNumber, showParams }
   ) {
     const validModel = device.features && device.features.length > 0;
-    const nodeId = device.external_id.split(':')[1];
-    const nodeIsDisconnected = nodesIsConnected.get(nodeId) === false;
+    const availability = getDeviceAvailability(device, nodesStatus);
 
     if (isMobile) {
-      return this.renderMobile(this.props, this.state, { validModel, nodeIsDisconnected });
+      return this.renderMobile(this.props, this.state, { validModel, availability });
     }
 
     return (
@@ -208,16 +210,7 @@ class MatterDeviceBox extends Component {
         <div class="card">
           <div class="card-header">
             {device.name}
-            {nodeIsDisconnected && (
-              <div class="page-options d-flex">
-                <div class="tag tag-danger">
-                  <Text id="integration.matter.device.nodeDisconnected" />
-                  <span class="tag-addon">
-                    <i class="fe fe-wifi-off" />
-                  </span>
-                </div>
-              </div>
-            )}
+            <UnavailableTag availability={availability} />
           </div>
           <div
             class={cx('dimmer', {

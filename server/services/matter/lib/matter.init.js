@@ -52,6 +52,8 @@ async function init() {
 
   await this.commissioningController.start();
   logger.info('Matter controller started');
+  // the last contact of the nodes lost before Gladys restarted
+  await this.loadLastContacts();
   // Refresh devices in the background to avoid blocking Gladys startup
   // Store the promise so it can be awaited in tests
   this.refreshDevicesPromise = this.refreshDevices().catch((err) => {

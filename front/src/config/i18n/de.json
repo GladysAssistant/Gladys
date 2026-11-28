@@ -4258,8 +4258,6 @@
         "saveButton": "Speichern",
         "error": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten",
         "nodesTitle": "Matter-Knoten",
-        "nodeIdLabel": "Knoten-ID",
-        "nodeDetailsLabel": "Knotendetails",
         "actionsLabel": "Aktionen",
         "decommissionButton": "Stilllegen",
         "decommission": {
@@ -4293,7 +4291,21 @@
           "confirmButton": "Ja, alles zurücksetzen",
           "cancelButton": "Abbrechen",
           "error": "Beim Zurücksetzen der Integration ist ein Fehler aufgetreten."
-        }
+        },
+        "node": {
+          "ids": "Knoten-ID: {{nodeId}} | Hersteller-ID: {{vendorId}} | Produkt-ID: {{productId}}",
+          "device": "Gerät: {{name}} (Endpunkt {{number}})",
+          "childEndpoint": "Untergeordneter Endpunkt:",
+          "clusterId": "Cluster-ID",
+          "clusterName": "Cluster-Name",
+          "attributes": "Attribute",
+          "commands": "Befehle",
+          "showKeys": "Schlüssel anzeigen",
+          "hideKeys": "Schlüssel ausblenden",
+          "allKeys": "Alle Schlüssel:"
+        },
+        "expertMode": "Expertenmodus",
+        "expertModeDescription": "Zeigt die Endpunkte und Cluster jedes Knotens sowie den Export der Knoten."
       },
       "device": {
         "title": "Matter-Geräte",
@@ -4306,7 +4318,126 @@
         "deviceHasUpdates": "Dieses Gerät existiert bereits in Gladys mit neuen oder geänderten Funktionen. Du kannst es mit dem untenstehenden Button aktualisieren.",
         "deviceAlreadyExist": "Ein Gerät mit derselben eindeutigen Kennung existiert bereits. Du kannst es mit dem untenstehenden Button aktualisieren.",
         "replaceExisting": "Vorhandenes Gerät aktualisieren",
-        "nodeDisconnected": "Nicht verbunden"
+        "available": "Verfügbar",
+        "unavailable": "Nicht verfügbar",
+        "unavailableReason": {
+          "node-offline": "Der Knoten antwortet nicht mehr",
+          "bridged-unreachable": "Die Bridge meldet dieses Gerät als nicht erreichbar"
+        }
+      },
+      "roles": {
+        "outlet": "Steckdose",
+        "light": "Licht",
+        "switch": "Schalter",
+        "button": "Taste",
+        "temperature": "Temperatur",
+        "humidity": "Luftfeuchtigkeit",
+        "illuminance": "Helligkeit",
+        "occupancy": "Anwesenheit",
+        "contact": "Öffnung",
+        "leak": "Wasserleck",
+        "rain": "Regen",
+        "freeze": "Frost",
+        "cover": "Rollladen",
+        "thermostat": "Thermostat",
+        "airConditioner": "Klimaanlage",
+        "fan": "Ventilator",
+        "airPurifier": "Luftreiniger",
+        "airQuality": "Luftqualität",
+        "lock": "Schloss",
+        "vacuum": "Staubsauger",
+        "energy": "Energie"
+      },
+      "node": {
+        "unnamed": "Knoten {{nodeId}}",
+        "status": {
+          "connected": "Verbunden",
+          "reconnecting": "Neuverbindung",
+          "offline": "Offline"
+        },
+        "firmwareShort": "Firmware {{version}}",
+        "linkedDevicesCount": {
+          "singular": "{{count}} Gladys-Gerät",
+          "plural": "{{count}} Gladys-Geräte"
+        },
+        "sections": {
+          "status": "Status",
+          "appliance": "Gerät",
+          "network": "Netzwerk",
+          "controllers": "Controller mit Zugriff",
+          "devices": "Geräte",
+          "actions": "Aktionen"
+        },
+        "statusLabel": "Status",
+        "lastContact": "Letzter Kontakt",
+        "never": "Unbekannt",
+        "manufacturer": "Hersteller",
+        "product": "Produkt",
+        "label": "Bezeichnung",
+        "firmware": "Firmware",
+        "hardware": "Hardwareversion",
+        "serialNumber": "Seriennummer",
+        "identifiers": "Kennungen",
+        "network": {
+          "type": "Netzwerk",
+          "types": {
+            "wifi": "WLAN",
+            "thread": "Thread",
+            "ethernet": "Ethernet",
+            "unknown": "Unbekannt"
+          },
+          "signal": "Signal",
+          "threadRole": "Thread-Rolle",
+          "threadRoles": {
+            "unspecified": "Nicht angegeben",
+            "unassigned": "Nicht zugewiesen",
+            "sleepy-end-device": "Schlafendes Endgerät",
+            "end-device": "Endgerät",
+            "reed": "Router-fähiges Endgerät",
+            "router": "Router",
+            "leader": "Leader"
+          },
+          "channel": "Kanal {{channel}}",
+          "powerSource": "Stromversorgung",
+          "powerSources": {
+            "battery": "Batterie",
+            "mains": "Netzstrom"
+          },
+          "ipAddresses": "IP-Adressen"
+        },
+        "signal": {
+          "excellent": "Ausgezeichnet",
+          "good": "Gut",
+          "fair": "Mittel",
+          "weak": "Schwach"
+        },
+        "controllers": {
+          "unknown": "Die Controller werden angezeigt, solange der Knoten verbunden ist.",
+          "unknownController": "Controller (Hersteller {{vendorId}})",
+          "thisController": "Dieses Gladys"
+        },
+        "noGladysDevices": "Noch kein Gerät dieses Knotens ist in Gladys: Füge sie über den Tab Geräte hinzu.",
+        "bridgedDevices": "Geräte der Bridge",
+        "reachable": "Erreichbar",
+        "unreachable": "Nicht erreichbar",
+        "unavailableNotice": "Dieser Knoten antwortet nicht mehr: Seine Geräte sind nicht verfügbar. Prüfe, ob er mit Strom versorgt wird und in Reichweite seines Netzwerks ist.",
+        "cachedNotice": "Der Knoten ist gerade nicht verbunden: Die angezeigten Werte sind die zuletzt bekannten.",
+        "loadError": "Die Informationen dieses Knotens konnten nicht geladen werden.",
+        "identify": "Identifizieren",
+        "identifySuccess": "Das Gerät identifiziert sich 15 Sekunden lang (es blinkt oder piept, je nach Modell).",
+        "identifyError": "Der Knoten konnte sich nicht identifizieren.",
+        "share": {
+          "button": "Mit einer anderen App teilen",
+          "title": "Mit einer anderen App teilen",
+          "opening": "Ein Kopplungsfenster wird auf dem Knoten geöffnet…",
+          "error": "Der Knoten konnte nicht geteilt werden.",
+          "description": "Füge in Apple Home, Google Home, Alexa oder SmartThings ein Matter-Gerät hinzu und scanne diesen Code oder gib den Code unten ein. <b>Gladys steuert das Gerät weiterhin.</b>",
+          "remaining": "Der Code läuft in {{minutes}}:{{seconds}} ab.",
+          "expired": "Das Kopplungsfenster ist geschlossen: Teile den Knoten erneut, um einen neuen Code zu erhalten.",
+          "close": "Schließen"
+        },
+        "remove": "Diesen Knoten entfernen",
+        "removeTitle": "Diesen Knoten entfernen?"
       },
       "discoverDeviceDescr": "Ein neues Matter-Gerät hinzufügen",
       "nameLabel": "Name",

@@ -8,6 +8,8 @@ import {
   MobileEmptyState,
   BigButton
 } from '../../../../components/mobile';
+import { UnavailablePill, UnavailableReason } from './MatterAvailability';
+import { UNAVAILABLE_REASONS } from './matterUtils';
 import {
   MobileIntegrationTab,
   MobileListToolbar,
@@ -19,17 +21,10 @@ import {
 import MatterDeviceBox from './MatterDeviceBox';
 import { MatterDeviceSaveErrorContent } from './MatterDeviceSaveErrorAlert';
 
-const DisconnectedPill = () => (
-  <MobilePill tone="danger" data-cy="matter-device-disconnected">
-    <i class="fe fe-wifi-off" aria-hidden="true" />
-    <Text id="integration.matter.device.nodeDisconnected" />
-  </MobilePill>
-);
-
 // A device paired with the Matter controller that Gladys does not have yet, or has differently:
 // what its desktop card says and does, behind a row
 const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
-  const { device, title, pairedError, isNodeIdChanged, isUpdate, nodeIsDisconnected } = item;
+  const { device, title, pairedError, isNodeIdChanged, isUpdate, availability } = item;
   const hasFeatures = Boolean(device.features) && device.features.length > 0;
   let primaryAction;
   if (isNodeIdChanged) {
@@ -59,7 +54,7 @@ const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
           fields={{ count: (device.features || []).length }}
         />
       }
-      pills={nodeIsDisconnected ? <DisconnectedPill /> : null}
+      pills={<UnavailablePill availability={availability} />}
       status={
         (isNodeIdChanged || isUpdate) && (
           <MobilePill tone="accent">
@@ -67,7 +62,16 @@ const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
           </MobilePill>
         )
       }
-      notices={
+      notices={[
+        availability && availability.available === false && (
+          <MobileNotice
+            tone="danger"
+            icon={availability.reason === UNAVAILABLE_REASONS.BRIDGED_UNREACHABLE ? 'link-2' : 'wifi-off'}
+            data-cy="matter-paired-device-unavailable-reason"
+          >
+            <UnavailableReason reason={availability.reason} />
+          </MobileNotice>
+        ),
         (isNodeIdChanged || isUpdate) && (
           <MobileNotice icon="info">
             <Text
@@ -79,7 +83,7 @@ const PairedDevice = ({ item, addDeviceToGladys, replaceGladysDevice }) => {
             />
           </MobileNotice>
         )
-      }
+      ]}
       showFeatures={hasFeatures}
       saveError={
         pairedError && (
@@ -115,7 +119,7 @@ const MobileMatterDevices = ({
   pairedItems,
   hasPairedDevices,
   housesWithRooms,
-  nodesIsConnected,
+  nodesStatus,
   addDeviceToGladys,
   replaceGladysDevice
 }) => (
@@ -186,7 +190,7 @@ const MobileMatterDevices = ({
                 device={device}
                 deviceIndex={index}
                 refreshMatterDevices={refresh}
-                nodesIsConnected={nodesIsConnected}
+                nodesStatus={nodesStatus}
                 housesWithRooms={housesWithRooms}
               />
             ))}

@@ -14,6 +14,9 @@ describe('Matter.refreshDevices', () => {
       job: {
         wrapper: fake.returns(null),
       },
+      event: {
+        emit: fake(),
+      },
     };
     const MatterMain = {};
     const ProjectChipMatter = {};
