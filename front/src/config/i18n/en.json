@@ -4665,7 +4665,7 @@
         "hours": "hours",
         "valueTypeSimple": "Simple",
         "valueTypeComputed": "Computed",
-        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to define a variable before this action."
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on."
       },
       "messageSend": {
         "userLabel": "User",
@@ -4678,14 +4678,14 @@
         "serviceIntegrationInternal": "built-in integration",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
-        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+        "explanationText": "To inject a variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on."
       },
       "messageCameraSend": {
         "userLabel": "User",
         "cameraLabel": "Camera",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
-        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+        "explanationText": "To inject a variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on."
       },
       "askAi": {
         "description": "This action will send a message to the AI via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
@@ -4694,13 +4694,13 @@
         "cameraLabel": "Attach a camera image (optional)",
         "textLabel": "My question for the AI",
         "textPlaceholder": "Message text",
-        "explanationText": "To insert a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+        "explanationText": "To insert a variable, type '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on."
       },
       "smsSend": {
         "deprecatedTitle": "Action soon deprecated",
         "deprecatedDescription": "This action uses the built-in Free Mobile integration, which will be removed in a future version of Gladys. Install the community integration <b>Free Mobile SMS</b>, enter your Free Mobile credentials in the <b>My account</b> section of the <b>Configuration</b> tab of that integration, then replace this action with a <b>Send Message</b> action targeting the Free Mobile SMS channel and the Gladys user whose account is configured.",
         "textLabel": "Message",
-        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
+        "explanationText": "To inject a variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on.",
         "messagePlaceholder": "My message"
       },
       "turnOnLights": {
@@ -4747,9 +4747,9 @@
         "namePlaceholder": "Ex: waiting time",
         "valueTypeText": "Text",
         "valueTypeComputed": "Computed",
-        "textExplanationText": "Enter here the value of the variable. To inject another variable in the text, press '{{'.",
+        "textExplanationText": "Enter here the value of the variable. To inject another variable in the text, press '{{': it can come from a box placed before this one, or from the trigger of the scene when it passes information on.",
         "textPlaceholder": "Value of the variable",
-        "computedExplanationText": "Enter here a calculation, its result will be stored in the variable. To inject a variable in the calculation, press '{{'.",
+        "computedExplanationText": "Enter here a calculation, its result will be stored in the variable. To inject a variable in the calculation, press '{{': it can come from a box placed before this one, or from the trigger of the scene when it passes information on.",
         "computedPlaceholder": "Ex: 2 * 3"
       },
       "getDate": {
@@ -4769,8 +4769,8 @@
         "useCustomValue": "Enter a custom value",
         "useValueList": "Choose from the list of values",
         "valueTypeComputed": "Computed",
-        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
-        "textExplanationText": "Enter here the text to send to your device. To inject a scene variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on.",
+        "textExplanationText": "Enter here the text to send to your device. To inject a scene variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on."
       },
       "onlyContinueIf": {
         "variableLabel": "Device or variable",
@@ -4784,7 +4784,7 @@
         "useCustomValue": "Enter a custom value",
         "useValueList": "Choose from the list of values",
         "logicExplanationText": "The conditions in this box are combined with an OR: the box is satisfied as soon as one of them is met. To make an AND, add several \"Condition on variables\" boxes: they will then all have to be satisfied.",
-        "explanationText": "Choose what to compare: the current state of a device, read when the scene reaches this box, or a variable set by a 'Set a variable' or 'Get device value' box placed before this one. As the value, enter a fixed value or a calculation based on a scene variable: press '{{' to inject one."
+        "explanationText": "Choose what to compare: the current state of a device, read when the scene reaches this box, or a variable set by a 'Set a variable' or 'Get device value' box placed before this one. As the value, enter a fixed value or a calculation based on a scene variable: press '{{' to inject one, whether it comes from a box placed before this one or from the trigger of the scene."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
@@ -4856,7 +4856,7 @@
         "headersValuePlaceholder": "Value",
         "responseData": "Response",
         "tryButton": "Try request",
-        "variablesExplanation": "To inject a variable defined in a \"Set a variable\" or \"Get device value\" action, type \"{{\". This variable will be injected only during scene execution, not when clicking on \"Try request\" below.",
+        "variablesExplanation": "To inject a variable, type \"{{\". A variable comes from an action placed before this one, such as \"Set a variable\" or \"Get device value\", or from the trigger of the scene when it passes information on. Variables are injected only during scene execution, not when clicking on \"Try request\" below.",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
       },
       "scene": {
@@ -4933,7 +4933,7 @@
         "topic": "Topic",
         "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
-        "variablesExplanation": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
+        "variablesExplanation": "To inject a variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on.",
         "messagePlaceholder": "My message"
       },
       "zigbee2mqttMessage": {
@@ -4941,7 +4941,7 @@
         "topicPlaceholder": "zigbee2mqtt/my-device/set",
         "topicExplanation": "The topic is published as-is: you must write the full MQTT topic, including the 'zigbee2mqtt/' prefix (for example 'zigbee2mqtt/my-device/set').",
         "messageLabel": "Message",
-        "variablesExplanation": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
+        "variablesExplanation": "To inject a variable in the text, press '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on.",
         "messagePlaceholder": "My message"
       },
       "playMedia": {
@@ -4964,9 +4964,9 @@
         "volumeLabel": "Volume",
         "valueTypeSimple": "Simple",
         "valueTypeComputed": "Computed",
-        "computedExplanationText": "Instead of a fixed volume, you can enter here a calculation based on a scene variable, for example to speak quieter at night. To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
+        "computedExplanationText": "Instead of a fixed volume, you can enter here a calculation based on a scene variable, for example to speak quieter at night. To inject a variable, type '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on.",
         "textLabel": "Message to speak on the speaker",
-        "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
+        "variablesExplanation": "To inject a variable, type '{{'. A variable comes from a box placed before this one, such as 'Set a variable' or 'Get device value', or from the trigger of the scene when it passes information on."
       },
       "energyCurrentPrice": {
         "description": "The scene will continue only if the current price per kWh of the contract active on the selected meter meets the condition below. Without an active contract, the scene stops.",

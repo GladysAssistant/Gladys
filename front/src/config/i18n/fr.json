@@ -4665,7 +4665,7 @@
         "hours": "heures",
         "valueTypeSimple": "Simple",
         "valueTypeComputed": "Calculée",
-        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant."
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations."
       },
       "messageSend": {
         "userLabel": "Utilisateur",
@@ -4678,14 +4678,14 @@
         "serviceIntegrationInternal": "intégration native",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+        "explanationText": "Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations."
       },
       "messageCameraSend": {
         "userLabel": "Utilisateur",
         "cameraLabel": "Camera",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+        "explanationText": "Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations."
       },
       "askAi": {
         "description": "Cette action enverra un message à l'IA via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
@@ -4694,13 +4694,13 @@
         "cameraLabel": "Joindre une image de caméra (optionnel)",
         "textLabel": "Ma question pour l'IA",
         "textPlaceholder": "Texte du message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+        "explanationText": "Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations."
       },
       "smsSend": {
         "deprecatedTitle": "Action bientôt dépréciée",
         "deprecatedDescription": "Cette action utilise l'intégration native Free Mobile, qui sera supprimée dans une prochaine version de Gladys. Installez l'intégration communautaire <b>Free Mobile SMS</b>, renseignez vos identifiants Free Mobile dans le bloc <b>Mon compte</b> de l'onglet <b>Configuration</b> de cette intégration, puis remplacez cette action par une action <b>Envoyer un message</b> ciblant le canal Free Mobile SMS et l'utilisateur Gladys dont le compte est configuré.",
         "textLabel": "Message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations.",
         "messagePlaceholder": "Mon message"
       },
       "turnOnLights": {
@@ -4747,9 +4747,9 @@
         "namePlaceholder": "Ex : temps d'attente",
         "valueTypeText": "Texte",
         "valueTypeComputed": "Calculée",
-        "textExplanationText": "Entrez ici la valeur de la variable. Pour injecter une autre variable dans le texte, tapez '{{'.",
+        "textExplanationText": "Entrez ici la valeur de la variable. Pour injecter une autre variable dans le texte, tapez '{{' : elle peut venir d'un bloc placé avant celui-ci, ou du déclencheur de la scène lorsqu'il transmet des informations.",
         "textPlaceholder": "Valeur de la variable",
-        "computedExplanationText": "Entrez ici un calcul, son résultat sera stocké dans la variable. Pour injecter une variable dans le calcul, tapez '{{'.",
+        "computedExplanationText": "Entrez ici un calcul, son résultat sera stocké dans la variable. Pour injecter une variable dans le calcul, tapez '{{' : elle peut venir d'un bloc placé avant celui-ci, ou du déclencheur de la scène lorsqu'il transmet des informations.",
         "computedPlaceholder": "Ex : 2 * 3"
       },
       "getDate": {
@@ -4769,8 +4769,8 @@
         "useCustomValue": "Saisir une valeur personnalisée",
         "useValueList": "Choisir dans la liste des valeurs",
         "valueTypeComputed": "Calculée",
-        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc.",
-        "textExplanationText": "Entrez ici le texte à envoyer à votre appareil. Pour injecter une variable de scène dans le texte, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc."
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations.",
+        "textExplanationText": "Entrez ici le texte à envoyer à votre appareil. Pour injecter une variable de scène dans le texte, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations."
       },
       "onlyContinueIf": {
         "variableLabel": "Appareil ou variable",
@@ -4784,7 +4784,7 @@
         "useCustomValue": "Saisir une valeur personnalisée",
         "useValueList": "Choisir dans la liste des valeurs",
         "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
-        "explanationText": "Choisissez ce que vous comparez : l'état actuel d'un appareil, lu au moment où la scène arrive sur ce bloc, ou une variable définie par une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc. Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène : pour injecter une variable, tapez '{{'."
+        "explanationText": "Choisissez ce que vous comparez : l'état actuel d'un appareil, lu au moment où la scène arrive sur ce bloc, ou une variable définie par une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc. Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène : pour injecter une variable, tapez '{{', qu'elle vienne d'un bloc placé avant celui-ci ou du déclencheur de la scène."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
@@ -4856,7 +4856,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
-        "variablesExplanation": "Pour injecter une variable définie dans un bloc \"Définir une variable\" ou \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injectée que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
+        "variablesExplanation": "Pour injecter une variable, tapez \"{{\". Une variable vient d'un bloc placé avant celui-ci, par exemple \"Définir une variable\" ou \"Récupérer le dernier état\", ou du déclencheur de la scène lorsqu'il transmet des informations. Les variables ne sont injectées que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
@@ -4933,7 +4933,7 @@
         "topic": "Topic",
         "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations.",
         "messagePlaceholder": "Mon message"
       },
       "zigbee2mqttMessage": {
@@ -4941,7 +4941,7 @@
         "topicPlaceholder": "zigbee2mqtt/mon-appareil/set",
         "topicExplanation": "Le topic est publié tel quel : vous devez écrire le topic MQTT complet, préfixe 'zigbee2mqtt/' inclus (par exemple 'zigbee2mqtt/mon-appareil/set').",
         "messageLabel": "Message",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations.",
         "messagePlaceholder": "Mon message"
       },
       "playMedia": {
@@ -4964,9 +4964,9 @@
         "volumeLabel": "Volume",
         "valueTypeSimple": "Simple",
         "valueTypeComputed": "Calculé",
-        "computedExplanationText": "À la place d'un volume fixe, vous pouvez entrer ici un calcul basé sur une variable de scène, par exemple pour parler moins fort la nuit. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc.",
+        "computedExplanationText": "À la place d'un volume fixe, vous pouvez entrer ici un calcul basé sur une variable de scène, par exemple pour parler moins fort la nuit. Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations.",
         "textLabel": "Message à dire sur l'enceinte",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Une variable vient d'un bloc placé avant celui-ci, par exemple 'Définir une variable' ou 'Récupérer le dernier état', ou du déclencheur de la scène lorsqu'il transmet des informations."
       },
       "energyCurrentPrice": {
         "description": "La scène ne continuera que si le prix actuel du kWh du contrat actif sur le compteur sélectionné respecte la condition ci-dessous. Sans contrat actif, la scène s'arrête.",
