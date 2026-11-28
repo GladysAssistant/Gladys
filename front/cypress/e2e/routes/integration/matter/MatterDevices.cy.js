@@ -86,6 +86,16 @@ describe('Matter devices', () => {
     cy.get('[data-cy=matter-paired-device]').should('have.length', 1);
   });
 
+  it('should propose to update a device when the range of a feature has changed', () => {
+    // ex: a thermostat created when Gladys did not read its setpoint limits yet
+    visitWithPairedDevice({
+      ...pairedDevice,
+      features: [{ ...indexFeature, min: 0, max: 500000 }]
+    });
+
+    cy.get('[data-cy=matter-paired-device]').should('have.length', 1);
+  });
+
   it('should name the existing device on the update card and keep its name and params when updating', () => {
     visitWithPairedDevice({ ...pairedDevice, features: [indexFeature, powerFeature] });
     cy.intercept({ method: 'POST', url: `${serverUrl}/api/v1/device` }, req => {

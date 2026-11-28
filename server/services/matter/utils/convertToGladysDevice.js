@@ -41,9 +41,24 @@ const {
 } = require('../../../utils/constants');
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
-const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
+const {
+  getAcModeSupportedOptions,
+  getThermostatModeSupportedOptions,
+  getSetpointLimits,
+} = require('./thermostatMatterMapping');
 const { getBooleanStateFeatureCategoryAndType } = require('./booleanStateMatterMapping');
 const { applyLightCategoryToOnOff } = require('./lightMatterMapping');
+
+/**
+ * @description Tell if a text published by a device is filled (not absent, empty or blank).
+ * @param {any} value - The text.
+ * @returns {boolean} True when the text is filled.
+ * @example
+ * const hasVendorName = isFilled(basicInformation.vendorName);
+ */
+function isFilled(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -109,12 +124,17 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
     params: [],
   };
   if (nodeDetailDeviceDataBasicInformation) {
-    gladysDevice.name = `${
-      nodeDetailDeviceDataBasicInformation.vendorName
-    } (${nodeDetailDeviceDataBasicInformation.nodeLabel ||
-      nodeDetailDeviceDataBasicInformation.productLabel ||
-      nodeDetailDeviceDataBasicInformation.productName ||
-      device.name})`;
+    const label =
+      [
+        nodeDetailDeviceDataBasicInformation.nodeLabel,
+        nodeDetailDeviceDataBasicInformation.productLabel,
+        nodeDetailDeviceDataBasicInformation.productName,
+      ].find(isFilled) || device.name;
+    // A device that publishes no manufacturer name (empty, or absent on a bridged device) is named
+    // after its label only, instead of " (label)" or "undefined (label)"
+    gladysDevice.name = isFilled(nodeDetailDeviceDataBasicInformation.vendorName)
+      ? `${nodeDetailDeviceDataBasicInformation.vendorName.trim()} (${label})`
+      : label;
     if (nodeDetailDeviceDataBasicInformation.uniqueId) {
       gladysDevice.params.push({
         name: 'UNIQUE_ID',
@@ -294,6 +314,9 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: -100,
           max: 200,
         });
+        // The setpoints are bounded by the limits the device advertises, not by the
+        // range of the attribute (-273.15 to 327.67 °C)
+        const setpointLimits = await getSetpointLimits(clusterClient);
         if (clusterClient.supportedFeatures.heating) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Heating)`,
@@ -303,8 +326,24 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             has_feedback: true,
             unit: DEVICE_FEATURE_UNITS.CELSIUS,
             external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:heating`,
-            min: -100,
-            max: 200,
+            min: setpointLimits.heating.min,
+            max: setpointLimits.heating.max,
+          });
+        }
+        if (clusterClient.supportedFeatures.heating && !clusterClient.supportedFeatures.cooling) {
+          // A heating-only thermostat (radiator valve, floor heating...) is stopped and started
+          // through the Thermostat cluster SystemMode attribute (Off / Heat)
+          const thermostatModeSupportedOptions = getThermostatModeSupportedOptions(clusterClient.supportedFeatures);
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Mode)`,
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:mode`,
+            min: thermostatModeSupportedOptions[0].value,
+            max: thermostatModeSupportedOptions[thermostatModeSupportedOptions.length - 1].value,
+            supported_options: thermostatModeSupportedOptions,
           });
         }
         if (clusterClient.supportedFeatures.cooling) {
@@ -316,8 +355,8 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             has_feedback: true,
             unit: DEVICE_FEATURE_UNITS.CELSIUS,
             external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:cooling`,
-            min: -100,
-            max: 200,
+            min: setpointLimits.cooling.min,
+            max: setpointLimits.cooling.max,
           });
           // Air conditioners expose their operating mode (auto/cool/heat/dry/fan)
           // through the Thermostat cluster SystemMode attribute
@@ -333,6 +372,21 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: acModeSupportedOptions[acModeSupportedOptions.length - 1].value,
             supported_options: acModeSupportedOptions,
           });
+          // AC_MODE has no Off value: the unit is stopped by its power feature. An endpoint with
+          // an OnOff cluster (room air conditioner) already has one, the switch of that cluster;
+          // otherwise the power is the Off value of SystemMode.
+          if (!allClusterClients.some((otherClusterClient) => otherClusterClient.id === OnOff.Complete.id)) {
+            gladysDevice.features.push({
+              name: `${clusterClient.name} - ${clusterClient.endpointId} (Power)`,
+              category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+              type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
+              read_only: false,
+              has_feedback: true,
+              external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:power`,
+              min: 0,
+              max: 1,
+            });
+          }
         }
       } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
         const measurementUnit = await clusterClient.getMeasurementUnitAttribute();

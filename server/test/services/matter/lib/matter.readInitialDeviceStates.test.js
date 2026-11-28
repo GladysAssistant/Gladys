@@ -33,7 +33,7 @@ const {
 } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');
-const { EVENTS, STATE, FAN_MODE, AC_MODE, LOCK } = require('../../../../utils/constants');
+const { EVENTS, STATE, FAN_MODE, AC_MODE, LOCK, THERMOSTAT_MODE } = require('../../../../utils/constants');
 
 describe('Matter.readInitialDeviceStates', () => {
   let matterHandler;
@@ -244,6 +244,10 @@ describe('Matter.readInitialDeviceStates', () => {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
       state: AC_MODE.COOLING,
     });
+    // the endpoint has an OnOff cluster: it is the power, SystemMode does not report one
+    assert.neverCalledWithMatch(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:power`,
+    });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${PowerSource.Complete.id}:battery`,
       state: 50,
@@ -251,12 +255,103 @@ describe('Matter.readInitialDeviceStates', () => {
     expect(gladys.event.emit.callCount).to.be.greaterThan(20);
   });
 
-  it('should skip thermostat system mode when it has no Gladys equivalent', async () => {
+  it('should report system mode Off as the power of an air conditioner without OnOff cluster', async () => {
     const thermostat = {
       supportedFeatures: { cooling: true },
       getOccupiedCoolingSetpointAttribute: fake.resolves(undefined),
       // Matter SystemMode Off = 0
       getSystemModeAttribute: fake.resolves(0),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === Thermostat.Complete.id ? thermostat : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    // Off has no air conditioning mode: only the power is reported
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${Thermostat.Complete.id}:power`,
+      state: STATE.OFF,
+    });
+  });
+
+  it('should report a running system mode as the power on of an air conditioner without OnOff cluster', async () => {
+    const thermostat = {
+      supportedFeatures: { cooling: true },
+      getOccupiedCoolingSetpointAttribute: fake.resolves(null),
+      // Matter SystemMode Cool = 3
+      getSystemModeAttribute: fake.resolves(3),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === Thermostat.Complete.id ? thermostat : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${Thermostat.Complete.id}:mode`,
+      state: AC_MODE.COOLING,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${Thermostat.Complete.id}:power`,
+      state: STATE.ON,
+    });
+  });
+
+  it('should skip system mode Off on an air conditioner with an OnOff cluster', async () => {
+    const thermostat = {
+      supportedFeatures: { cooling: true },
+      getOccupiedCoolingSetpointAttribute: fake.resolves(undefined),
+      // Matter SystemMode Off = 0
+      getSystemModeAttribute: fake.resolves(0),
+    };
+    const onOff = {
+      getOnOffAttribute: fake.resolves(undefined),
+    };
+    const device = {
+      getClusterClientById: (id) => {
+        if (id === Thermostat.Complete.id) {
+          return thermostat;
+        }
+        return id === OnOff.Complete.id ? onOff : null;
+      },
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should read the thermostat mode of a heating-only thermostat, Off included', async () => {
+    const thermostat = {
+      supportedFeatures: { heating: true },
+      getOccupiedHeatingSetpointAttribute: fake.resolves(1900),
+      // Matter SystemMode Off = 0
+      getSystemModeAttribute: fake.resolves(0),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === Thermostat.Complete.id ? thermostat : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${Thermostat.Complete.id}:heating`,
+      state: 19,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${Thermostat.Complete.id}:mode`,
+      state: THERMOSTAT_MODE.OFF,
+    });
+  });
+
+  it('should skip a null setpoint and system mode of a heating-only thermostat', async () => {
+    const thermostat = {
+      supportedFeatures: { heating: true },
+      getOccupiedHeatingSetpointAttribute: fake.resolves(null),
+      getSystemModeAttribute: fake.resolves(null),
     };
     const device = {
       getClusterClientById: (id) => (id === Thermostat.Complete.id ? thermostat : null),

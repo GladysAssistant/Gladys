@@ -12,6 +12,7 @@ const {
   DEVICE_FEATURE_TYPES,
   COVER_STATE,
   AC_MODE,
+  THERMOSTAT_MODE,
   FAN_MODE,
   FAN_AIRFLOW_DIRECTION,
   LOCK,
@@ -589,6 +590,108 @@ describe('Matter.setValue', () => {
     const promise = matterHandler.setValue(gladysDevice, gladysFeature, 99);
     await chaiAssert.isRejected(promise, 'Unsupported air conditioning mode: 99');
     assert.notCalled(clusterClient.setSystemModeAttribute);
+  });
+  describe('thermostat mode and air conditioning power (Thermostat cluster SystemMode)', () => {
+    let thermostat;
+
+    const setThermostatNode = (thermostatClusterClient) => {
+      matterHandler.nodesMap.set(12345n, {
+        isConnected: true,
+        getDevices: fake.returns([
+          {
+            number: 1,
+            getClusterClientById: (id) => (id === 513 ? thermostatClusterClient : null),
+            getChildEndpoints: () => [],
+          },
+        ]),
+      });
+    };
+    const thermostatModeFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+      external_id: 'matter:12345:1:513:mode',
+    };
+    const powerFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
+      external_id: 'matter:12345:1:513:power',
+    };
+    const acModeFeature = (lastValue) => ({
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+      external_id: 'matter:12345:1:513:mode',
+      last_value: lastValue,
+    });
+
+    beforeEach(() => {
+      thermostat = {
+        supportedFeatures: { cooling: true },
+        setSystemModeAttribute: fake.resolves(null),
+      };
+      setThermostatNode(thermostat);
+    });
+
+    it('should turn off a heating-only thermostat', async () => {
+      await matterHandler.setValue({ external_id: 'matter:12345:1' }, thermostatModeFeature, THERMOSTAT_MODE.OFF);
+      // Matter SystemMode Off = 0
+      assert.calledOnceWithExactly(thermostat.setSystemModeAttribute, 0);
+    });
+
+    it('should turn on the heating of a heating-only thermostat', async () => {
+      await matterHandler.setValue({ external_id: 'matter:12345:1' }, thermostatModeFeature, THERMOSTAT_MODE.HEATING);
+      // Matter SystemMode Heat = 4
+      assert.calledOnceWithExactly(thermostat.setSystemModeAttribute, 4);
+    });
+
+    it('should return an error for an unsupported thermostat mode', async () => {
+      const promise = matterHandler.setValue({ external_id: 'matter:12345:1' }, thermostatModeFeature, 99);
+      await chaiAssert.isRejected(promise, 'Unsupported thermostat mode: 99');
+      assert.notCalled(thermostat.setSystemModeAttribute);
+    });
+
+    it('should return an error if the device does not support the Thermostat cluster (thermostat mode)', async () => {
+      setThermostatNode(null);
+      const promise = matterHandler.setValue(
+        { external_id: 'matter:12345:1' },
+        thermostatModeFeature,
+        THERMOSTAT_MODE.OFF,
+      );
+      await chaiAssert.isRejected(promise, 'Device does not support Thermostat cluster');
+    });
+
+    it('should power off an air conditioner through SystemMode, not through the OnOff cluster', async () => {
+      const gladysDevice = { external_id: 'matter:12345:1', features: [acModeFeature(AC_MODE.COOLING), powerFeature] };
+      await matterHandler.setValue(gladysDevice, powerFeature, 0);
+      // Matter SystemMode Off = 0
+      assert.calledOnceWithExactly(thermostat.setSystemModeAttribute, 0);
+    });
+
+    it('should power on an air conditioner in the last mode of its mode feature', async () => {
+      const gladysDevice = { external_id: 'matter:12345:1', features: [acModeFeature(AC_MODE.DRYING), powerFeature] };
+      await matterHandler.setValue(gladysDevice, powerFeature, 1);
+      // Matter SystemMode Dry = 8
+      assert.calledOnceWithExactly(thermostat.setSystemModeAttribute, 8);
+    });
+
+    it('should power on an air conditioner in its first supported mode when no mode is known', async () => {
+      thermostat.supportedFeatures = { heating: true, cooling: true, autoMode: true };
+      const gladysDevice = { external_id: 'matter:12345:1', features: [acModeFeature(null), powerFeature] };
+      await matterHandler.setValue(gladysDevice, powerFeature, '1');
+      // Matter SystemMode Auto = 1
+      assert.calledOnceWithExactly(thermostat.setSystemModeAttribute, 1);
+    });
+
+    it('should power on an air conditioner whose Gladys device carries no features', async () => {
+      await matterHandler.setValue({ external_id: 'matter:12345:1' }, powerFeature, 1);
+      // Matter SystemMode Cool = 3
+      assert.calledOnceWithExactly(thermostat.setSystemModeAttribute, 3);
+    });
+
+    it('should return an error if the device does not support the Thermostat cluster (air conditioning power)', async () => {
+      setThermostatNode(null);
+      const promise = matterHandler.setValue({ external_id: 'matter:12345:1' }, powerFeature, 0);
+      await chaiAssert.isRejected(promise, 'Device does not support Thermostat cluster');
+    });
   });
   it('should return an error, no node found', async () => {
     const gladysDevice = {

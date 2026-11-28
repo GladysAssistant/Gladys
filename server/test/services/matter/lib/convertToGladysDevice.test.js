@@ -21,7 +21,7 @@ const {
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
 const { MATTER_LIGHT_DEVICE_TYPE } = require('../../../../services/matter/utils/lightMatterMapping');
-const { AC_MODE, LOCK } = require('../../../../utils/constants');
+const { AC_MODE, LOCK, THERMOSTAT_MODE } = require('../../../../utils/constants');
 
 describe('Matter.convertToGladysDevice', () => {
   const serviceId = 'service-1';
@@ -43,6 +43,32 @@ describe('Matter.convertToGladysDevice', () => {
     ],
     getChildEndpoints: () => [],
     ...(deviceTypes ? { getDeviceTypes: () => deviceTypes } : {}),
+  });
+
+  describe('device name', () => {
+    const nameOf = async (information) =>
+      (await convertToGladysDevice(serviceId, nodeId, buildBooleanStateDevice(), information, '1')).name;
+
+    it('should name the device after its manufacturer and its label, then its endpoint', async () => {
+      expect(await nameOf({ vendorName: 'Acme', nodeLabel: 'Kitchen', productName: 'Sensor' })).to.equal(
+        'Acme (Kitchen) 1',
+      );
+      expect(await nameOf({ vendorName: ' Acme ', productLabel: 'Leak sensor', productName: 'Sensor' })).to.equal(
+        'Acme (Leak sensor) 1',
+      );
+    });
+
+    it('should name the device after its label only when it publishes no manufacturer name', async () => {
+      expect(await nameOf({ vendorName: '', productName: 'Split AC-3' })).to.equal('Split AC-3 1');
+      expect(await nameOf({ vendorName: '   ', nodeLabel: '', productName: 'Split AC-3' })).to.equal('Split AC-3 1');
+      // a bridged device may not publish the attribute at all
+      expect(await nameOf({ vendorName: undefined, productName: 'Bridged lamp' })).to.equal('Bridged lamp 1');
+    });
+
+    it('should fall back on the name of the endpoint when the device publishes no label', async () => {
+      expect(await nameOf({ vendorName: 'Acme', nodeLabel: '', productLabel: ' ' })).to.equal('Acme (Test Device) 1');
+      expect(await nameOf({})).to.equal('Test Device 1');
+    });
   });
 
   it('should create a read-only binary feature for BooleanState cluster', async () => {
@@ -503,7 +529,7 @@ describe('Matter.convertToGladysDevice', () => {
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
 
-    expect(gladysDevice.features).to.have.lengthOf(4);
+    expect(gladysDevice.features).to.have.lengthOf(5);
     expect(gladysDevice.features[0]).to.deep.equal({
       name: 'Thermostat - 4 (Local temperature)',
       selector: gladysDevice.features[0].selector,
@@ -516,17 +542,22 @@ describe('Matter.convertToGladysDevice', () => {
       min: -100,
       max: 200,
     });
+    // the device does not advertise its limits: the defaults of the Matter specification
     expect(gladysDevice.features[1]).to.deep.include({
       name: 'Thermostat - 4 (Heating)',
       category: 'thermostat',
       type: 'target-temperature',
       external_id: 'matter:12345:1:child_endpoint:4:513:heating',
+      min: 7,
+      max: 30,
     });
     expect(gladysDevice.features[2]).to.deep.include({
       name: 'Thermostat - 4 (Cooling)',
       category: 'air-conditioning',
       type: 'target-temperature',
       external_id: 'matter:12345:1:child_endpoint:4:513:cooling',
+      min: 16,
+      max: 32,
     });
     expect(gladysDevice.features[3]).to.deep.include({
       name: 'Thermostat - 4 (Mode)',
@@ -544,6 +575,84 @@ describe('Matter.convertToGladysDevice', () => {
         { value: AC_MODE.FAN, label: 'Fan' },
       ],
     });
+    // no OnOff cluster on the endpoint: the power is the Off value of SystemMode
+    expect(gladysDevice.features[4]).to.deep.equal({
+      name: 'Thermostat - 4 (Power)',
+      selector: matterExternalIdToSelector('matter:12345:1:child_endpoint:4:513:power'),
+      category: 'air-conditioning',
+      type: 'binary',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:child_endpoint:4:513:power',
+      min: 0,
+      max: 1,
+    });
+  });
+
+  it('should read the setpoint ranges advertised by the thermostat', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      name: 'Thermostat',
+      endpointId: 1,
+      supportedFeatures: {
+        heating: true,
+        cooling: true,
+      },
+      getMinHeatSetpointLimitAttribute: async () => 500,
+      getMaxHeatSetpointLimitAttribute: async () => 2500,
+      getMinCoolSetpointLimitAttribute: async () => undefined,
+      getAbsMinCoolSetpointLimitAttribute: async () => 1800,
+      getMaxCoolSetpointLimitAttribute: async () => undefined,
+      getAbsMaxCoolSetpointLimitAttribute: async () => 3050,
+    };
+
+    const device = {
+      name: 'Heat pump',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    const heatingFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':heating'));
+    const coolingFeature = gladysDevice.features.find((feature) => feature.external_id.endsWith(':cooling'));
+    expect(heatingFeature).to.deep.include({ min: 5, max: 25 });
+    expect(coolingFeature).to.deep.include({ min: 18, max: 30.5 });
+  });
+
+  it('should not create an air conditioning power feature when the endpoint has an OnOff cluster', async () => {
+    const thermostatClusterClient = {
+      id: Thermostat.Complete.id,
+      name: 'Thermostat',
+      endpointId: 1,
+      supportedFeatures: {
+        heating: true,
+        cooling: true,
+      },
+    };
+    const onOffClusterClient = {
+      id: OnOff.Complete.id,
+      name: 'OnOff',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Room air conditioner',
+      number: 1,
+      getAllClusterClients: () => [onOffClusterClient, thermostatClusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features.map((feature) => `${feature.category}/${feature.type}`)).to.deep.equal([
+      'switch/binary',
+      'temperature-sensor/decimal',
+      'thermostat/target-temperature',
+      'air-conditioning/target-temperature',
+      'air-conditioning/mode',
+    ]);
   });
 
   it('should include auto in the mode supported options when auto mode is supported', async () => {
@@ -581,7 +690,7 @@ describe('Matter.convertToGladysDevice', () => {
     });
   });
 
-  it('should not create air conditioning mode feature when cooling is not supported', async () => {
+  it('should create a thermostat mode feature (Off / Heat) instead of an air conditioning one when cooling is not supported', async () => {
     const clusterClient = {
       id: Thermostat.Complete.id,
       name: 'Thermostat',
@@ -600,8 +709,25 @@ describe('Matter.convertToGladysDevice', () => {
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
 
+    expect(gladysDevice.features.filter((feature) => feature.category === 'air-conditioning')).to.have.lengthOf(0);
     const modeFeatures = gladysDevice.features.filter((feature) => feature.type === 'mode');
-    expect(modeFeatures).to.have.lengthOf(0);
+    expect(modeFeatures).to.deep.equal([
+      {
+        name: 'Thermostat - 4 (Mode)',
+        selector: matterExternalIdToSelector('matter:12345:1:child_endpoint:4:513:mode'),
+        category: 'thermostat',
+        type: 'mode',
+        read_only: false,
+        has_feedback: true,
+        external_id: 'matter:12345:1:child_endpoint:4:513:mode',
+        min: THERMOSTAT_MODE.OFF,
+        max: THERMOSTAT_MODE.HEATING,
+        supported_options: [
+          { value: THERMOSTAT_MODE.OFF, label: 'Off' },
+          { value: THERMOSTAT_MODE.HEATING, label: 'Heat' },
+        ],
+      },
+    ]);
   });
 
   it('should create lock features for DoorLock cluster', async () => {
