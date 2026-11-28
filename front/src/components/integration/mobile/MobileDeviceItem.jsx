@@ -35,12 +35,15 @@ const getSignature = (device, extraSignature) =>
  * - onSave: "Save", disabled while nothing changed (unless `saveAlways`: a device that was
  *   never saved has nothing to differ from); with `guard` (the default with onSave),
  *   closing the sheet with unsaved changes asks first;
- * - primaryAction { label, onClick, icon, disabled, toast, dataCy }: the action of a discovered
- *   device ("Add to Gladys");
+ * - primaryAction { label, onClick, icon, disabled, toast, dataCy, confirm }: the action of a
+ *   discovered device ("Add to Gladys"); with `confirm` ({ title, text, confirmLabel }) it asks
+ *   first, in a sheet over this one (a device added with generic features);
  * - actions [{ label, href | onClick, icon, toast, keepOpen, disabled, dataCy }]: the other ones
  *   ("Edit");
  *   with `keepOpen` a success leaves the sheet open (its result shows in it: a connection test);
  * - onDelete: "Delete", confirmed in a sheet.
+ * `footer`, after the buttons: what the integration offers besides the action of the sheet (reporting a device to
+ * its maker or to the Gladys forum), so that the action comes first.
  * onSave, primaryAction.onClick and onDelete return a promise of `false` when they failed: the
  * sheet then stays open with `saveError` / `deleteError` (or a default sentence).
  * `deleteScheduled`: the deletion was not refused, Gladys does it in the background (a device
@@ -66,6 +69,7 @@ class MobileDeviceItem extends Component {
       snapshot: null,
       detailsOpen: false,
       confirmDelete: false,
+      confirmPrimary: false,
       leaveOpen: false,
       // the request running: 'save' | 'primary' | 'delete'
       busy: null,
@@ -113,6 +117,7 @@ class MobileDeviceItem extends Component {
       snapshot: { device, signature: getSignature(device, extraSignature) },
       detailsOpen: false,
       confirmDelete: false,
+      confirmPrimary: false,
       leaveOpen: false,
       failed: null
     });
@@ -123,7 +128,7 @@ class MobileDeviceItem extends Component {
 
   // closed without a request that succeeded (`run` closes the sheet itself after one)
   close = () => {
-    this.setState({ open: false, confirmDelete: false, leaveOpen: false });
+    this.setState({ open: false, confirmDelete: false, confirmPrimary: false, leaveOpen: false });
     if (this.props.onDismiss) {
       this.props.onDismiss();
     }
@@ -188,7 +193,9 @@ class MobileDeviceItem extends Component {
       this.setState({
         busy: null,
         failed: succeeded ? null : kind,
-        ...(succeeded && !keepOpen ? { open: false, confirmDelete: false, leaveOpen: false } : {})
+        ...(succeeded && !keepOpen ? { open: false, confirmDelete: false, leaveOpen: false } : {}),
+        // a confirmation answered: its outcome shows in the sheet
+        ...(kind === 'primary' ? { confirmPrimary: false } : {})
       });
     }
     return succeeded;
@@ -198,7 +205,17 @@ class MobileDeviceItem extends Component {
 
   runPrimary = () => {
     const { primaryAction } = this.props;
+    if (primaryAction.confirm && !this.state.confirmPrimary) {
+      this.setState({ confirmPrimary: true, failed: null });
+      return Promise.resolve(false);
+    }
     return this.run('primary', primaryAction.onClick, primaryAction.toast);
+  };
+
+  cancelPrimary = () => {
+    if (this.state.busy !== 'primary') {
+      this.setState({ confirmPrimary: false });
+    }
   };
 
   // another request of the card ("Update" a meter): same feedback as the primary one
@@ -320,7 +337,8 @@ class MobileDeviceItem extends Component {
       saveError,
       primaryAction,
       actions = [],
-      onDelete
+      onDelete,
+      footer
     } = this.props;
     const { busy, failed } = this.state;
     const { deleteScheduled } = this.props;
@@ -455,11 +473,16 @@ class MobileDeviceItem extends Component {
             </BigButton>
           )}
         </div>
+        {footer && (
+          <div class={style.sheetFooter} data-cy="integration-device-footer">
+            {footer}
+          </div>
+        )}
       </div>
     );
   };
 
-  render(props, { open, confirmDelete, leaveOpen, busy, failed }) {
+  render(props, { open, confirmDelete, confirmPrimary, leaveOpen, busy, failed }) {
     const { device, houses, intl, dataCy } = props;
     const name = device.name || get(intl.dictionary, 'mobileDeviceList.noName');
     const subtitle = props.subtitle === undefined ? getRoomLabel(houses, device, intl) : props.subtitle;
@@ -490,6 +513,19 @@ class MobileDeviceItem extends Component {
       >
         {this.renderSheet()}
       </BottomSheet>,
+      props.primaryAction && props.primaryAction.confirm && (
+        <ConfirmSheet
+          open={open && confirmPrimary}
+          depth={1}
+          title={props.primaryAction.confirm.title}
+          text={props.primaryAction.confirm.text}
+          confirmLabel={props.primaryAction.confirm.confirmLabel}
+          loading={busy === 'primary'}
+          onConfirm={this.runPrimary}
+          onCancel={this.cancelPrimary}
+          dataCy="integration-device-primary-confirm"
+        />
+      ),
       props.onDelete && (
         <ConfirmSheet
           open={open && confirmDelete && !props.deleteScheduled}

@@ -86,10 +86,9 @@ async function handleMqttMessage(topic, message) {
       }
 
       devices
-        // Remove Coordinator
+        // Remove Coordinator. The devices Zigbee2mqtt does not support are kept: added with their generic features,
+        // they are controlled like the others (docs/specs/zigbee2mqtt-pairing.md, E.2)
         .filter((d) => d.type !== 'Coordinator')
-        // Keep only supported devices from zigbee2mqtt library
-        .filter((d) => d.supported)
         .forEach((device) => {
           this.discoveredDevices[device.friendly_name] = device;
         });
@@ -211,7 +210,10 @@ async function handleMqttMessage(topic, message) {
           lastStates[property] = { value: incomingFeatures[property], receivedAt };
         });
         this.lastReceivedStates[discoveredDevice.ieee_address] = lastStates;
-        logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
+        // A device Zigbee2mqtt does not support is often never added: not worth a warning at each state
+        logger[discoveredDevice.supported ? 'warn' : 'debug'](
+          `Zigbee2mqtt device ${deviceName} not configured in Gladys.`,
+        );
       }
     }
   }

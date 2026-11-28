@@ -2,6 +2,8 @@ const { mergeDevices } = require('../../../utils/device');
 const { convertDevice } = require('../utils/convertDevice');
 const { addEnergyFeatures, addProductionFeatures } = require('../../energy-monitoring/utils/addEnergyFeatures');
 const { isDerivedEnergyFeature } = require('../../energy-monitoring/utils/constants');
+const { ZIGBEE2MQTT_SUPPORT } = require('./constants');
+const { getSupport, getZigbee2mqttInfo, hasUsefulFeature } = require('../utils/support');
 
 /**
  * @description Get discovered devices.
@@ -13,10 +15,22 @@ const { isDerivedEnergyFeature } = require('../../energy-monitoring/utils/consta
  */
 function getDiscoveredDevices(filters = {}, defaultElectricMeterDeviceFeatureId) {
   let devices = Object.values(this.discoveredDevices)
-    // Filter unknown models
-    .filter((d) => d.definition !== null)
-    // Convert to Gladys device
-    .map((d) => convertDevice(d, this.serviceId))
+    // Convert to Gladys device, with what Gladys can do with it (docs/specs/zigbee2mqtt-pairing.md, E.2)
+    .map((d) => {
+      const device = convertDevice(d, this.serviceId);
+      const support = getSupport(d, device.features);
+      if (!support) {
+        // Not supported, its interview not over: the pairing window follows it
+        return null;
+      }
+      device.zigbee2mqtt_support = support;
+      // What the reports need: to Zigbee2mqtt for a model it does not know, to Gladys for one it cannot convert
+      if (support !== ZIGBEE2MQTT_SUPPORT.NATIVE || !hasUsefulFeature(device.features)) {
+        device.zigbee2mqtt_info = getZigbee2mqttInfo(d);
+      }
+      return device;
+    })
+    .filter((d) => d !== null)
     .map((d) => {
       // Remove features with duplicate external_id
       // This code is needed because AQARA motion sensor

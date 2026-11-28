@@ -1,24 +1,17 @@
 import get from 'get-value';
 
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
 import { getDeviceIcon } from '../../../../../../components/integration/mobile/utils';
+import { SECONDARY_CATEGORIES } from '../../utils/support';
 
 // docs/specs/zigbee2mqtt-pairing.md
 
 const PHOTO_URL = 'https://www.zigbee2mqtt.io/images/devices';
 
-// What a device has besides what it is: never its name
-const SECONDARY_CATEGORIES = [
-  DEVICE_FEATURE_CATEGORIES.BATTERY,
-  DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
-  DEVICE_FEATURE_CATEGORIES.SIGNAL,
-  DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR
-];
-
 export const PAIRING_STATUS = {
   JOINED: 'joined',
   INTERVIEWING: 'interviewing',
   READY: 'ready',
+  GENERIC: 'generic',
   UNSUPPORTED: 'unsupported',
   FAILED: 'failed',
   LEFT: 'left'
@@ -63,7 +56,9 @@ export const suggestName = (device, entry, dictionary, takenNames) => {
   const features = (device && device.features) || [];
   const main = features.find(feature => !SECONDARY_CATEGORIES.includes(feature.category));
   const category = main && get(dictionary, `deviceFeatureCategory.${main.category}.shortCategoryName`);
-  const parts = category ? [category, entry.vendor] : [entry.vendor, entry.model];
+  // A raw Tuya manufacturer name (`_TZ3000_abcd`, a generic device) tells the user nothing (E.3)
+  const vendor = entry.vendor && entry.vendor.startsWith('_') ? null : entry.vendor;
+  const parts = category ? [category, vendor] : [vendor, entry.model];
   const base = parts.filter(Boolean).join(' ') || entry.friendly_name;
   const taken = takenNames.map(name => name.toLowerCase());
   let name = base;

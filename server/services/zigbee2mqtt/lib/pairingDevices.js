@@ -1,5 +1,24 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { PAIRING_STATUS } = require('./constants');
+const { hasUsefulDefinition } = require('../utils/support');
+
+// The entries that get their Gladys device: to add (ready, generic), or to report (unsupported)
+const WITH_DEVICE = [PAIRING_STATUS.READY, PAIRING_STATUS.GENERIC, PAIRING_STATUS.UNSUPPORTED];
+
+/**
+ * @description The status of a device whose interview ended well (docs/specs/zigbee2mqtt-pairing.md, C.2): ready when
+ * Zigbee2mqtt supports it, generic when the definition it generated gives a useful feature, else unsupported.
+ * @param {object} data - The device: `supported`, `definition`, `ieee_address`.
+ * @returns {string} A PAIRING_STATUS.
+ * @example
+ * getInterviewedStatus({ supported: true, definition: {} }); // 'ready'
+ */
+function getInterviewedStatus(data) {
+  if (data.supported && data.definition) {
+    return PAIRING_STATUS.READY;
+  }
+  return hasUsefulDefinition(data.ieee_address, data.definition) ? PAIRING_STATUS.GENERIC : PAIRING_STATUS.UNSUPPORTED;
+}
 
 /**
  * @description The status a `bridge/event` of Zigbee2mqtt gives to a device (docs/specs/zigbee2mqtt-pairing.md, C.2).
@@ -18,7 +37,7 @@ function getStatus(type, data) {
       return PAIRING_STATUS.INTERVIEWING;
     }
     if (data.status === 'successful') {
-      return data.supported && data.definition ? PAIRING_STATUS.READY : PAIRING_STATUS.UNSUPPORTED;
+      return getInterviewedStatus(data);
     }
     if (data.status === 'failed') {
       return PAIRING_STATUS.FAILED;
@@ -40,19 +59,19 @@ function getStatus(type, data) {
  */
 function getPairingDevices(defaultElectricMeterDeviceFeatureId) {
   const entries = Object.values(this.pairingDevices);
-  const anyReady = entries.some((entry) => entry.status === PAIRING_STATUS.READY);
-  const gladysDevices = anyReady ? this.getDiscoveredDevices({}, defaultElectricMeterDeviceFeatureId) : [];
+  const anyWithDevice = entries.some((entry) => WITH_DEVICE.includes(entry.status));
+  const gladysDevices = anyWithDevice ? this.getDiscoveredDevices({}, defaultElectricMeterDeviceFeatureId) : [];
   return entries.map((entry) => {
-    const device =
-      entry.status === PAIRING_STATUS.READY
-        ? gladysDevices.find((gladysDevice) => gladysDevice.ieee_address === entry.ieee_address)
-        : undefined;
+    const device = WITH_DEVICE.includes(entry.status)
+      ? gladysDevices.find((gladysDevice) => gladysDevice.ieee_address === entry.ieee_address)
+      : undefined;
     return { ...entry, device: device || null };
   });
 }
 
 /**
- * @description What the window shows of the Gladys devices of the ready entries: not known yet, to add, or in Gladys.
+ * @description What the window shows of the Gladys devices of the entries that have one (ready, generic, unsupported):
+ * not known yet, to add, or in Gladys.
  * @param {Array} entries - The entries of the registry, as getPairingDevices gives them.
  * @returns {string} A key that changes only with one of them.
  * @example
@@ -60,7 +79,7 @@ function getPairingDevices(defaultElectricMeterDeviceFeatureId) {
  */
 function getReadyDevicesKey(entries) {
   return entries
-    .filter((entry) => entry.status === PAIRING_STATUS.READY)
+    .filter((entry) => WITH_DEVICE.includes(entry.status))
     .map((entry) => `${entry.ieee_address}:${entry.device ? entry.device.id || 'new' : 'none'}`)
     .join(',');
 }
@@ -81,7 +100,8 @@ function emitPairingDevices(entries = this.getPairingDevices()) {
 
 /**
  * @description Forget the devices seen joining (joining opens again, Gladys disconnects), and tell it. A new window
- * keeps the ready devices not in Gladys yet: the user may not have added them before it opened (C.2).
+ * keeps the ready devices not in Gladys yet: the user may not have added them before it opened (C.2). Not the generic
+ * ones: their confirmation says features may be missing, declining it is an answer; the Discover tab keeps them (E.5).
  * @param {boolean} [keepDevicesToAdd] - Whether the ready devices not in Gladys are kept.
  * @example
  * clearPairingDevices(true);
@@ -192,9 +212,13 @@ function updatePairingFromList(devices) {
       changed = true;
     }
     const waiting = entry.status === PAIRING_STATUS.JOINED || entry.status === PAIRING_STATUS.INTERVIEWING;
-    if (waiting && device.interview_completed === true && device.interviewing !== true) {
+    // Not supported when its interview ended, supported now: Zigbee2mqtt updated meanwhile
+    const nowSupported =
+      [PAIRING_STATUS.GENERIC, PAIRING_STATUS.UNSUPPORTED].includes(entry.status) &&
+      getInterviewedStatus(device) === PAIRING_STATUS.READY;
+    if ((waiting && device.interview_completed === true && device.interviewing !== true) || nowSupported) {
       const definition = device.definition || {};
-      entry.status = device.supported && device.definition ? PAIRING_STATUS.READY : PAIRING_STATUS.UNSUPPORTED;
+      entry.status = getInterviewedStatus(device);
       entry.model = definition.model || null;
       entry.vendor = definition.vendor || null;
       entry.description = definition.description || null;
@@ -207,8 +231,8 @@ function updatePairingFromList(devices) {
 
 /**
  * @description Tell the registry once a device list of Zigbee2mqtt (`bridge/devices`) is handled: when an entry
- * changed, or when the Gladys device of a ready entry did (only now known, added to Gladys or deleted from it since
- * last sent). Not at each list while an entry is ready: the registry may keep one for weeks.
+ * changed, or when the Gladys device of a ready, generic or unsupported entry did (only now known, added to Gladys or
+ * deleted from it since last sent). Not at each list while an entry is ready: the registry may keep one for weeks.
  * @param {boolean} entriesChanged - Whether updatePairingFromList changed an entry.
  * @example
  * emitPairingDevicesAfterList(true);
@@ -218,7 +242,7 @@ function emitPairingDevicesAfterList(entriesChanged) {
     this.emitPairingDevices();
     return;
   }
-  if (!Object.values(this.pairingDevices).some((entry) => entry.status === PAIRING_STATUS.READY)) {
+  if (!Object.values(this.pairingDevices).some((entry) => WITH_DEVICE.includes(entry.status))) {
     return;
   }
   const entries = this.getPairingDevices();

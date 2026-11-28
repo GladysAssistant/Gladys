@@ -1,5 +1,5 @@
 import { visitDashboard } from './dashboardFixtures';
-import { readyBulb, atStep, answerPairing, sendPermitJoin, sendPairing } from './pairingFixtures';
+import { readyBulb, genericSwitch, atStep, answerPairing, sendPermitJoin, sendPairing } from './pairingFixtures';
 
 const T = 'integration.zigbee2mqtt.pairing';
 
@@ -54,7 +54,7 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=z2m-pairing-row]')
       .eq(2)
       .should('contain', 'Lidl ZNCZ02LM')
-      .and('contain', Cypress._.get(Cypress.env('i18n'), `${T}.unsupportedText`));
+      .and('contain', Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.support.unsupportedText'));
     // In a button or a link, which holds no list
     cy.get('[data-cy=z2m-pairing-timeline]').should('have.length', 3);
     cy.get('[data-cy=z2m-pairing-row] ol, [data-cy=z2m-pairing-row] li').should('not.exist');
@@ -88,6 +88,71 @@ describe('Zigbee2mqtt pairing window on a phone', () => {
     cy.get('[data-cy=z2m-pairing-close]').click();
     cy.get('[data-cy=z2m-pairing-screen]').should('not.exist');
     cy.get('[data-cy=z2m-dashboard-pair]').should('exist');
+  });
+
+  it('should add a device Zigbee2mqtt does not know after the confirmation sheet', () => {
+    // docs/specs/zigbee2mqtt-pairing.md, E.3
+    const serverUrl = Cypress.env('serverUrl');
+    visitDashboard();
+    answerPairing({ pairing: [genericSwitch] });
+    cy.get('[data-cy=z2m-dashboard-pair]').click();
+    cy.wait('@permitJoin');
+    cy.get('[data-cy=z2m-pairing-row]').click();
+    cy.get('[data-cy=integration-device-sheet]').should(
+      'contain',
+      Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.support.genericText')
+    );
+    // Not the photo of the product another `TS0001` is; the reports after "Add"
+    cy.get('[data-cy=integration-device-sheet] [data-cy=z2m-pairing-photo] img').should('not.exist');
+    cy.get('[data-cy=integration-device-sheet]')
+      .find('[data-cy=z2m-pairing-add], [data-cy=integration-device-footer]')
+      .then(elements => {
+        expect([...elements].map(element => element.dataset.cy)).to.deep.equal([
+          'z2m-pairing-add',
+          'integration-device-footer'
+        ]);
+      });
+    cy.get('[data-cy=integration-device-footer] [data-cy=z2m-support-ask-z2m-link]').should('exist');
+    cy.intercept(
+      { method: 'POST', url: `${serverUrl}/api/v1/device` },
+      { body: { name: 'Switch', selector: 'switch' } }
+    ).as('addDevice');
+    cy.get('[data-cy=z2m-pairing-add]').click();
+    cy.get('[data-cy=integration-device-primary-confirm]').should('be.visible');
+    cy.get('[data-cy=integration-device-primary-confirm] [data-cy=confirm-sheet-cancel]').click();
+    cy.get('[data-cy=integration-device-primary-confirm]').should('not.exist');
+    cy.get('[data-cy=integration-device-sheet]').should('be.visible');
+
+    cy.get('[data-cy=z2m-pairing-add]').click();
+    cy.get('[data-cy=integration-device-primary-confirm] [data-cy=confirm-sheet-confirm]').click();
+    cy.wait('@addDevice')
+      .its('request.body')
+      .should('not.have.property', 'zigbee2mqtt_info');
+    cy.get('[data-cy=integration-device-sheet]').should('not.exist');
+    cy.get('[data-cy=z2m-pairing-in-gladys]').i18n(`${T}.added`);
+  });
+
+  it('should tell what to do about a device Zigbee2mqtt does not know, without an empty list of features', () => {
+    // docs/specs/zigbee2mqtt-pairing.md, E.4
+    const unsupported = {
+      ...genericSwitch,
+      status: 'unsupported',
+      device: { ...genericSwitch.device, zigbee2mqtt_support: 'unsupported', features: [] }
+    };
+    visitDashboard();
+    answerPairing({ pairing: [unsupported] });
+    cy.get('[data-cy=z2m-dashboard-pair]').click();
+    cy.wait('@permitJoin');
+    cy.get('[data-cy=z2m-pairing-row]').click();
+    cy.get('[data-cy=integration-device-sheet]').within(() => {
+      cy.root().should(
+        'contain',
+        Cypress._.get(Cypress.env('i18n'), 'integration.zigbee2mqtt.support.unsupportedText')
+      );
+      cy.get('[data-cy=integration-device-features]').should('not.exist');
+      cy.get('[data-cy=integration-device-footer] [data-cy=z2m-support-ask-z2m-link]').should('exist');
+      cy.get('[data-cy=z2m-pairing-add]').should('not.exist');
+    });
   });
 
   it('should close the sheet of a device, then the screen, on "back"', () => {

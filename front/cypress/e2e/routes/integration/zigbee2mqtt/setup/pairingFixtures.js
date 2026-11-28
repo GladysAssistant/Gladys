@@ -37,6 +37,53 @@ const readyBulb = {
   }
 };
 
+// A model Zigbee2mqtt does not know, with the generic features it deduced (docs/specs/zigbee2mqtt-pairing.md, E)
+const genericSwitch = {
+  ieee_address: '0xa4c138000000f00d',
+  friendly_name: '0xa4c138000000f00d',
+  status: 'generic',
+  model: 'TS0001',
+  vendor: '_TZ3000_abcd',
+  description: 'Automatically generated definition',
+  updated_at: '2026-11-20T10:00:00.000Z',
+  device: {
+    name: '0xa4c138000000f00d',
+    external_id: 'zigbee2mqtt:0xa4c138000000f00d',
+    selector: 'zigbee2mqtt-0xa4c138000000f00d',
+    model: 'TS0001',
+    ieee_address: '0xa4c138000000f00d',
+    should_poll: false,
+    zigbee2mqtt_support: 'generic',
+    zigbee2mqtt_info: {
+      model_id: 'TS0001',
+      manufacturer: '_TZ3000_abcd',
+      power_source: 'Mains (single phase)',
+      interview_state: 'SUCCESSFUL',
+      definition: {
+        model: 'TS0001',
+        vendor: '_TZ3000_abcd',
+        description: 'Automatically generated definition',
+        exposes: []
+      },
+      endpoints: { 1: { clusters: { input: ['genBasic', 'genOnOff'], output: ['genOta'] } } }
+    },
+    features: [
+      {
+        name: 'state',
+        category: 'switch',
+        type: 'binary',
+        external_id: 'zigbee2mqtt:0xa4c138000000f00d:switch:binary:state',
+        selector: 'zigbee2mqtt-0xa4c138000000f00d-switch-binary-state',
+        read_only: false,
+        has_feedback: true,
+        min: 0,
+        max: 1
+      }
+    ],
+    params: []
+  }
+};
+
 // The same device at an earlier step
 const atStep = (entry, status) => ({
   ...entry,
@@ -84,4 +131,4 @@ const sendPermitJoin = payload => cy.sendWebSocket({ type: 'zigbee2mqtt.permit-j
 
 const sendPairing = payload => cy.sendWebSocket({ type: 'zigbee2mqtt.pairing', payload });
 
-export { closedJoining, houses, readyBulb, atStep, answerPairing, sendPermitJoin, sendPairing };
+export { closedJoining, houses, readyBulb, genericSwitch, atStep, answerPairing, sendPermitJoin, sendPairing };

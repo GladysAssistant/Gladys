@@ -18,3 +18,26 @@
   height: 20px;
   object-fit: contain;
 }
+/* who a device the card cannot add is: text, not disabled fields */
+.identityName {
+  word-break: break-all;
+}
+
+.identity {
+  margin: 0;
+}
+
+.identityRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+}
+
+.identityRow dt {
+  font-weight: 600;
+}
+
+.identityRow dd {
+  margin: 0;
+  word-break: break-all;
+}

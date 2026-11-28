@@ -4,6 +4,7 @@ import createActionsHouse from '../../../../../actions/house';
 import createActionsStatus from '../commons/actions';
 import getZ2mUrl, { shouldShowZ2mUrlWarning } from '../utils/getZ2mUrl';
 import { stripDeviceStatesForSave } from '../../../../../utils/device';
+import { withoutSupportFields } from '../utils/support';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -86,7 +87,11 @@ function createActions(store) {
           feature.name = featureName;
         }
       });
-      const savedDevice = await state.httpClient.post(`/api/v1/device`, stripDeviceStatesForSave(device));
+      // What GET /discovered adds for the page is not saved with the device (docs/specs/zigbee2mqtt-pairing.md, E.2)
+      const savedDevice = await state.httpClient.post(
+        `/api/v1/device`,
+        stripDeviceStatesForSave(withoutSupportFields(device))
+      );
       const zigbee2mqttDevices = state.zigbee2mqttDevices.filter(d => d.external_id !== savedDevice.external_id);
       store.setState({
         zigbee2mqttDevices

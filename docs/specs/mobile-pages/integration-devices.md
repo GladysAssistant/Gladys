@@ -125,6 +125,9 @@ From top to bottom:
    - **the action of a discovered device** ("Add to Gladys", "Update", "Connect in Gladys"…): a
      success closes the sheet and shows "Device added to Gladys" / "Device updated". A device
      that cannot be added says why on a disabled button ("Already created", "Managed by … service").
+     An action that needs a confirmation (`primaryAction.confirm`: a Zigbee2MQTT device added with
+     generic features) asks first in a sheet over this one; Cancel leaves the sheet as it was, a
+     failure shows in it once the confirmation closed.
    - **Edit**, when the integration has an edit page for the device (Bluetooth, MQTT,
      Thermostat).
    - **another request of the card** ("Update" a meter, "Test connection" of a camera). A success
@@ -133,6 +136,9 @@ From top to bottom:
    - A button shows a spinner while its request runs, and the other ones are disabled meanwhile
      — **and so are the fields of the sheet** (name, room, switches): what would be typed after
      "Save" is not in the request, and would be taken for saved the next time the sheet opens.
+7. **What the integration offers besides the action** (`footer`: reporting a Zigbee2MQTT device to
+   Zigbee2MQTT or to the Gladys forum), after the buttons: the action the sheet is opened for comes
+   first, its secondary links do not push it below the fold.
 
 **A failure stays where the thumb is**: the sheet stays open and the error shows right above the
 buttons — the sentence of the desktop card when it has one (with its technical detail for Matter
@@ -324,9 +330,18 @@ The integration has one page and no "Discovery": a camera is created by hand, in
   the Zigbee2MQTT interface, another installation) and those to update. "Hide already added
   devices" is a switch row. A device is added with "Save"
   or updated with "Update", as on the card; its sheet shows the topic and the IEEE address, and
-  "Open in Zigbee2MQTT" as on the "Devices" tab. A device that exposes nothing besides a battery
-  is "Not supported": its sheet says so and holds "Suggest this device" (a GitHub issue, in a new
-  tab). The empty list says "No new device found." — the button above it is the next step.
+  "Open in Zigbee2MQTT" as on the "Devices" tab. A device Zigbee2MQTT supports of which Gladys only uses
+  the battery or the signal is added all the same; its sheet says so and holds "Suggest this device" (a
+  prefilled topic of the Gladys forum, in a new tab). With nothing but a battery, it is "Not supported":
+  no Add, the same link. The devices
+  Zigbee2MQTT does not support are in a row "Not supported by Zigbee2MQTT (n)" after the list, which
+  opens and closes their section (open when it holds a device that can be added, which it counts): a device
+  with generic features is added with "Add to Gladys" after a confirmation sheet, the others hold "Ask
+  Zigbee2MQTT to support it" and "Copy the information", or the advice of a failed identification
+  (`zigbee2mqtt-pairing.md`, E). These reports, and "Suggest this device", are after the buttons
+  (D.7). A device that cannot be added has no name field: its model ID, manufacturer and IEEE address are
+  its details. The empty list says "No new device found." — the button above it is the next step; with only
+  devices of the section, it says "No new device supported by Zigbee2MQTT.".
 
 ## F. What does not change
 

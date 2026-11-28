@@ -595,6 +595,62 @@ const integrations = {
           type: 'decimal'
         }
       ]
+    },
+    // docs/specs/zigbee2mqtt-pairing.md, E: a model Zigbee2mqtt does not know, with generic features, and one with none
+    {
+      model: 'TS0001',
+      name: '0xa4c138c0ffee0001',
+      should_poll: false,
+      external_id: 'zigbee2mqtt:0xa4c138c0ffee0001',
+      ieee_address: '0xa4c138c0ffee0001',
+      zigbee2mqtt_support: 'generic',
+      zigbee2mqtt_info: {
+        model_id: 'TS0001',
+        manufacturer: '_TZ3000_demo0001',
+        power_source: 'Mains (single phase)',
+        interview_state: 'SUCCESSFUL',
+        definition: {
+          model: 'TS0001',
+          vendor: '_TZ3000_demo0001',
+          description: 'Automatically generated definition',
+          exposes: []
+        },
+        endpoints: { 1: { clusters: { input: ['genBasic', 'genOnOff'], output: ['genOta'] } } }
+      },
+      features: [
+        {
+          category: 'switch',
+          external_id: 'zigbee2mqtt:0xa4c138c0ffee0001:switch:binary:state',
+          name: 'Switch',
+          read_only: false,
+          has_feedback: true,
+          type: 'binary',
+          min: 0,
+          max: 1
+        }
+      ]
+    },
+    {
+      model: 'TS0601',
+      name: '0xa4c138c0ffee0002',
+      should_poll: false,
+      external_id: 'zigbee2mqtt:0xa4c138c0ffee0002',
+      ieee_address: '0xa4c138c0ffee0002',
+      zigbee2mqtt_support: 'unsupported',
+      zigbee2mqtt_info: {
+        model_id: 'TS0601',
+        manufacturer: '_TZE200_demo0002',
+        power_source: 'Battery',
+        interview_state: 'SUCCESSFUL',
+        definition: {
+          model: 'TS0601',
+          vendor: '_TZE200_demo0002',
+          description: 'Automatically generated definition',
+          exposes: []
+        },
+        endpoints: { 1: { clusters: { input: ['genBasic', 'manuSpecificTuya'], output: ['genOta'] } } }
+      },
+      features: []
     }
   ],
   'get /api/v1/service/zigbee2mqtt/setup': {
