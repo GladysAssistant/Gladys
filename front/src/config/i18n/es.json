@@ -4456,6 +4456,19 @@
         },
         "pilotWireFeatureLabel": "Hilo piloto (actuador)",
         "pilotWireFeatureHelp": "Un radiador con hilo piloto: Gladys le envía una orden (confort, eco, antihielo, apagado…) en lugar de cortar su alimentación. Desactive primero el programa propio del módulo.",
+        "pilotWireKind": {
+          "module": "Un módulo de hilo piloto",
+          "switches": "Dos interruptores (módulo de dos relés)"
+        },
+        "pilotWireSwitchLabel": "Interruptor {{number}}",
+        "pilotWireSwitchOrderLabel": "Orden",
+        "pilotWireSwitchesHelp": "Las dos salidas de un módulo de dos relés cableado al hilo piloto mediante dos diodos (un FIBARO FGS-224, por ejemplo), que Gladys ve como dos interruptores. Indique abajo el estado de los dos interruptores para cada orden: depende del sentido de los diodos. El ajuste propuesto es el cableado más habitual.",
+        "pilotWireSwitchState": {
+          "on": "Encendido",
+          "off": "Apagado"
+        },
+        "pilotWireSwitchStatesError": "Cada orden necesita su propia combinación de los dos interruptores: dos órdenes con la misma combinación no se pueden distinguir.",
+        "pilotWireSwitchesWarning": "Estos dos interruptores están reservados al termostato: si se cambian en otro sitio (escena, panel, botón del módulo), Gladys vuelve a poner la orden esperada en menos de un minuto. Recuerde desactivar las escenas que los controlaban.",
         "pilotWireProgrammeWarning": "Desactive el programa o el modo termostato propio del módulo (programación de Heatzy, programa de Tuya…) antes de controlarlo desde Gladys. Si no, cada orden que escribe ese programa se toma por un cambio hecho en el módulo, y el módulo y Gladys escriben la orden por turnos.",
         "pilotWireStandbyOrderLabel": "Orden una vez alcanzada la consigna",
         "pilotWireStandbyForceLabel": "Forzar otra orden que antihielo en reposo",
@@ -4509,7 +4522,7 @@
         "saveError": "Error al guardar.",
         "incompleteVirtualError": "Un termostato virtual necesita un sensor de temperatura y un actuador (conmutador o hilo piloto): regula leyendo uno y accionando el otro.",
         "incompleteExternalError": "Un termostato existente necesita la consigna del termostato que controla.",
-        "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar.",
+        "incompletePilotWireError": "Un radiador con hilo piloto necesita el hilo piloto que se va a controlar: un módulo de hilo piloto, o los dos interruptores que lo controlan.",
         "pilotWireUnreadError": "No se ha podido leer el hilo piloto elegido, así que no se puede comprobar la orden de reposo: recarga la página y vuelve a elegirlo.",
         "invertedRangeError": "La temperatura mínima debe ser inferior a la temperatura máxima.",
         "activeScheduleLabel": "Programación activa",

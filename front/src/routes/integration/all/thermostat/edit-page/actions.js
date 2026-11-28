@@ -7,9 +7,15 @@ import {
 import {
   DEFAULT_PILOT_WIRE_ORDERS,
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  DEFAULT_PILOT_WIRE_SWITCH_STATES,
+  PILOT_WIRE_SWITCH_ORDERS,
+  PILOT_WIRE_SWITCH_STATES_PARAMS,
+  PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS,
   MAX_WINDOW_DELAY_SECONDS,
   defaultPresetTemps,
+  isPilotWireSwitchStates,
   parsePilotWireStandbyOrder,
+  parsePilotWireSwitchStates,
   supportedStandbyOrder,
   defaultTempRange
 } from '../../../../../../../server/utils/thermostatConstants';
@@ -69,6 +75,20 @@ const carriedPresets = (state, previous, mode) => {
     });
   }
   return update;
+};
+// What picking a pilot wire changes around it, whichever way it is carried: it
+// is the only actuator, it leaves TPI — the loop never pulses its orders within
+// a cycle (spec C.1.1) — and it only heats, the presets coming along as on any
+// change of use.
+const pilotWirePicked = state => {
+  const next = { thermostatEditSwitchFeature: '' };
+  if (state.thermostatEditControlType === 'tpi') {
+    next.thermostatEditControlType = 'hysteresis';
+  }
+  if (state.thermostatEditMode === 'cooling') {
+    Object.assign(next, { thermostatEditMode: 'heating' }, carriedPresets(state, 'cooling', 'heating'));
+  }
+  return next;
 };
 const isPowerFeature = feature =>
   (feature.category === AC && feature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY) ||
@@ -235,6 +255,10 @@ function createActions(store) {
         // Bounds never saved default in the thermostat's unit: 5-35 shown on a
         // Fahrenheit one was saved as 5-35 °F.
         const rangeDefaults = defaultTempRange(getParam('THERMOSTAT_TEMP_UNIT'));
+        // A pilot wire driven by two switches rather than by a module (spec
+        // C.1.2), read as the server does: a module wins, half a pair is none.
+        const switchPair = parseSelectorList(getParam('THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE'));
+        const usesSwitches = !getParam('THERMOSTAT_PILOT_WIRE_FEATURE') && switchPair.length === 2;
         store.setState({
           thermostatEditActiveSchedule: activeSchedule,
           thermostatEditDeviceSchedule: activeSchedule,
@@ -250,6 +274,9 @@ function createActions(store) {
           thermostatEditHumidityFeature: getParam('THERMOSTAT_HUMIDITY_FEATURE') || '',
           thermostatEditSwitchFeature: getParam('THERMOSTAT_SWITCH_FEATURE') || '',
           thermostatEditPilotWireFeature: getParam('THERMOSTAT_PILOT_WIRE_FEATURE') || '',
+          thermostatEditPilotWireKind: usesSwitches ? 'switches' : 'module',
+          thermostatEditPilotWireSwitches: usesSwitches ? switchPair : ['', ''],
+          thermostatEditPilotWireSwitchStates: parsePilotWireSwitchStates(getParam),
           thermostatEditPilotWireOrders: readPilotWireOrders(getParam),
           // The order a heater Gladys regulates rests on (spec C.1.1).
           thermostatEditPilotWireStandbyOrder: parsePilotWireStandbyOrder(
@@ -299,21 +326,45 @@ function createActions(store) {
 
     // The switch and the pilot wire are the same actuator slot: picking one
     // empties the other, so the form can never describe a heater driven both
-    // ways at once. A pilot wire also leaves TPI: the loop never pulses its
-    // orders within a cycle (spec C.1.1).
+    // ways at once — the pilot wire's two switches included (spec C.1.2).
     updateThermostatActuator(state, field, value) {
-      const pilotWire = field === 'thermostatEditPilotWireFeature';
-      const other = pilotWire ? 'thermostatEditSwitchFeature' : 'thermostatEditPilotWireFeature';
-      const next = value ? { [field]: value, [other]: '' } : { [field]: value };
-      if (pilotWire && value && state.thermostatEditControlType === 'tpi') {
-        next.thermostatEditControlType = 'hysteresis';
+      const next = { [field]: value };
+      if (value && field === 'thermostatEditPilotWireFeature') {
+        Object.assign(next, pilotWirePicked(state));
       }
-      // A pilot-wire heater only heats, and the presets come along as on any
-      // change of use.
-      if (pilotWire && value && state.thermostatEditMode === 'cooling') {
-        Object.assign(next, { thermostatEditMode: 'heating' }, carriedPresets(state, 'cooling', 'heating'));
+      if (value && field === 'thermostatEditSwitchFeature') {
+        Object.assign(next, { thermostatEditPilotWireFeature: '', thermostatEditPilotWireSwitches: ['', ''] });
       }
       store.setState(next);
+    },
+
+    // What carries the pilot wire: a module, or two switches (spec C.1.2). It is
+    // one wire, carried one way: the other choice is emptied.
+    updateThermostatPilotWireKind(state, kind) {
+      store.setState(
+        kind === 'switches'
+          ? { thermostatEditPilotWireKind: 'switches', thermostatEditPilotWireFeature: '' }
+          : { thermostatEditPilotWireKind: 'module', thermostatEditPilotWireSwitches: ['', ''] }
+      );
+    },
+
+    // One of the two switches of a pilot wire. The pair is an actuator once
+    // both are picked.
+    updateThermostatPilotWireSwitch(state, index, selector) {
+      const pair = [...(state.thermostatEditPilotWireSwitches || ['', ''])];
+      pair[index] = selector;
+      store.setState({
+        thermostatEditPilotWireSwitches: pair,
+        ...(pair[0] && pair[1] ? pilotWirePicked(state) : {})
+      });
+    },
+
+    // Whether one of the two switches is on for an order.
+    updateThermostatPilotWireSwitchState(state, order, index, on) {
+      const states = state.thermostatEditPilotWireSwitchStates || DEFAULT_PILOT_WIRE_SWITCH_STATES;
+      const bits = String(states[order]).split('');
+      bits[index] = on ? '1' : '0';
+      store.setState({ thermostatEditPilotWireSwitchStates: { ...states, [order]: bits.join('') } });
     },
 
     // The order a preset sends a pilot-wire heater that regulates itself.
@@ -393,16 +444,24 @@ function createActions(store) {
         const isPilotWireThermostat = thermostatType === 'pilot-wire';
         // A real thermostat never carries a pilot wire: one left in the form from
         // another type is dropped rather than saved.
-        const pilotWireFeature = isExternalThermostat ? '' : state.thermostatEditPilotWireFeature || '';
+        // The wire is carried one way: by a module, or by two switches (spec
+        // C.1.2). The choice not shown in the form is not saved.
+        const usesSwitches = state.thermostatEditPilotWireKind === 'switches';
+        const pilotWireFeature = isExternalThermostat || usesSwitches ? '' : state.thermostatEditPilotWireFeature || '';
+        const pickedSwitches = parseSelectorList(state.thermostatEditPilotWireSwitches);
+        const pilotWireSwitches =
+          !isExternalThermostat && usesSwitches && pickedSwitches.length === 2 ? pickedSwitches : null;
+        const pilotWireSwitchStates = state.thermostatEditPilotWireSwitchStates || DEFAULT_PILOT_WIRE_SWITCH_STATES;
+        const hasPilotWire = Boolean(pilotWireFeature || pilotWireSwitches);
         // A pilot wire is regulated on hysteresis only: a TPI saved before it was
         // picked would be offered nowhere in the form and ignored by the loop.
         const pickedControlType = state.thermostatEditControlType || 'hysteresis';
-        const controlType = pilotWireFeature && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
+        const controlType = hasPilotWire && pickedControlType === 'tpi' ? 'hysteresis' : pickedControlType;
         // A heater is driven by one actuator or the other, never both: the form
         // clears one when the other is picked, and the save holds to it for a
         // device that already carried both.
         const switchFeature =
-          thermostatType !== 'virtual' || pilotWireFeature ? '' : state.thermostatEditSwitchFeature || '';
+          thermostatType !== 'virtual' || hasPilotWire ? '' : state.thermostatEditSwitchFeature || '';
         const pilotWireOrders = state.thermostatEditPilotWireOrders || DEFAULT_PILOT_WIRE_ORDERS;
         const windowFeature = serializeSelectorList(state.thermostatEditWindowFeatures);
         // `|| default` would discard an explicitly entered 0, which the preset
@@ -427,7 +486,7 @@ function createActions(store) {
 
         // A pilot-wire heater only heats: a cooling mode picked before it would
         // show cooling while the loop heats (spec C.1.1).
-        const savedMode = pilotWireFeature || isPilotWireThermostat ? 'heating' : mode;
+        const savedMode = hasPilotWire || isPilotWireThermostat ? 'heating' : mode;
 
         // Saving an empty form used to create a thermostat with no room, no
         // sensor and no actuator: it appeared in the list, regulated nothing, and
@@ -440,8 +499,8 @@ function createActions(store) {
         // heater regulating itself needs only its pilot wire.
         const missingConfig = {
           external: !state.thermostatEditTargetFeature,
-          'pilot-wire': !pilotWireFeature,
-          virtual: !temperatureFeature || (!switchFeature && !pilotWireFeature)
+          'pilot-wire': !hasPilotWire,
+          virtual: !temperatureFeature || (!switchFeature && !hasPilotWire)
         }[thermostatType];
         if (missingConfig) {
           store.setState({
@@ -451,6 +510,16 @@ function createActions(store) {
               'pilot-wire': 'incompletePilotWire',
               virtual: 'incompleteVirtual'
             }[thermostatType]
+          });
+          return;
+        }
+
+        // Each order needs a state of the two switches of its own: two orders on
+        // the same one could not be told apart, and the server refuses them.
+        if (pilotWireSwitches && !isPilotWireSwitchStates(pilotWireSwitchStates)) {
+          store.setState({
+            thermostatCreateStatus: RequestStatus.Error,
+            thermostatEditError: 'pilotWireSwitchStates'
           });
           return;
         }
@@ -471,9 +540,11 @@ function createActions(store) {
           });
           return;
         }
+        // Two switches take the four orders of their table.
+        const modulesOrders = pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null;
         const sentStandbyOrder = supportedStandbyOrder(
           storedStandbyOrder,
-          pickedPilotWire ? pickedPilotWire.supportedOrders.map(value => ({ value })) : null
+          pilotWireSwitches ? PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS : modulesOrders
         );
         // An inverted range bounds nothing anyone could mean, and one with no
         // width (20-20) pins the dial to a single value: refused here, and by
@@ -529,6 +600,16 @@ function createActions(store) {
             { name: 'THERMOSTAT_HUMIDITY_FEATURE', value: humidityFeature },
             { name: 'THERMOSTAT_SWITCH_FEATURE', value: switchFeature },
             { name: 'THERMOSTAT_PILOT_WIRE_FEATURE', value: pilotWireFeature },
+            // The two switches of a pilot wire, always both, in the order their
+            // states are written in, and the state of the two for each order.
+            {
+              name: 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE',
+              value: pilotWireSwitches ? JSON.stringify(pilotWireSwitches) : ''
+            },
+            ...PILOT_WIRE_SWITCH_ORDERS.map(order => ({
+              name: PILOT_WIRE_SWITCH_STATES_PARAMS[order],
+              value: pilotWireSwitches ? String(pilotWireSwitchStates[order]) : ''
+            })),
             // The order each preset sends, on a heater regulating itself only:
             // the other types send none, and cleared there like the real
             // thermostat's params below (spec A.1).
@@ -541,7 +622,7 @@ function createActions(store) {
             {
               name: 'THERMOSTAT_PILOT_WIRE_STANDBY_ORDER',
               value:
-                thermostatType === 'virtual' && pilotWireFeature
+                thermostatType === 'virtual' && hasPilotWire
                   ? String(sentStandbyOrder !== null ? sentStandbyOrder : storedStandbyOrder)
                   : ''
             },
@@ -629,6 +710,9 @@ function createActions(store) {
           thermostatEditHumidityFeature: '',
           thermostatEditSwitchFeature: '',
           thermostatEditPilotWireFeature: '',
+          thermostatEditPilotWireKind: 'module',
+          thermostatEditPilotWireSwitches: ['', ''],
+          thermostatEditPilotWireSwitchStates: DEFAULT_PILOT_WIRE_SWITCH_STATES,
           thermostatEditPilotWireOrders: DEFAULT_PILOT_WIRE_ORDERS,
           thermostatEditPilotWireStandbyOrder: DEFAULT_PILOT_WIRE_STANDBY_ORDER,
           thermostatEditType: 'virtual',

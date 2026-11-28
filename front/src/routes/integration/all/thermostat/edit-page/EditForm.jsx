@@ -13,7 +13,10 @@ import {
   DEFAULT_PILOT_WIRE_ORDERS,
   PILOT_WIRE_STANDBY_ORDERS,
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
+  DEFAULT_PILOT_WIRE_SWITCH_STATES,
+  PILOT_WIRE_SWITCH_ORDERS,
   MAX_WINDOW_DELAY_SECONDS,
+  isPilotWireSwitchStates,
   parsePilotWireStandbyOrder,
   supportedStandbyOrder,
   defaultTempRange
@@ -111,6 +114,7 @@ const SaveError = ({ status, reason }) =>
       {reason === 'incompletePilotWire' && <Text id="integration.thermostat.edit.incompletePilotWireError" />}
       {reason === 'pilotWireUnread' && <Text id="integration.thermostat.edit.pilotWireUnreadError" />}
       {reason === 'invertedRange' && <Text id="integration.thermostat.edit.invertedRangeError" />}
+      {reason === 'pilotWireSwitchStates' && <Text id="integration.thermostat.edit.pilotWireSwitchStatesError" />}
       {!reason && <Text id="integration.thermostat.edit.saveError" />}
     </div>
   );
@@ -130,7 +134,14 @@ const EditForm = ({ ...props }) => {
   const isVirtualThermostat = thermostatType === 'virtual';
   // A pilot-wire heater only heats, on either of its types: cooling is neither
   // offered nor shown.
-  const hasPilotWire = isPilotWireThermostat || (isVirtualThermostat && !!props.thermostatEditPilotWireFeature);
+  // The wire is carried by a module, or by two switches whose states together
+  // make the order (spec C.1.2): picked once both switches are.
+  const usesSwitches = props.thermostatEditPilotWireKind === 'switches';
+  const pilotWireSwitches = props.thermostatEditPilotWireSwitches || ['', ''];
+  const pilotWirePicked = usesSwitches
+    ? Boolean(pilotWireSwitches[0] && pilotWireSwitches[1])
+    : !!props.thermostatEditPilotWireFeature;
+  const hasPilotWire = isPilotWireThermostat || (isVirtualThermostat && pilotWirePicked);
   const pickedMode = props.thermostatEditMode || 'heating';
   const mode = hasPilotWire ? 'heating' : pickedMode;
   // The control rules read the other way round in cooling: the switch turns on
@@ -218,10 +229,20 @@ const EditForm = ({ ...props }) => {
   const pickedPilotWire = (props.pilotWireFeatures || []).find(
     feature => feature.selector === props.thermostatEditPilotWireFeature
   );
-  const supportedOrders =
+  const moduleOrders =
     pickedPilotWire && pickedPilotWire.supportedOrders && pickedPilotWire.supportedOrders.length > 0
       ? pickedPilotWire.supportedOrders
       : null;
+  // Two switches take the four orders of their table: comfort -1 and -2 are
+  // not on offer, as on any 4-order module.
+  const supportedOrders = usesSwitches ? PILOT_WIRE_SWITCH_ORDERS : moduleOrders;
+  const pilotWireSwitchStates = props.thermostatEditPilotWireSwitchStates || DEFAULT_PILOT_WIRE_SWITCH_STATES;
+  // Each of the two switches leaves the list of the other, like the sensors of
+  // a list: the same output cannot be both.
+  const pilotWireSwitchChoices = index =>
+    pickable(props.switchFeatures, keep(pilotWireSwitches[index])).filter(
+      feature => feature.selector !== pilotWireSwitches[1 - index]
+    );
   // The order the server actually sends, with the server's own fallback: a
   // stored eco on a module that refuses it rests on frost protection, or on off
   // when the module takes only off. The form shows that one, and saving stores
@@ -256,19 +277,126 @@ const EditForm = ({ ...props }) => {
   // to the switch, and first thing on a pilot-wire one.
   const pilotWirePicker = (
     <div class="form-group">
-      <label class="form-label">
+      <label class="form-label" htmlFor="thermostat-pilot-wire-kind">
         <Text id="integration.thermostat.edit.pilotWireFeatureLabel" />
       </label>
-      <Localizer>
-        <FeatureSelect
-          value={props.thermostatEditPilotWireFeature || ''}
-          features={pilotWireChoices}
-          onChange={e => props.updateThermostatActuator('thermostatEditPilotWireFeature', e.target.value)}
-          emptyLabel={<Text id="global.emptySelectOption" />}
-        />
-      </Localizer>
+      {/* What carries the wire: a pilot-wire module, or the two outputs of a
+          two-relay module wired to it through diodes, which Gladys only knows
+          as two switches (spec C.1.2). */}
+      <select
+        id="thermostat-pilot-wire-kind"
+        class="form-control mb-2"
+        value={usesSwitches ? 'switches' : 'module'}
+        onChange={e => props.updateThermostatPilotWireKind(e.target.value)}
+      >
+        <option value="module" selected={!usesSwitches}>
+          <Text id="integration.thermostat.edit.pilotWireKind.module" />
+        </option>
+        <option value="switches" selected={usesSwitches}>
+          <Text id="integration.thermostat.edit.pilotWireKind.switches" />
+        </option>
+      </select>
+      {!usesSwitches && (
+        <Localizer>
+          <FeatureSelect
+            value={props.thermostatEditPilotWireFeature || ''}
+            features={pilotWireChoices}
+            onChange={e => props.updateThermostatActuator('thermostatEditPilotWireFeature', e.target.value)}
+            emptyLabel={<Text id="global.emptySelectOption" />}
+          />
+        </Localizer>
+      )}
+      {usesSwitches && (
+        <div>
+          <div class="row">
+            {[0, 1].map(index => (
+              <div class="col-md-6 mb-2" key={index}>
+                <label class="form-label" htmlFor={`thermostat-pilot-wire-switch-${index}`}>
+                  <Text id="integration.thermostat.edit.pilotWireSwitchLabel" fields={{ number: index + 1 }} />
+                </label>
+                <select
+                  id={`thermostat-pilot-wire-switch-${index}`}
+                  class="form-control"
+                  value={pilotWireSwitches[index] || ''}
+                  onChange={e => props.updateThermostatPilotWireSwitch(index, e.target.value)}
+                >
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  {pilotWireSwitchChoices(index).map(feature => (
+                    <option
+                      key={feature.selector}
+                      value={feature.selector}
+                      selected={feature.selector === pilotWireSwitches[index]}
+                    >
+                      {feature.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+          <small class="form-text text-muted mb-2">
+            <Text id="integration.thermostat.edit.pilotWireSwitchesHelp" />
+          </small>
+          {/* The state of the two switches for each order: it depends on how
+              the diodes are wired, so it is set per heater. */}
+          <table class="table table-sm table-borderless mb-0">
+            <thead>
+              <tr>
+                <th>
+                  <Text id="integration.thermostat.edit.pilotWireSwitchOrderLabel" />
+                </th>
+                {[0, 1].map(index => (
+                  <th key={index} id={`thermostat-pilot-wire-switch-column-${index}`}>
+                    <Text id="integration.thermostat.edit.pilotWireSwitchLabel" fields={{ number: index + 1 }} />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {PILOT_WIRE_ORDER_OPTIONS.filter(([order]) => PILOT_WIRE_SWITCH_ORDERS.includes(order))
+                .reverse()
+                .map(([order, orderKey]) => (
+                  <tr key={order}>
+                    <td class="align-middle" id={`thermostat-pilot-wire-switch-order-${order}`}>
+                      <Text id={`deviceFeatureAction.category.heater.pilot-wire-mode.${orderKey}`} />
+                    </td>
+                    {/* Each box is named after its order and its switch ("Eco
+                        Switch 1"): "On" alone does not say which state it sets. */}
+                    {[0, 1].map(index => {
+                      const on = String(pilotWireSwitchStates[order])[index] === '1';
+                      return (
+                        <td class="align-middle" key={index}>
+                          <label class="custom-switch">
+                            <input
+                              type="checkbox"
+                              class="custom-switch-input"
+                              checked={on}
+                              aria-labelledby={`thermostat-pilot-wire-switch-order-${order} thermostat-pilot-wire-switch-column-${index}`}
+                              onChange={e => props.updateThermostatPilotWireSwitchState(order, index, e.target.checked)}
+                            />
+                            <span class="custom-switch-indicator" />
+                            <span class="custom-switch-description">
+                              <Text id={`integration.thermostat.edit.pilotWireSwitchState.${on ? 'on' : 'off'}`} />
+                            </span>
+                          </label>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          {!isPilotWireSwitchStates(pilotWireSwitchStates) && (
+            <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
+              <Text id="integration.thermostat.edit.pilotWireSwitchStatesError" />
+            </div>
+          )}
+        </div>
+      )}
       <small class="form-text text-muted">
-        <Text id="integration.thermostat.edit.pilotWireFeatureHelp" />{' '}
+        {!usesSwitches && <Text id="integration.thermostat.edit.pilotWireFeatureHelp" />}{' '}
         <Text
           id={`integration.thermostat.edit.pilotWireRegulationHelp.${isPilotWireThermostat ? 'heater' : 'gladys'}`}
         />
@@ -277,7 +405,7 @@ const EditForm = ({ ...props }) => {
           enough (spec C.1.1). Frost protection unless forced: some heaters lock
           their own functions out under it, a towel rail's boost among them. */}
       {/* Not offered when the module leaves no choice of standby order. */}
-      {isVirtualThermostat && props.thermostatEditPilotWireFeature && (showStandbySwitch || showStandbySelect) && (
+      {isVirtualThermostat && pilotWirePicked && (showStandbySwitch || showStandbySelect) && (
         <div class="mt-2">
           {showStandbySwitch && (
             <label class="custom-switch">
@@ -332,9 +460,16 @@ const EditForm = ({ ...props }) => {
       {/* Promised by the spec (G): a module that keeps its own programme
           writes orders that are taken as presses of its button, and Gladys
           and the programme take turns. */}
-      {props.thermostatEditPilotWireFeature && (
+      {!usesSwitches && props.thermostatEditPilotWireFeature && (
         <div class={cx('alert', 'alert-warning', 'mt-2', style.vendorWarning)}>
           <Text id="integration.thermostat.edit.pilotWireProgrammeWarning" />
+        </div>
+      )}
+      {/* Two switches are relays, and Gladys their only writer: whatever else
+          sets them is undone by the next pass (spec C.1.2). */}
+      {usesSwitches && pilotWirePicked && (
+        <div class="alert alert-info mt-2">
+          <Text id="integration.thermostat.edit.pilotWireSwitchesWarning" />
         </div>
       )}
     </div>

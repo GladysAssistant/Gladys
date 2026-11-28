@@ -793,6 +793,43 @@ describe('thermostat.setValue', () => {
       assert.calledWith(handler.gladys.device.saveState, setpointFeature, 7);
     });
 
+    it('should leave a virtual thermostat alone when the heater on its two switches regulates itself', async () => {
+      // The pair carries the order as a module does (C.1.2): bounded to 20, a
+      // 7 °C scene write sent Comfort rather than Frost.
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'virtual' },
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE', value: '["relay-q1","relay-q2"]' },
+          { name: 'THERMOSTAT_MIN_TEMP', value: '20' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+        ]),
+        setpointFeature,
+        7,
+      );
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 7);
+    });
+
+    it('should bound a virtual thermostat regulating its two switches on its room sensor', async () => {
+      const handler = buildHandler();
+
+      await handler.setValue(
+        device([
+          { name: 'THERMOSTAT_TYPE', value: 'virtual' },
+          { name: 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE', value: '["relay-q1","relay-q2"]' },
+          { name: 'THERMOSTAT_TEMPERATURE_FEATURE', value: 'room-temperature' },
+          { name: 'THERMOSTAT_MIN_TEMP', value: '20' },
+          { name: 'THERMOSTAT_MAX_TEMP', value: '25' },
+        ]),
+        setpointFeature,
+        7,
+      );
+
+      assert.calledWith(handler.gladys.device.saveState, setpointFeature, 20);
+    });
+
     it('should bound a virtual thermostat regulating a pilot wire on its room sensor', async () => {
       const handler = buildHandler();
 

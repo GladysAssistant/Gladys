@@ -1,4 +1,5 @@
 import { parseSelectorList } from '../../../../../server/utils/thermostatSelectorList';
+import { parsePilotWireSwitchStates } from '../../../../../server/utils/thermostatConstants';
 
 // How each THERMOSTAT_* device param maps onto the config the widget reads.
 // Declaring it once removes the ninety lines of near-identical ternaries this
@@ -9,6 +10,8 @@ const PARAM_FIELDS = [
   ['humidity_feature', 'THERMOSTAT_HUMIDITY_FEATURE'],
   ['switch_feature', 'THERMOSTAT_SWITCH_FEATURE'],
   ['pilot_wire_feature', 'THERMOSTAT_PILOT_WIRE_FEATURE'],
+  // A pilot wire driven by two switches rather than by a module (spec C.1.2).
+  ['pilot_wire_switches', 'THERMOSTAT_PILOT_WIRE_SWITCH_FEATURE', parseSelectorList],
   // The order each preset sends a pilot-wire heater regulating itself: the
   // widget compares it with the order the module confirms.
   ['pilot_wire_order_frost', 'THERMOSTAT_PILOT_WIRE_ORDER_FROST', v => parseInt(v, 10)],
@@ -75,6 +78,13 @@ export const buildConfigFromParams = device => {
     const parsed = parse ? parse(raw) : raw;
     config[field] = typeof parsed === 'number' && !Number.isFinite(parsed) ? null : parsed;
   });
+  // Read as the server does: a module's feature wins over the two switches, and
+  // half a pair drives nothing.
+  const pair = config.pilot_wire_switches;
+  config.pilot_wire_switches = !config.pilot_wire_feature && pair && pair.length === 2 ? pair : null;
+  config.pilot_wire_switch_states = parsePilotWireSwitchStates(getParam);
+  // Whether the heater is driven by an order, whichever way it is carried.
+  config.pilot_wire = Boolean(config.pilot_wire_feature || config.pilot_wire_switches);
   return config;
 };
 

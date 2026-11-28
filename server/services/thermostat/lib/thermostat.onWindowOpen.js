@@ -99,6 +99,9 @@ async function getWindowSelectors() {
     if (config && config.target_feature) {
       targets.add(config.target_feature);
     }
+    // Two switches wired as a pilot wire (C.1.2) are not followed: they are
+    // relays, and Gladys is their only writer, as on a virtual thermostat's
+    // switch.
     if (config && config.pilot_wire_feature) {
       targets.add(config.pilot_wire_feature);
     }
@@ -879,7 +882,7 @@ async function onDeviceNewState(event) {
         // does: it holds no switch, and waiting for the next tick left it on
         // comfort for up to a minute with the window open. A stopped one keeps
         // its off: frost protection would only raise it.
-        if (paramsConfig.pilot_wire_feature) {
+        if (paramsConfig.pilot_wire) {
           const stopped = isStopped(device);
           logger.info(
             `Thermostat: window opened (${changedSelector}) for ${device.selector}, sending ${

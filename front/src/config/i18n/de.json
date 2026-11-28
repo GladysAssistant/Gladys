@@ -4456,6 +4456,19 @@
         },
         "pilotWireFeatureLabel": "Steuerleitung (Aktor)",
         "pilotWireFeatureHelp": "Ein Heizkörper mit französischer Steuerleitung: Gladys sendet ihm einen Befehl (Komfort, Eco, Frostschutz, Aus…), statt die Stromzufuhr zu unterbrechen. Schalten Sie zuerst das eigene Programm des Moduls aus.",
+        "pilotWireKind": {
+          "module": "Ein Steuerleitungsmodul",
+          "switches": "Zwei Schalter (Modul mit zwei Relais)"
+        },
+        "pilotWireSwitchLabel": "Schalter {{number}}",
+        "pilotWireSwitchOrderLabel": "Befehl",
+        "pilotWireSwitchesHelp": "Die beiden Ausgänge eines Moduls mit zwei Relais, das über zwei Dioden an die Steuerleitung angeschlossen ist (zum Beispiel ein FIBARO FGS-224) und das Gladys als zwei Schalter sieht. Geben Sie unten für jeden Befehl den Zustand der beiden Schalter an: Er hängt von der Richtung der Dioden ab. Vorgeschlagen wird die häufigste Verdrahtung.",
+        "pilotWireSwitchState": {
+          "on": "Ein",
+          "off": "Aus"
+        },
+        "pilotWireSwitchStatesError": "Jeder Befehl braucht seine eigene Kombination der beiden Schalter: Zwei Befehle mit derselben Kombination lassen sich nicht unterscheiden.",
+        "pilotWireSwitchesWarning": "Diese beiden Schalter gehören dem Thermostat: Werden sie anderswo geändert (Szene, Dashboard, Taste des Moduls), stellt Gladys den erwarteten Befehl innerhalb einer Minute wieder her. Deaktivieren Sie die Szenen, die sie bisher gesteuert haben.",
         "pilotWireProgrammeWarning": "Schalten Sie das eigene Programm oder den Thermostatmodus des Moduls aus (Heatzy-Zeitplan, Tuya-Programm…), bevor Sie es mit Gladys steuern. Sonst wird jeder vom Programm geschriebene Befehl als Änderung am Modul gewertet, und Modul und Gladys schreiben den Befehl abwechselnd.",
         "pilotWireStandbyOrderLabel": "Befehl nach Erreichen des Sollwerts",
         "pilotWireStandbyForceLabel": "Einen anderen Ruhebefehl als Frostschutz erzwingen",
@@ -4509,7 +4522,7 @@
         "saveError": "Beim Speichern ist ein Fehler aufgetreten.",
         "incompleteVirtualError": "Ein virtueller Thermostat braucht einen Temperatursensor und einen Aktor (Schalter oder Steuerleitung): Er regelt, indem er den einen liest und den anderen schaltet.",
         "incompleteExternalError": "Ein vorhandener Thermostat braucht den Sollwert des Thermostats, den er steuert.",
-        "incompletePilotWireError": "Ein Heizkörper mit Steuerleitung braucht die zu steuernde Steuerleitung.",
+        "incompletePilotWireError": "Ein Heizkörper mit Steuerleitung braucht die zu steuernde Steuerleitung: ein Steuerleitungsmodul oder die beiden Schalter, die sie steuern.",
         "pilotWireUnreadError": "Die gewählte Steuerleitung konnte nicht gelesen werden, daher kann der Ruhebefehl nicht geprüft werden: Seite neu laden und sie erneut auswählen.",
         "invertedRangeError": "Die Mindesttemperatur muss unter der Höchsttemperatur liegen.",
         "activeScheduleLabel": "Aktiver Zeitplan",

@@ -234,6 +234,87 @@ function supportedStandbyOrder(order, supportedOptions) {
   return supported.includes(PILOT_WIRE_MODE.ECO) ? PILOT_WIRE_MODE.ECO : null;
 }
 
+// A pilot wire driven by two switches (C.1.2): a two-relay module whose outputs
+// each feed the wire through a diode. The four orders such a wiring carries,
+// in the order the edit form lists them.
+const PILOT_WIRE_SWITCH_ORDERS = [
+  PILOT_WIRE_MODE.COMFORT,
+  PILOT_WIRE_MODE.ECO,
+  PILOT_WIRE_MODE.FROST_PROTECTION,
+  PILOT_WIRE_MODE.OFF,
+];
+
+// The state of the two switches for each order, switch 1 then switch 2, `1` for
+// on. The default is the usual two-diode wiring: no signal is comfort, both
+// half-waves eco, one half-wave frost protection and the other off. Which
+// half-wave is which depends on how the diodes are wired, so the table is set
+// per thermostat by the THERMOSTAT_PILOT_WIRE_SWITCH_STATES_<ORDER> params.
+const DEFAULT_PILOT_WIRE_SWITCH_STATES = {
+  [PILOT_WIRE_MODE.COMFORT]: '00',
+  [PILOT_WIRE_MODE.ECO]: '11',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: '01',
+  [PILOT_WIRE_MODE.OFF]: '10',
+};
+
+const PILOT_WIRE_SWITCH_STATES_PARAMS = {
+  [PILOT_WIRE_MODE.COMFORT]: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_COMFORT',
+  [PILOT_WIRE_MODE.ECO]: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_ECO',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_FROST_PROTECTION',
+  [PILOT_WIRE_MODE.OFF]: 'THERMOSTAT_PILOT_WIRE_SWITCH_STATES_OFF',
+};
+
+// What two switches take, said the way a module's feature says it: comfort -1
+// and -2 are then sent as comfort, like on any 4-order module.
+const PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS = PILOT_WIRE_SWITCH_ORDERS.map((value) => ({ value }));
+
+/**
+ * @description Whether a table gives each of the four orders its own state of
+ * the two switches. Two orders on the same state could not be told apart, and
+ * the second one would never be sent: the pass would read it as already carried.
+ * @param {object} states - The state of the two switches (`'01'`…), keyed by order.
+ * @returns {boolean} True when the four states are valid and all different.
+ * @example
+ * isPilotWireSwitchStates({ 0: '10', 1: '01', 2: '11', 5: '00' }); // true
+ */
+function isPilotWireSwitchStates(states) {
+  const values = PILOT_WIRE_SWITCH_ORDERS.map((order) => (states || {})[order]);
+  return values.every((value) => /^[01]{2}$/.test(String(value))) && new Set(values.map(String)).size === values.length;
+}
+
+/**
+ * @description Read the stored state of the two switches for each order: the
+ * params when they give each order its own state, the default table as a whole
+ * otherwise — a table mixing stored and default states could send two orders
+ * the same way. Shared by the server, the edit form and the widget.
+ * @param {Function} getParam - Returns the value of a device param by its name.
+ * @returns {object} The state of the two switches, keyed by order.
+ * @example
+ * parsePilotWireSwitchStates(() => null); // DEFAULT_PILOT_WIRE_SWITCH_STATES
+ */
+function parsePilotWireSwitchStates(getParam) {
+  const states = PILOT_WIRE_SWITCH_ORDERS.reduce(
+    (table, order) => ({ ...table, [order]: getParam(PILOT_WIRE_SWITCH_STATES_PARAMS[order]) }),
+    {},
+  );
+  return isPilotWireSwitchStates(states) ? states : DEFAULT_PILOT_WIRE_SWITCH_STATES;
+}
+
+/**
+ * @description The order two switches carry, from the state of each.
+ * @param {object} states - The state of the two switches, keyed by order.
+ * @param {number|null} first - The value of the first switch, `0` or `1`.
+ * @param {number|null} second - The value of the second switch, `0` or `1`.
+ * @returns {number|null} A PILOT_WIRE_MODE value, or null when a switch has no
+ * known state or the table names none for that state.
+ * @example
+ * pilotWireOrderOfSwitches(DEFAULT_PILOT_WIRE_SWITCH_STATES, 1, 1); // PILOT_WIRE_MODE.ECO
+ */
+function pilotWireOrderOfSwitches(states, first, second) {
+  const carried = `${first}${second}`;
+  const order = PILOT_WIRE_SWITCH_ORDERS.find((candidate) => String(states[candidate]) === carried);
+  return order === undefined ? null : order;
+}
+
 module.exports = {
   DEFAULT_PRESET_TEMPS,
   DEFAULT_COOLING_PRESET_TEMPS,
@@ -268,4 +349,11 @@ module.exports = {
   DEFAULT_PILOT_WIRE_STANDBY_ORDER,
   parsePilotWireStandbyOrder,
   supportedStandbyOrder,
+  PILOT_WIRE_SWITCH_ORDERS,
+  DEFAULT_PILOT_WIRE_SWITCH_STATES,
+  PILOT_WIRE_SWITCH_STATES_PARAMS,
+  PILOT_WIRE_SWITCH_SUPPORTED_OPTIONS,
+  isPilotWireSwitchStates,
+  parsePilotWireSwitchStates,
+  pilotWireOrderOfSwitches,
 };
