@@ -3720,6 +3720,16 @@
         "peak-off-peak": "peak/off-peak hours",
         "edf-tempo": "EDF Tempo"
       },
+      "tierLabels": {
+        "peak": "Peak hours",
+        "offPeak": "Off-peak hours",
+        "bluePeak": "Blue peak",
+        "blueOffPeak": "Blue off-peak",
+        "whitePeak": "White peak",
+        "whiteOffPeak": "White off-peak",
+        "redPeak": "Red peak",
+        "redOffPeak": "Red off-peak"
+      },
       "priceTypes": {
         "consumption": "consumption",
         "subscription": "subscription"

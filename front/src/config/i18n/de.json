@@ -1894,6 +1894,16 @@
         "peak-off-peak": "Haupt-/Nebenzeiten",
         "edf-tempo": "EDF Tempo"
       },
+      "tierLabels": {
+        "peak": "Hauptzeit",
+        "offPeak": "Nebenzeit",
+        "bluePeak": "Blau HT",
+        "blueOffPeak": "Blau NT",
+        "whitePeak": "Weiß HT",
+        "whiteOffPeak": "Weiß NT",
+        "redPeak": "Rot HT",
+        "redOffPeak": "Rot NT"
+      },
       "priceTypes": {
         "consumption": "Verbrauch",
         "subscription": "Abonnement"

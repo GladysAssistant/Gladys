@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+import { formatTierLabel } from '../../../routes/integration/all/energy-monitoring/contracts/contractUtils';
 import style from './style.css';
 
 export const CONTRACTS_PAGE = '/dashboard/integration/device/energy-monitoring/contracts';
@@ -93,7 +94,7 @@ const EnergyPriceBox = ({ title, loading, error, current, language }) => {
                 <i class="fe fe-dollar-sign" />
                 <span>{title}</span>
               </span>
-              {current && current.label && <span class={style.tierBadge}>{current.label}</span>}
+              {current && current.label && <span class={style.tierBadge}>{formatTierLabel(current.label)}</span>}
             </div>
             {error && (
               <div class={style.errorState}>
@@ -136,7 +137,13 @@ const EnergyPriceBox = ({ title, loading, error, current, language }) => {
                         {' '}
                         <i class="fe fe-arrow-right" />{' '}
                         {formatPrice(current.next_price, current.currency, current.unit, language)}
-                        {current.next_label && ` (${current.next_label})`}
+                        {current.next_label && (
+                          <span>
+                            {' ('}
+                            {formatTierLabel(current.next_label)}
+                            {')'}
+                          </span>
+                        )}
                       </span>
                     )}
                   </div>

@@ -5,6 +5,7 @@ import HourSlotGrid from './HourSlotGrid';
 import {
   localize,
   formatMoney,
+  formatTierLabel,
   getMeterDevices,
   PROVIDER_BADGE,
   WIZARD_STEPS as STEPS,
@@ -560,7 +561,7 @@ class ContractWizardDesktop extends Component {
                         <td class="text-right">{Math.round(sample.kwh * 1000) / 1000}</td>
                         <td class="text-right">{formatMoney(sample.unit_price, form.currency)}</td>
                         <td class="text-right">{formatMoney(sample.cost, form.currency)}</td>
-                        <td>{sample.label || ''}</td>
+                        <td>{formatTierLabel(sample.label)}</td>
                       </tr>
                     ))}
                   </tbody>

@@ -1769,6 +1769,16 @@
         "peak-off-peak": "heures pleines/creuses",
         "edf-tempo": "EDF Tempo"
       },
+      "tierLabels": {
+        "peak": "Heures pleines",
+        "offPeak": "Heures creuses",
+        "bluePeak": "Bleu HP",
+        "blueOffPeak": "Bleu HC",
+        "whitePeak": "Blanc HP",
+        "whiteOffPeak": "Blanc HC",
+        "redPeak": "Rouge HP",
+        "redOffPeak": "Rouge HC"
+      },
       "priceTypes": {
         "consumption": "consommation",
         "subscription": "abonnement"

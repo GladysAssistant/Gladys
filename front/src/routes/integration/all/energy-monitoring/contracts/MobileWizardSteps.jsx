@@ -17,7 +17,7 @@ import {
   kitStyle
 } from '../../../../../components/mobile';
 import MobileHourRanges from './MobileHourRanges';
-import { localize, formatMoney, getMeterDevices, MANUAL_TEMPLATE } from './contractUtils';
+import { localize, formatMoney, formatTierLabel, getMeterDevices, MANUAL_TEMPLATE } from './contractUtils';
 import style from '../mobile.css';
 
 const PROVIDER_PILL_TONE = {
@@ -687,7 +687,12 @@ export class PreviewStep extends Component {
                         <span>
                           {formatNumber(sample.kwh, 3)} kWh ×{' '}
                           {formatMoney(sample.unit_price, form.currency, 4, language)}
-                          {sample.label ? ` · ${sample.label}` : ''}
+                          {sample.label && (
+                            <span>
+                              {' · '}
+                              {formatTierLabel(sample.label)}
+                            </span>
+                          )}
                         </span>
                       }
                       trailing={

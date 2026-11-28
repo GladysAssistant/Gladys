@@ -230,7 +230,8 @@ describe('Energy monitoring on a phone', () => {
       expect(request.body.inputs.off_peak_hours).to.deep.eq([['12:00', '15:30']]);
       expect(request.body.inputs.peak_price).to.eq(0.25);
     });
-    cy.get('[data-cy=energy-contract-preview-samples]').should('contain', 'peak');
+    // the tier label of the sample ("peak") is displayed translated
+    cy.get('[data-cy=energy-contract-preview-samples]').i18n('integration.energyMonitoring.tierLabels.peak');
   });
 
   it('should ask before leaving a contract that is not saved', () => {

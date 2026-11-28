@@ -3720,6 +3720,16 @@
         "peak-off-peak": "horas punta/horas valle",
         "edf-tempo": "EDF Tempo"
       },
+      "tierLabels": {
+        "peak": "Horas punta",
+        "offPeak": "Horas valle",
+        "bluePeak": "Azul punta",
+        "blueOffPeak": "Azul valle",
+        "whitePeak": "Blanco punta",
+        "whiteOffPeak": "Blanco valle",
+        "redPeak": "Rojo punta",
+        "redOffPeak": "Rojo valle"
+      },
       "priceTypes": {
         "consumption": "consumo",
         "subscription": "abono"
