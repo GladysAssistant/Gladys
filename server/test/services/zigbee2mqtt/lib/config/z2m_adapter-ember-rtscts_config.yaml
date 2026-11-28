@@ -6,7 +6,7 @@ mqtt:
 serial:
   port: /dev/ttyACM0
   adapter: ember
-  rtscts: false
+  rtscts: true
 map_options:
   graphviz:
     colors:
