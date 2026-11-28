@@ -28,6 +28,7 @@ module.exports.tuya = require('./tuya');
 module.exports.melcloud = require('./melcloud');
 module.exports['node-red'] = require('./node-red');
 module.exports.matterbridge = require('./matterbridge');
+module.exports['matter-bridge'] = require('./matter-bridge');
 module.exports.netatmo = require('./netatmo');
 module.exports.sonos = require('./sonos');
 module.exports.nuki = require('./nuki');

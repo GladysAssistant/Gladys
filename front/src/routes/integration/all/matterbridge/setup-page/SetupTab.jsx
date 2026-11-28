@@ -10,6 +10,10 @@ import config from '../../../../../config';
 
 let cx = classNames.bind(style);
 
+// Error the server answers when the Matter bridge of Gladys is turned on: it listens on the
+// standard Matter port, which Matterbridge needs too.
+const MATTER_BRIDGE_ENABLED = 'MATTER_BRIDGE_ENABLED';
+
 class SetupTab extends Component {
   componentDidMount = () => {
     this.checkStatus();
@@ -35,6 +39,10 @@ class SetupTab extends Component {
   };
 
   startContainer = async () => {
+    // Both cannot run: the button is disabled, this only covers a status that is not up to date
+    if (this.state.matterBridgeEnabled) {
+      return;
+    }
     let error = false;
 
     this.setState({
@@ -50,8 +58,9 @@ class SetupTab extends Component {
       await this.props.httpClient.post('/api/v1/service/matterbridge/connect');
     } catch (e) {
       error = error | get(e, 'response.status');
-      // A container that is not ours carries our name: the server says which one to rename
-      if (get(e, 'response.status') === 409) {
+      // A container that is not ours carries our name: the server says which one to rename.
+      // The other conflict, the Matter bridge of Gladys turned on, is explained by the status.
+      if (get(e, 'response.status') === 409 && get(e, 'response.data.error') !== MATTER_BRIDGE_ENABLED) {
         this.setState({ containerConflictMessage: get(e, 'response.data.error') });
       }
     }
@@ -99,7 +108,8 @@ class SetupTab extends Component {
       matterbridgeRunning: false,
       matterbridgeEnabled: false,
       dockerBased: false,
-      networkModeValid: false
+      networkModeValid: false,
+      matterBridgeEnabled: false
     };
     try {
       matterbridgeStatus = await this.props.httpClient.get('/api/v1/service/matterbridge/status');
@@ -125,6 +135,7 @@ class SetupTab extends Component {
         matterbridgeEnabled: matterbridgeStatus.matterbridgeEnabled,
         dockerBased: matterbridgeStatus.dockerBased,
         networkModeValid: matterbridgeStatus.networkModeValid,
+        matterBridgeEnabled: matterbridgeStatus.matterBridgeEnabled,
         matterbridgeUrl
       });
     }
@@ -149,7 +160,8 @@ class SetupTab extends Component {
       matterbridgeUrl,
       matterbridgeStatus,
       showConfirmDelete,
-      containerConflictMessage
+      containerConflictMessage,
+      matterBridgeEnabled
     }
   ) {
     return (
@@ -204,11 +216,16 @@ class SetupTab extends Component {
               <Text id="integration.matterbridge.setup.disableMatterbridge" />
             </button>
           )}
+          {!matterbridgeEnabled && matterBridgeEnabled && (
+            <div class="alert alert-warning">
+              <MarkupText id="integration.matterbridge.setup.matterBridgeEnabled" />
+            </div>
+          )}
           {dockerBased && networkModeValid && !matterbridgeEnabled && !showConfirmDelete && (
             <button
               onClick={this.startContainer}
               class="btn btn-primary"
-              disabled={matterbridgeStatus === RequestStatus.Getting}
+              disabled={matterbridgeStatus === RequestStatus.Getting || matterBridgeEnabled}
             >
               <Text id="integration.matterbridge.setup.enableMatterbridge" />
             </button>
