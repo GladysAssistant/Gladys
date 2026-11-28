@@ -5161,6 +5161,12 @@
       "device": {
         "get-value": {
           "last_value": "Último valor del dispositivo"
+        },
+        "newState": {
+          "deviceName": "Nombre del dispositivo disparador",
+          "deviceFeatureName": "Nombre de la función disparadora",
+          "lastValue": "Nuevo valor del disparador",
+          "previousValue": "Valor anterior del disparador"
         }
       },
       "calendar": {

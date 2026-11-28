@@ -3,7 +3,7 @@
 > **Living specification — source of truth.** This document specifies how the scene list and the
 > scene editor behave on a phone, and the editor behaviors shared by every screen size (unsaved
 > changes, local draft, save errors, step summaries, what a condition compares, a deletion that
-> can be undone). **Rule: any PR
+> can be undone, what a device state trigger tells the steps). **Rule: any PR
 > that changes one of these behaviors modifies this file in the same diff.**
 >
 > Status: **phases 1 and 2 implemented** (sections C to F). Section G lists what is designed but
@@ -246,6 +246,45 @@ back.
 
 "Scene saved" after a successful save is a toast on a phone only: on a wider screen the footer
 already says "Saved" next to its buttons, and the same sentence twice would be noise.
+
+### C.8 A device state trigger tells the steps what fired it
+
+One device state trigger watches several features (`device_features`), and a scene can hold
+several of those triggers: the steps need to know which device started the scene — "Garage door
+was just opened", not one scene per door. The trigger hands them four variables, read like any
+other variable of the scene (`{{triggerEvent.…}}` in a text, a formula or a declared `string`
+field of an integration step):
+
+| Variable                          | What it holds                            |
+| --------------------------------- | ---------------------------------------- |
+| `triggerEvent.device.name`        | name of the device whose feature changed |
+| `triggerEvent.deviceFeature.name` | name of that feature, as it is stored    |
+| `triggerEvent.last_value`         | the value which fired the trigger        |
+| `triggerEvent.previous_value`     | the value of the feature just before     |
+
+- **On the server**, the checker of the trigger (`scene.triggers.js`) returns the trigger event
+  instead of `true` when it matches, as the trigger of an integration does: the event as it was
+  emitted (`type`, `device_feature`, `last_value`, `previous_value`…), plus `device`
+  (`name`, `selector`) and `deviceFeature` (`name`, `selector`), both read in RAM — no request,
+  and nothing computed for an event no scene matches. The event the other scenes are checked
+  against is not modified. A feature the state does not hold leaves the event as it is, a
+  device it does not hold leaves `device` empty: a variable that cannot be filled renders an
+  empty text and never stops the scene. With `for_duration`, the scene starts when the timer
+  ends: `last_value` is the value at that moment and `previous_value` the one which started
+  the timer.
+- **In the editor**, the form of the trigger declares the four variables when it mounts
+  (`setVariablesTrigger`, as the calendar and the integration triggers do), so every text field
+  lists them and a summary names them (C.1). **Their labels name the trigger** ("Trigger device
+  name", "Trigger new value"): the label is all the user sees of a variable, and "New value"
+  alone would not say whose. The list of a text field shows them under the number of the
+  trigger card, once — every device state trigger declares the same four, and whichever fires,
+  they describe that one.
+- The scene schema given to the assistant (`sceneSchemas.js`) names the four variables, so a
+  scene written through MCP can use them.
+
+A scene started by anything else (another trigger, the "Start" button) holds none of them: they
+render an empty text. A scene started by another scene reads the trigger event of its caller, as
+it always did.
 
 ## D. Mobile scene list (`/dashboard/scene`, < 768 px)
 
@@ -609,6 +648,13 @@ From 768 px the forms are untouched.
   "Choose a device" button and no select, the device is picked in the picker sheet in one tap and
   saved, no "Device / Variable" switch without a variable to offer; with one, the switch shows the
   variable held, puts it aside for a device and brings it back.
+- Cypress, `SceneTriggerVariables.cy.js` (C.8): the four variables of a device state trigger
+  listed in the text field of a step under their labels, the one picked saved as
+  `{{triggerEvent.device.name}}` and named in the collapsed step, the variables listed once with
+  two device state triggers; in a phone viewport, listed in the sheet of a step whose trigger
+  sheet was never opened. Server, `scene.trigger.deviceNewState.test.js`: the trigger event of
+  each feature of a trigger, after a `for_duration` timer, without the device and without the
+  feature in the state.
 - Cypress, phone viewport, `SceneMobileGestures.cy.js`: summaries naming the user and the house,
   the system "back" closing the sheet on top then leaving the editor in one press, a sheet
   dragged down by its header (kept when barely moved), a step moved by a long press (a quick move

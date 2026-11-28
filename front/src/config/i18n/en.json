@@ -5161,6 +5161,12 @@
       "device": {
         "get-value": {
           "last_value": "Device last value"
+        },
+        "newState": {
+          "deviceName": "Trigger device name",
+          "deviceFeatureName": "Trigger feature name",
+          "lastValue": "Trigger new value",
+          "previousValue": "Trigger previous value"
         }
       },
       "calendar": {

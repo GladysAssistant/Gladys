@@ -35,7 +35,8 @@ function checkTrigger(event) {
 
           // if yes, we execute the scene. A checker returning an object builds
           // the trigger event the actions see (the reduced event of an
-          // integration scene trigger); a boolean keeps the raw event.
+          // integration scene trigger, the event of a device state trigger
+          // completed with its device); a boolean keeps the raw event.
           if (conditionVerified) {
             this.execute(sceneSelector, {
               triggerEvent: typeof conditionVerified === 'object' ? conditionVerified : event,
