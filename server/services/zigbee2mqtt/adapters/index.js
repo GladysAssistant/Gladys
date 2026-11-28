@@ -96,20 +96,23 @@ const ADAPTERS_BY_CONFIG_KEY = {
 // without it, Zigbee2mqtt fails to start with "failed to start adapter connection to firmware".
 // The whole deconz family is listed, even at the default value, so that switching from a model to
 // another always rewrites the baudrate instead of keeping the one of the previous coordinator.
+// The Home Assistant Connect ZBT-2 talks at 460800 bauds with hardware flow control: without them,
+// Zigbee2mqtt fails to start with "Failed to start EZSP layer with status=HOST_FATAL_ERROR".
 const SERIAL_OPTIONS_BY_ADAPTER = {
   ConBee: { baudrate: 38400 },
   'ConBee II': { baudrate: 38400 },
   'ConBee III': { baudrate: 115200 },
   RaspBee: { baudrate: 38400 },
   'RaspBee II': { baudrate: 38400 },
+  'Home Assistant Connect ZBT-2': { baudrate: 460800, rtscts: true },
 };
 
 // Serial keys Gladys owns in the Zigbee2mqtt configuration file: they are written for the models
 // requiring them, and removed for the models that don't, so that switching coordinator never
-// leaves behind a setting belonging to the previous one.
-const MANAGED_SERIAL_OPTION_KEYS = [
-  ...new Set(Object.values(SERIAL_OPTIONS_BY_ADAPTER).flatMap((options) => Object.keys(options))),
-];
+// leaves behind a setting belonging to the previous one. The other keys of SERIAL_OPTIONS_BY_ADAPTER
+// (rtscts) may have been set by hand for another dongle: they are only removed when the file holds
+// all the settings of a model, that is when they were left by that model.
+const MANAGED_SERIAL_OPTION_KEYS = ['baudrate'];
 
 const ADAPTERS = Object.entries(ADAPTERS_BY_CONFIG_KEY)
   .flatMap(([configKey, labels]) => labels.map((label) => ({ label, configKey })))

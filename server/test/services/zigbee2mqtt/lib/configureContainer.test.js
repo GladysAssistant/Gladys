@@ -30,6 +30,8 @@ const mqttOtherConfigFilePath = path.join(configBasePath, 'z2m_mqtt-other_config
 const deconzConfigFilePath = path.join(configBasePath, 'z2m_adapter-deconz_config.yaml');
 const conbee3ConfigFilePath = path.join(configBasePath, 'z2m_adapter-deconz-conbee3_config.yaml');
 const emberConfigFilePath = path.join(configBasePath, 'z2m_adapter-ember_config.yaml');
+const zbt2ConfigFilePath = path.join(configBasePath, 'z2m_adapter-ember-zbt2_config.yaml');
+const rtsctsConfigFilePath = path.join(configBasePath, 'z2m_adapter-ember-rtscts_config.yaml');
 const ezspConfigFilePath = path.join(configBasePath, 'z2m_adapter-ezsp_config.yaml');
 const portConfigFilePath = path.join(configBasePath, 'z2m_port_config.yaml');
 const networkAdapterConfigFilePath = path.join(configBasePath, 'z2m_network-adapter_config.yaml');
@@ -1089,6 +1091,66 @@ describe('zigbee2mqtt configureContainer', () => {
     const expectedContent = fs.readFileSync(networkAdapterConfigFilePath, 'utf8');
     expect(resultContent).to.equal(expectedContent);
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should set the Home Assistant Connect ZBT-2 baudrate and flow control on an existing ember configuration', async () => {
+    // PREPARE
+    fs.copyFileSync(emberConfigFilePath, configFilePath);
+    const config = {
+      z2mDongleName: 'Home Assistant Connect ZBT-2',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(zbt2ConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should keep the Home Assistant Connect ZBT-2 configuration', async () => {
+    // PREPARE
+    fs.copyFileSync(zbt2ConfigFilePath, configFilePath);
+    const config = {
+      z2mDongleName: 'Home Assistant Connect ZBT-2',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(zbt2ConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
+  });
+
+  it('it should remove the baudrate and flow control when switching from a Home Assistant Connect ZBT-2 to a ZBT-1', async () => {
+    // PREPARE
+    fs.copyFileSync(zbt2ConfigFilePath, configFilePath);
+    const config = {
+      z2mDongleName: 'Home Assistant Connect ZBT-1',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(emberConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+  });
+
+  it('it should keep a flow control set by hand for another ember dongle than the Home Assistant Connect ZBT-2', async () => {
+    // PREPARE
+    fs.copyFileSync(rtsctsConfigFilePath, configFilePath);
+    const config = {
+      z2mDongleName: 'ITead Sonoff Zigbee 3.0 USB Dongle Plus V2 model "ZBDongle-E"',
+    };
+    // EXECUTE
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    // ASSERT
+    const resultContent = fs.readFileSync(configFilePath, 'utf8');
+    const expectedContent = fs.readFileSync(rtsctsConfigFilePath, 'utf8');
+    expect(resultContent).to.equal(expectedContent);
+    expect(changed).to.deep.equal({ configChanged: false, adapterChanged: false });
   });
 
   it('it should configure a network coordinator', async () => {
