@@ -757,7 +757,20 @@
         "previousPeriod": "Previous period",
         "nextPeriod": "Next period",
         "currentPeriod": "Live",
-        "backToNow": "Back to now"
+        "backToNow": "Back to now",
+        "expand": "Enlarge the chart",
+        "zoomHint": "Drag on the chart to zoom in",
+        "zoomHintTouch": "Pinch the chart to zoom in",
+        "resetZoom": "Reset zoom",
+        "series": "Series",
+        "showSeries": "Show this series",
+        "hideSeries": "Hide this series",
+        "stats": {
+          "min": "Min",
+          "avg": "Avg",
+          "max": "Max",
+          "last": "Last"
+        }
       },
       "sun": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to compute the sun position.",

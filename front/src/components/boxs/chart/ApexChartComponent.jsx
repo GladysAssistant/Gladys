@@ -31,6 +31,9 @@ const DEFAULT_COLORS = [
 ];
 const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua', 'pink', 'orange', 'grey'];
 
+// The shortest range of the x axis a zoom may show
+const MIN_ZOOM_RANGE_IN_MS = 10 * 1000;
+
 class ApexChartComponent extends Component {
   chartRef = createRef();
   // One instance for the life of the chart, so the tooltip positioning state
@@ -234,6 +237,46 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    // The enlarged view of a chart (ChartExpandedView) sizes the chart on its container and
+    // draws its own legend, whatever the chart type. The last label of the x axis is centered
+    // on the right edge of the plot: it needs room there not to be cut.
+    if (this.props.fill_container) {
+      options.chart.height = '100%';
+      options.grid = {
+        ...options.grid,
+        // a mid gray the dark mode inversion leaves readable (the default light gray turns
+        // into the color of the dark surface)
+        borderColor: 'rgba(124, 131, 150, 0.35)',
+        padding: { ...(options.grid || {}).padding, right: 20 }
+      };
+      // The markers of the hovered points wait at the origin of the plot with no radius, but
+      // their white outline still draws a dot there — a black one in dark mode
+      options.markers = { ...options.markers, strokeWidth: 0 };
+    }
+    if (this.props.hide_legend) {
+      options.legend = { ...options.legend, show: false };
+    }
+    // A caller that holds the zoom (`x_range`: { min, max }, or null for the whole period) gets
+    // it applied on every draw. Both bounds are always written, undefined included:
+    // `updateOptions` merges into the live config, where the bounds of the last zoom would
+    // otherwise stay on new data.
+    if (this.props.x_range !== undefined) {
+      // no zoom: the bounds the chart type gave itself (a binary chart), or none
+      const { min, max } = this.props.x_range || options.xaxis;
+      options.xaxis = { ...options.xaxis, min, max };
+    }
+    // Same for the y axis, fitted by the caller on what the zoom shows (`y_range`: bounds and
+    // number of graduations, or null for the scale ApexCharts picks)
+    if (this.props.y_range !== undefined) {
+      const yRange = this.props.y_range || {};
+      options.yaxis = {
+        ...options.yaxis,
+        min: yRange.min,
+        max: yRange.max,
+        tickAmount: yRange.tickAmount
+      };
+    }
+    this.addZoomEvents(options);
     this.addHiddenSeriesEvents(options);
     this.tooltipPositioning.addToOptions(options);
     // markers a caller draws on the chart (ApexCharts `annotations`: xaxis
@@ -250,6 +293,31 @@ class ApexChartComponent extends Component {
       this.chart.render();
     }
   };
+  // Tell the parent the range of the x axis the user zoomed on, null once back on the whole period
+  addZoomEvents(options) {
+    if (!this.props.onZoomChange) {
+      return;
+    }
+    // The zoom the caller holds is the selection dragged on the chart (and what the caller makes
+    // of a pinch). The wheel zoom of ApexCharts is on by default and swallows the wheel: over
+    // the chart, it would zoom instead of scrolling what the chart is in.
+    options.chart.zoom = { ...options.chart.zoom, allowMouseWheelZoom: false };
+    const existingEvents = options.chart.events || {};
+    options.chart.events = {
+      ...existingEvents,
+      zoomed: (chartContext, config) => {
+        if (typeof existingEvents.zoomed === 'function') {
+          existingEvents.zoomed(chartContext, config);
+        }
+        const { xaxis } = config;
+        const zoomed = xaxis && Number.isFinite(xaxis.min) && Number.isFinite(xaxis.max);
+        // a selection of a few pixels would leave a chart with nothing on it
+        this.props.onZoomChange(
+          zoomed ? { min: xaxis.min, max: Math.max(xaxis.max, xaxis.min + MIN_ZOOM_RANGE_IN_MS) } : null
+        );
+      }
+    };
+  }
   // Tell the parent which series are hidden (collapsed through the legend) each time the
   // chart is drawn: after a legend click, after a data refresh (ApexCharts keeps the
   // collapsed series) and when the chart is (re)created (all series visible again).
@@ -298,6 +366,9 @@ class ApexChartComponent extends Component {
     const yAxisUnitDifferent = nextProps.y_axis_unit !== this.props.y_axis_unit;
     const colorsDifferent = nextProps.colors !== this.props.colors;
     const annotationsDifferent = nextProps.annotations !== this.props.annotations;
+    const fillContainerDifferent = nextProps.fill_container !== this.props.fill_container;
+    const xRangeDifferent = nextProps.x_range !== this.props.x_range;
+    const yRangeDifferent = nextProps.y_range !== this.props.y_range;
     if (
       seriesDifferent ||
       chartTypeDifferent ||
@@ -309,7 +380,10 @@ class ApexChartComponent extends Component {
       yAxisFormatterDifferent ||
       yAxisUnitDifferent ||
       colorsDifferent ||
-      annotationsDifferent
+      annotationsDifferent ||
+      fillContainerDifferent ||
+      xRangeDifferent ||
+      yRangeDifferent
     ) {
       this.displayChart();
     }

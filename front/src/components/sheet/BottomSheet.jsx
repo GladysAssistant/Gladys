@@ -50,6 +50,10 @@ const FOCUSABLE =
  * and light panels), rendered on <body> so no backdrop filter of the page can clip it. Closes on
  * Escape, on the backdrop and on its header button; stacks above an already open sheet.
  *
+ * size: 'full' gives the sheet a fixed height (a list whose search must not resize it). 'wide'
+ * makes the dialog of wider screens as wide as the screen allows, with the height of its content,
+ * and 'wide-full' as tall as the screen allows too (a chart read closely).
+ *
  * depth: the position of the sheet in a stack of sheets (0 at the bottom), so a sheet opened from
  * another one covers it.
  *
@@ -445,7 +449,11 @@ class BottomSheet extends Component {
         {...this.backdropDismiss}
       >
         <div
-          class={cx(style.sheet, { [style.sheetFull]: size === 'full' })}
+          class={cx(style.sheet, {
+            [style.sheetFull]: size === 'full',
+            [style.sheetWide]: size === 'wide' || size === 'wide-full',
+            [style.sheetWideFull]: size === 'wide-full'
+          })}
           role="dialog"
           aria-modal="true"
           aria-label={title}
