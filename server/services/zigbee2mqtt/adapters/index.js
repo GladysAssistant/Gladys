@@ -96,10 +96,13 @@ const ADAPTERS_BY_CONFIG_KEY = {
 // without it, Zigbee2mqtt fails to start with "failed to start adapter connection to firmware".
 // The whole deconz family is listed, even at the default value, so that switching from a model to
 // another always rewrites the baudrate instead of keeping the one of the previous coordinator.
+// The Home Assistant Connect ZBT-2 runs at 460800 bauds with hardware flow control: without them,
+// Zigbee2mqtt fails to start with "Failed to start EZSP layer with status=HOST_FATAL_ERROR".
 const SERIAL_OPTIONS_BY_ADAPTER = {
   ConBee: { baudrate: 38400 },
   'ConBee II': { baudrate: 38400 },
   'ConBee III': { baudrate: 115200 },
+  'Home Assistant Connect ZBT-2': { baudrate: 460800, rtscts: true },
   RaspBee: { baudrate: 38400 },
   'RaspBee II': { baudrate: 38400 },
 };
