@@ -328,7 +328,12 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
   const newSerial = { ...serial, port: serialPort, adapter: adapterKey, ...serialOptions };
   // Drop the model-specific settings of a previously selected coordinator: a baudrate left behind
   // by another dongle would prevent the new one from talking to its firmware
-  MANAGED_SERIAL_OPTION_KEYS.filter((key) => !(key in serialOptions)).forEach((key) => delete newSerial[key]);
+  const leftOptionKeys = Object.values(SERIAL_OPTIONS_BY_ADAPTER)
+    .filter((options) => Object.entries(options).every(([key, value]) => serial[key] === value))
+    .flatMap((options) => Object.keys(options));
+  [...MANAGED_SERIAL_OPTION_KEYS, ...leftOptionKeys]
+    .filter((key) => !(key in serialOptions))
+    .forEach((key) => delete newSerial[key]);
 
   const serialChanged =
     Object.keys(newSerial).length !== Object.keys(serial).length ||
