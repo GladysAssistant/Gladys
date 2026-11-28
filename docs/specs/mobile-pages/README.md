@@ -161,8 +161,10 @@ cards**, the pattern of the devices list.
 - A sheet that only holds a field to type in gives it the focus as it opens, keyboard included (a
   text to read out loud). A phone shows its keyboard only for a field focused during the tap, and
   the field of the sheet is not there yet: a stand-in field takes the focus at the tap and hands
-  it to the real one as soon as it is there. A search field over content to browse does not (the
-  search of the music box).
+  it to the real one as soon as it is there. The sheet would give the focus back to that stand-in,
+  gone by then, or with a mouse to `<body>` on Safari, which does not focus a clicked button: the
+  button that opened it takes the focus back instead, whatever the pointer. A search field
+  over content to browse does not (the search of the music box).
 - `ConfirmSheet`: the confirmation of a destructive action — what will happen in one sentence,
   the confirming button (red when destructive, a spinner while it runs), "Cancel". **Nothing is
   deleted, revoked, restored or restarted on a single tap.**

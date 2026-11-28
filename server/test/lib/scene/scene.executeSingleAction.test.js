@@ -462,11 +462,22 @@ describe('scene.executeSingleAction, a text to read out loud on a device', () =>
     last_value_string: null,
     last_value_changed: null,
   };
+  // a text feature takes a text as its value: not one to read out loud
+  const messageFeature = {
+    selector: 'rabbit-message',
+    name: 'Message',
+    device_id: 'device-id-2',
+    category: DEVICE_FEATURE_CATEGORIES.TEXT,
+    type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    last_value: null,
+    last_value_string: null,
+    last_value_changed: null,
+  };
   const rabbit = {
     id: 'device-id-2',
     selector: 'rabbit',
     name: 'Rabbit',
-    features: [notificationFeature, volumeFeature],
+    features: [notificationFeature, volumeFeature, messageFeature],
   };
   // what the devices widget sends
   const command = {
@@ -493,6 +504,7 @@ describe('scene.executeSingleAction, a text to read out loud on a device', () =>
     stateManager.setState('deviceById', 'device-id-2', rabbit);
     stateManager.setState('deviceFeature', 'rabbit-notification', notificationFeature);
     stateManager.setState('deviceFeature', 'rabbit-volume', volumeFeature);
+    stateManager.setState('deviceFeature', 'rabbit-message', messageFeature);
     stateManager.setState('userById', USER_ID, { id: USER_ID, language: 'fr' });
     eventFake = { emit: fake.returns(null), on: fake.returns(null) };
     device = { setValue: fake.resolves(null) };
@@ -556,6 +568,10 @@ describe('scene.executeSingleAction, a text to read out loud on a device', () =>
     {
       name: 'a text for a feature which is not a notification',
       action: { value: 'Hello', device_feature: 'rabbit-volume' },
+    },
+    {
+      name: 'a text for a text feature, which would show it instead of saying it',
+      action: { value: 'Hello', device_feature: 'rabbit-message' },
     },
   ].forEach(({ name, action }) => {
     it(`should refuse ${name}, without asking the voice`, async () => {

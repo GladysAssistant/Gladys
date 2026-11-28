@@ -160,10 +160,24 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
     cy.get('@command.all').should('have.length', 0);
   });
 
-  it('Should be ready to type into with a mouse', () => {
+  it('Should be ready to type into with a mouse, and give the focus back to its button', () => {
     setMouse(true);
     speakButton().click();
     field().should('have.focus');
+    cy.get('[data-cy="sheet-close"]').click();
+    sheet().should('not.exist');
+    speakButton().should('have.focus');
+  });
+
+  it('Should give the focus back to its button with a mouse that does not focus it on click (Safari)', () => {
+    setMouse(true);
+    // a click that does not move the focus, as Safari does on a button: the sheet then remembers
+    // <body> as the element that had the focus when it opened
+    speakButton().then(([button]) => button.click());
+    field().should('have.focus');
+    cy.get('[data-cy="sheet-close"]').click();
+    sheet().should('not.exist');
+    speakButton().should('have.focus');
   });
 
   it('Should be ready to type into on a touch screen too, its keyboard held by a stand-in field', () => {
@@ -175,6 +189,14 @@ describe('Dashboard Devices Box: a text to read out loud', () => {
     cy.get('[data-cy="sheet-close"]').click();
     sheet().should('not.exist');
     cy.get('[data-cy="speak-keyboard-stand-in"]').should('not.exist');
+    // the focus goes back to the button, not to the stand-in which held it at the tap
+    speakButton().should('have.focus');
+    // after a send too
+    speakButton().click();
+    field().type('Hello{enter}');
+    cy.wait('@command');
+    sheet().should('not.exist');
+    speakButton().should('have.focus');
   });
 
   it('Should keep the text and its button above the keyboard of a phone', () => {

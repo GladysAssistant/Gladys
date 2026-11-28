@@ -49,8 +49,11 @@ class MusicPlayNotificationDeviceFeature extends Component {
     this.textField = element;
   };
 
+  setButtonRef = element => {
+    this.button = element;
+  };
+
   openSheet = () => {
-    // with a mouse, the button that opened the sheet gets the focus back when it closes
     const hasMouse = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
     if (!hasMouse) {
       this.dropStandIn();
@@ -141,6 +144,14 @@ class MusicPlayNotificationDeviceFeature extends Component {
       }
       this.dropStandIn();
     }
+    // after the sheet tried (BottomSheet.jsx), whatever closed it: Escape, the cross, a send. The
+    // sheet gives the focus back to what had it when it opened, which is not always the button: on
+    // touch it was the stand-in, gone by then, and Safari does not focus a button clicked with a mouse
+    if (!this.state.open && previousState.open) {
+      if (this.button) {
+        this.button.focus({ preventScroll: true });
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -162,6 +173,7 @@ class MusicPlayNotificationDeviceFeature extends Component {
           <td>{rowName}</td>
           <td class="text-right">
             <button
+              ref={this.setButtonRef}
               type="button"
               onClick={this.openSheet}
               class="btn btn-outline-success btn-sm"
