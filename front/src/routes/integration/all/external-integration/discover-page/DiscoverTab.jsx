@@ -5,9 +5,12 @@ import get from 'get-value';
 import DiscoveredBox from './DiscoveredBox';
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import {
   MobileSectionHeader,
   MobileGroup,
+  MobileRow,
+  MobileSwitch,
   MobileNotice,
   MobileEmptyState,
   BigButton,
@@ -27,22 +30,56 @@ import {
 const matchesSearch = (device, search) =>
   device.name.toLowerCase().includes(search) || device.external_id.toLowerCase().includes(search);
 
+// an added device stays listed while it waits for its "Update" (re-published
+// with a different structure): hiding it would hide the only way to apply it;
+// one added or updated during this visit stays listed too, its "Already added"
+// badge being the confirmation of the click, until the page is loaded again
+const isHidden = (device, addedThisVisit) =>
+  device.created && !device.structure_changed && !(addedThisVisit && addedThisVisit.has(device.external_id));
+
+// the empty state of a list that shows nothing although devices were found.
+// An active search answers first: it matches only hidden devices, or nothing
+// at all; without one, everything is hidden by the toggle
+const getEmptyListTextId = ({ discoveredDevices, filteredDevices, search, hiddenSearchMatch }) => {
+  if (!discoveredDevices || discoveredDevices.length === 0 || filteredDevices.length > 0) {
+    return null;
+  }
+  if (search) {
+    return hiddenSearchMatch
+      ? 'integration.externalIntegration.discover.searchMatchesHiddenDevices'
+      : 'integration.externalIntegration.discover.noSearchResults';
+  }
+  return 'integration.externalIntegration.discover.allDevicesHidden';
+};
+
 const DiscoverTab = ({
   selector,
   integration,
   discoveredDevices,
   deviceSearch,
   searchDevices,
+  hideExistingDevices,
+  toggleHideExistingDevices,
+  addedThisVisit,
   getDiscoveredDevicesStatus,
   scanStatus,
   scanError,
   scan,
   createDevice,
-  isMobile
+  isMobile,
+  intl
 }) => {
   const search = (deviceSearch || '').trim().toLowerCase();
+  const visibleDevices =
+    discoveredDevices && hideExistingDevices
+      ? discoveredDevices.filter(device => !isHidden(device, addedThisVisit))
+      : discoveredDevices;
   const filteredDevices =
-    discoveredDevices && search ? discoveredDevices.filter(device => matchesSearch(device, search)) : discoveredDevices;
+    visibleDevices && search ? visibleDevices.filter(device => matchesSearch(device, search)) : visibleDevices;
+  const hiddenSearchMatch =
+    Boolean(search && hideExistingDevices && discoveredDevices) &&
+    discoveredDevices.some(device => isHidden(device, addedThisVisit) && matchesSearch(device, search));
+  const emptyListTextId = getEmptyListTextId({ discoveredDevices, filteredDevices, search, hiddenSearchMatch });
   const scanning = scanStatus === RequestStatus.Getting;
   // On a phone: the scan as the button of the page, then one row per device found
   // (docs/specs/mobile-pages/integration-devices.md)
@@ -62,6 +99,21 @@ const DiscoverTab = ({
               }
             />
           </BigButton>
+        </div>
+        <div class={integrationMobileStyle.block}>
+          <MobileGroup>
+            <MobileRow
+              title={<Text id="integration.externalIntegration.discover.hideExistingDevices" />}
+              trailing={
+                <MobileSwitch
+                  checked={!!hideExistingDevices}
+                  onChange={toggleHideExistingDevices}
+                  label={get(intl, 'dictionary.integration.externalIntegration.discover.hideExistingDevices')}
+                  dataCy="external-discover-hide-existing"
+                />
+              }
+            />
+          </MobileGroup>
         </div>
         {scanError && (
           <MobileNotice tone="danger" icon="alert-circle" role="alert" data-cy="external-discover-scan-error">
@@ -113,10 +165,10 @@ const DiscoverTab = ({
               )}
             </MobileEmptyState>
           )}
-          {all.length > 0 && shown.length === 0 && (
+          {emptyListTextId && (
             <MobileEmptyState
-              icon="search"
-              text={<Text id="integration.externalIntegration.discover.noSearchResults" />}
+              icon={emptyListTextId === 'integration.externalIntegration.discover.noSearchResults' ? 'search' : 'check'}
+              text={<Text id={emptyListTextId} />}
             />
           )}
         </MobileListLoader>
@@ -153,6 +205,22 @@ const DiscoverTab = ({
           </button>
         </div>
       </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <label class="custom-switch">
+            <input
+              type="checkbox"
+              class="custom-switch-input"
+              checked={!!hideExistingDevices}
+              onClick={toggleHideExistingDevices}
+            />
+            <span class="custom-switch-indicator mr-1" />
+            <span class="custom-switch-description">
+              <Text id="integration.externalIntegration.discover.hideExistingDevices" />
+            </span>
+          </label>
+        </li>
+      </ul>
       <div class="card-body">
         {scanError && (
           <div class="alert alert-danger">
@@ -199,9 +267,9 @@ const DiscoverTab = ({
                 )}
               </div>
             )}
-            {discoveredDevices && discoveredDevices.length > 0 && filteredDevices.length === 0 && (
+            {emptyListTextId && (
               <div class="text-center text-muted py-5">
-                <Text id="integration.externalIntegration.discover.noSearchResults" />
+                <Text id={emptyListTextId} />
               </div>
             )}
           </div>
@@ -211,4 +279,4 @@ const DiscoverTab = ({
   );
 };
 
-export default DiscoverTab;
+export default withIntlAsProp(DiscoverTab);
