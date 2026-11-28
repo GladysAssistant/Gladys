@@ -960,6 +960,7 @@
         "preset": {
           "off": "Arrêt",
           "frost": "Hors-gel",
+          "frostCooling": "Protection",
           "away": "Absence",
           "comfort": "Confort",
           "eco": "Éco",
@@ -967,7 +968,11 @@
         },
         "backToSchedule": "Revenir au planning",
         "resumeFromStopped": "Redémarrer le thermostat",
-        "presetPending": "{{preset}} (appliqué au redémarrage)"
+        "presetPending": "{{preset}} (appliqué au redémarrage)",
+        "use": {
+          "heating": "Chauffage",
+          "cooling": "Climatisation"
+        }
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
@@ -4509,6 +4514,8 @@
         "saveError": "Erreur lors de la sauvegarde.",
         "incompleteVirtualError": "Un thermostat virtuel a besoin d’un capteur de température et d’un actionneur (commutateur ou fil pilote) : c’est en lisant l’un et en actionnant l’autre qu’il régule.",
         "incompleteExternalError": "Un thermostat existant a besoin de la consigne du thermostat à piloter.",
+        "reversibleNoModeError": "Une PAC réversible a besoin du mode de l'appareil, pour que le passage du chauffage à la climatisation lui parvienne.",
+        "reversibleModeCannotCoolError": "Le mode de cet appareil ne peut pas passer en climatisation : une PAC réversible a besoin d'un mode modifiable qui sait aussi refroidir.",
         "incompletePilotWireError": "Un radiateur à fil pilote a besoin du fil pilote à commander.",
         "pilotWireUnreadError": "Le fil pilote choisi n'a pas pu être lu, l'ordre de repos ne peut donc pas être vérifié : rechargez la page et choisissez-le à nouveau.",
         "invertedRangeError": "La température minimale doit être inférieure à la température maximale.",
@@ -4523,6 +4530,8 @@
         "manualDurationUnit": "min",
         "manualDurationHelp": "Durée en minutes avant de revenir automatiquement au planning après une action manuelle.",
         "modeHelp": "Ce que ce thermostat commande : le chauffage ou la climatisation.",
+        "reversibleLabel": "PAC réversible (chauffage et climatisation)",
+        "reversibleHelp": "L'usage ci-dessus est celui en cours : il se change depuis le widget du tableau de bord, une scène ou la télécommande de l'appareil. Chaque preset a une consigne de chauffage et une de climatisation, et le même planning sert dans les deux cas.",
         "sectionDevice": "Appareil",
         "section": {
           "heating": "Chauffage",
@@ -4531,6 +4540,10 @@
         "sectionProgramming": "Programmation",
         "deviceRangeHint": "L’appareil annonce {{min}} – {{max}} °{{unit}}.",
         "deviceRangeApply": "Rester dans cette plage",
+        "rangeUse": {
+          "heating": "Chauffage",
+          "cooling": "Climatisation"
+        },
         "rangeSection": "Plage de températures"
       },
       "schedule": {
@@ -7049,7 +7062,7 @@
         "mode": {
           "off": "Arrêt",
           "heating": "Chauffage",
-          "cooling": "Refroidissement",
+          "cooling": "Climatisation",
           "auto": "Auto"
         },
         "preset": {
@@ -7363,7 +7376,7 @@
         "mode": {
           "0": "Arrêt",
           "1": "Chauffage",
-          "2": "Refroidissement",
+          "2": "Climatisation",
           "3": "Auto"
         },
         "preset": {
