@@ -338,7 +338,9 @@ The action groups of the root level render as a **numbered vertical timeline**:
   gives each step: the desktop card and the mobile row are both matched on it. These events are
   sent to every client, whichever scene runs: an editor ignores those of another scene (and an
   event without a path), or two scenes running at once would mark each other's steps. Actions of
-  a group run at the same time and are each marked on their own.
+  a group run at the same time and are each marked on their own. `scene.finished-executing-action`
+  is sent whenever an action that was marked ends, including when it fails and aborts the scene,
+  so a step never stays marked after the scene stopped.
 - "+ Add a step" (dashed, full width) ends the timeline; a scene with no step shows "Add a first
   step" instead. A hint says rows can be swiped.
 

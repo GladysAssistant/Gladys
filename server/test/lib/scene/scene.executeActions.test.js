@@ -4,7 +4,13 @@ const { assert, fake } = sinon;
 const chaiAssert = require('chai').assert;
 const EventEmitter = require('events');
 const cloneDeep = require('lodash.clonedeep');
-const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const {
+  ACTIONS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  EVENTS,
+  WEBSOCKET_MESSAGE_TYPES,
+} = require('../../../utils/constants');
 const { AbortScene } = require('../../../utils/coreErrors');
 const executeActionsFactory = require('../../../lib/scene/scene.executeActions');
 
@@ -1252,5 +1258,25 @@ describe('scene.executeActions', () => {
       scope,
     );
     assert.notCalled(execute);
+  });
+  it('should tell the UI the action has finished when it aborts the scene', async () => {
+    const messages = [];
+    event.on(EVENTS.WEBSOCKET.SEND_ALL, (message) => messages.push(message));
+    const abortingActionsFunc = {
+      aborting: fake.rejects(new AbortScene('ACTION_FAILED')),
+    };
+    const { executeActions: executeAbortingActions } = executeActionsFactory(abortingActionsFunc);
+    const promise = executeAbortingActions({ event }, [[{ type: 'aborting' }]], { sceneSelector: 'my-scene' });
+    await chaiAssert.isRejected(promise, AbortScene, 'ACTION_FAILED');
+    chaiAssert.deepEqual(messages, [
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.SCENE.EXECUTING_ACTION,
+        payload: { path: '0.0', sceneSelector: 'my-scene' },
+      },
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.SCENE.FINISHED_EXECUTING_ACTION,
+        payload: { path: '0.0', sceneSelector: 'my-scene' },
+      },
+    ]);
   });
 });
